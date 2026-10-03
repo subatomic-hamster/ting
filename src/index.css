@@ -1,0 +1,80 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --color-paper: #f6f7f4;
+  --color-ink: #1d2a2f;
+  --color-muted: #5b6b70;
+  --color-line: #dde3e0;
+  --color-brand-50: #eef7f5;
+  --color-brand-100: #d5ece7;
+  --color-brand-200: #a9d8cf;
+  --color-brand-500: #2f8f80;
+  --color-brand-600: #1f776a;
+  --color-brand-700: #175f55;
+  --color-brand-900: #0e3a34;
+  --color-plan: #2f8f80;       /* plan pays */
+  --color-sched: #8fb8d6;      /* scheduled against the max */
+  --color-roll: #c9b6e4;       /* rollover */
+  --color-save: #1c7c4d;       /* money saved */
+  --color-cost: #b3412f;       /* money added */
+  --color-warn: #b7791f;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  @apply bg-paper text-ink antialiased;
+}
+
+/* Visible keyboard focus everywhere. */
+:focus-visible {
+  outline: 3px solid var(--color-brand-500);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@utility card {
+  @apply rounded-2xl border border-line bg-white p-4 shadow-[0_1px_2px_rgba(16,40,36,0.04)] sm:p-5;
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+}
+@utility btn-primary {
+  @apply btn bg-brand-600 text-white hover:bg-brand-700;
+}
+@utility btn-secondary {
+  @apply btn border border-line bg-white text-ink hover:bg-brand-50;
+}
+@utility btn-ghost {
+  @apply btn text-brand-700 hover:bg-brand-50;
+}
+
+@utility eyebrow {
+  @apply text-xs font-semibold tracking-wide text-muted uppercase;
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

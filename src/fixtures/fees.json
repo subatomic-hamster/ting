@@ -1,0 +1,22 @@
+{
+  "zip": "27401",
+  "isDemoData": true,
+  "note": "Placeholder fees for Greensboro, NC 27401. Not real fee data.",
+  "procedures": [
+    { "cdt": "D0120", "label": "Periodic exam", "serviceClass": "preventive", "feeIn": 60, "feeOut": 85, "feeRange": [50, 75], "keywords": ["exam", "checkup", "check-up", "check up"] },
+    { "cdt": "D0274", "label": "Bitewing X-rays", "serviceClass": "preventive", "feeIn": 90, "feeOut": 120, "feeRange": [75, 110], "keywords": ["x-ray", "xray", "x ray", "bitewing", "radiograph"] },
+    { "cdt": "D1110", "label": "Cleaning", "serviceClass": "preventive", "feeIn": 90, "feeOut": 125, "feeRange": [80, 115], "keywords": ["cleaning", "prophy", "prophylaxis", "hygiene"] },
+    { "cdt": "D1351", "label": "Sealant", "serviceClass": "preventive", "feeIn": 45, "feeOut": 65, "feeRange": [35, 60], "keywords": ["sealant"] },
+    { "cdt": "D4341", "label": "Deep cleaning (per quadrant)", "serviceClass": "basic", "feeIn": 230, "feeOut": 320, "feeRange": [190, 290], "keywords": ["deep cleaning", "scaling", "root planing", "srp"] },
+    { "cdt": "D2392", "label": "Tooth-colored filling", "serviceClass": "basic", "feeIn": 210, "feeOut": 280, "feeRange": [170, 260], "keywords": ["filling", "cavity", "composite"] },
+    { "cdt": "D3330", "label": "Root canal (molar)", "serviceClass": "basic", "feeIn": 1000, "feeOut": 1350, "feeRange": [900, 1200], "keywords": ["root canal", "endo", "endodontic"] },
+    { "cdt": "D2950", "label": "Core buildup", "serviceClass": "major", "feeIn": 280, "feeOut": 360, "feeRange": [230, 340], "keywords": ["buildup", "build-up", "build up", "core"] },
+    { "cdt": "D2740", "label": "Porcelain crown", "serviceClass": "major", "feeIn": 1250, "feeOut": 1600, "feeRange": [1100, 1450], "keywords": ["crown", "cap"] },
+    { "cdt": "D7140", "label": "Simple extraction", "serviceClass": "basic", "feeIn": 180, "feeOut": 240, "feeRange": [150, 220], "keywords": ["extraction", "pull", "pulled"] },
+    { "cdt": "D7240", "label": "Wisdom tooth removal (impacted)", "serviceClass": "basic", "feeIn": 520, "feeOut": 700, "feeRange": [450, 650], "keywords": ["wisdom"] },
+    { "cdt": "D9944", "label": "Night guard", "serviceClass": "major", "feeIn": 450, "feeOut": 650, "feeRange": [350, 600], "keywords": ["night guard", "nightguard", "mouth guard", "grinding", "occlusal guard"] },
+    { "cdt": "D6010", "label": "Implant", "serviceClass": "major", "feeIn": 2200, "feeOut": 3000, "feeRange": [1900, 2800], "keywords": ["implant"] },
+    { "cdt": "D6240", "label": "Bridge (per unit)", "serviceClass": "major", "feeIn": 1150, "feeOut": 1500, "feeRange": [1000, 1400], "keywords": ["bridge", "pontic"] },
+    { "cdt": "D8080", "label": "Braces (comprehensive ortho)", "serviceClass": "ortho", "feeIn": 5500, "feeOut": 6500, "feeRange": [4800, 6800], "keywords": ["braces", "orthodontic", "ortho", "invisalign", "aligners"] }
+  ]
+}
