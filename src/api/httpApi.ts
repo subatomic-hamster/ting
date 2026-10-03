@@ -96,4 +96,6 @@ export const httpApi: TingApi = {
   },
   createShareLink: (scheduleKind) => http('/share', post({ scheduleKind, origin: window.location.origin })),
   resetDemo: () => http('/demo/reset', post({})),
+  scheduleReminder: (reminder) => http('/reminders', post(reminder)),
+  cancelReminder: (reminderId) => http(`/reminders/${encodeURIComponent(reminderId)}`, { method: 'DELETE' }),
 };

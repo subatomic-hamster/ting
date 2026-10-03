@@ -6,6 +6,7 @@
 
 import type { CompileResult } from '../compiler/compile';
 import type { ExplainedStep } from '../engine/explain';
+import type { Reminder } from '../engine/reminders';
 import type { AdjudicatedLine, Ledger, PlanRules, Profile } from '../engine/types';
 import type { DocumentKind } from '../intake/classify';
 import type { IntakeItem } from '../intake/types';
@@ -39,6 +40,13 @@ export interface TraceEvent {
   ms: number;
 }
 
+export interface ScheduledReminder {
+  reminderId: string;
+  sendOn: string;
+  /** Where it will be delivered: in the app (mock), or email too once SES is wired. */
+  channels: ('in_app' | 'email')[];
+}
+
 export interface TingApi {
   getSession(): Promise<Session>;
   /** Plan options at open enrollment, including waiving coverage and the dentist's membership plan. */
@@ -59,6 +67,12 @@ export interface TingApi {
   createShareLink(scheduleKind: string): Promise<{ url: string; expiresAt: string }>;
   /** Demo control: forget this member's claims so the next session starts clean. */
   resetDemo(): Promise<void>;
+  /**
+   * Year-end reminder from engine/reminders (EventBridge Scheduler + SES in AWS, where the Lambda can rebuild
+   * the text with buildReminders at send time). Scheduling the same reminder id again replaces it.
+   */
+  scheduleReminder(reminder: Reminder): Promise<ScheduledReminder>;
+  cancelReminder(reminderId: string): Promise<void>;
 }
 
 const runtime = typeof window === 'undefined' ? undefined : window.TING_CONFIG;
@@ -86,6 +100,7 @@ function describe(value: unknown): string {
     if (Array.isArray(v.items) && typeof v.kind === 'string') return `${v.kind}: ${v.items.length} items`;
     if (Array.isArray(v.history)) return `${v.history.length} services`;
     if (typeof v.url === 'string') return 'link created';
+    if (typeof v.reminderId === 'string' && typeof v.sendOn === 'string') return `reminder scheduled for ${v.sendOn}`;
     if (typeof v.name === 'string') return `signed in as ${v.name}`;
   }
   return 'ok';

@@ -7,6 +7,8 @@ export interface IcsEvent {
   title: string;
   date: string; // ISO date; exported as an all-day event
   description?: string;
+  /** iCalendar alarm trigger, relative to the start of the day (default: the day before). */
+  alarm?: string;
 }
 
 const esc = (s: string) => s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
@@ -31,7 +33,7 @@ export function buildIcs(events: IcsEvent[], calendarName = 'Ting dental plan'):
       `SUMMARY:${esc(e.title)}`,
       ...(e.description ? [`DESCRIPTION:${esc(e.description)}`] : []),
       'BEGIN:VALARM',
-      'TRIGGER:-P1D',
+      `TRIGGER:${e.alarm ?? '-P1D'}`,
       'ACTION:DISPLAY',
       `DESCRIPTION:${esc(e.title)}`,
       'END:VALARM',

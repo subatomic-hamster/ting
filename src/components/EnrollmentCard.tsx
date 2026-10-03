@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { leftOnTable } from '../engine/helpers';
+import { useReminderSchedule } from '../hooks/useReminderSchedule';
 import { formatDate, formatMoney, formatPercent, procedureName } from '../lib/format';
 import { downloadIcs, type IcsEvent } from '../lib/ics';
 import { useActive, useComparison, useProfile } from '../store';
@@ -17,7 +17,7 @@ export function EnrollmentCard({ variant = 'full' }: { variant?: 'compact' | 'fu
   const { card } = useComparison();
   const profile = useProfile();
   const active = useActive();
-  const [reminded, setReminded] = useState(false);
+  const reminders = useReminderSchedule();
   const { choice, fsa } = card;
 
   const actions: Action[] = [
@@ -98,12 +98,24 @@ export function EnrollmentCard({ variant = 'full' }: { variant?: 'compact' | 'fu
             <CalendarIcon /> Add to calendar
           </button>
           <ShareWithDentist compact />
-          <button type="button" className="btn-secondary" aria-pressed={reminded} onClick={() => setReminded((r) => !r)}>
-            <BellIcon /> {reminded ? 'Reminder set' : 'Remind me'}
+          <button
+            type="button"
+            className="btn-secondary"
+            aria-pressed={reminders.on}
+            disabled={reminders.toggle.isPending}
+            onClick={() => reminders.toggle.mutate()}
+          >
+            <BellIcon /> {reminders.toggle.isPending ? 'Saving…' : reminders.on ? 'Reminders on' : 'Remind me'}
           </button>
-          {reminded && (
+          {reminders.on && (
             <p className="w-full text-xs text-muted" role="status">
-              We'll remind you a week before each date (demo: no messages are sent).
+              {reminders.reminders.length
+                ? `We'll remind you on ${reminders.reminders.map((r) => formatDate(r.sendOn)).join(', ')} before this year's benefits expire. `
+                : "Nothing is set to expire unused this year, so there's nothing to remind you about yet. "}
+              <Link to="/" className="underline">
+                See them on your dashboard
+              </Link>
+              .
             </p>
           )}
         </div>

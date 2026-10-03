@@ -64,11 +64,12 @@ The API seam returns the engine's types, so the AWS backend runs the same `src/e
 | Bedrock intake | `TingApi.parseDescription` | `parseDescription` in `src/intake/describe.ts` | `IntakeItem[]` with candidate codes, teeth and confidence |
 | Textract | `TingApi.readDocument` / `OcrProvider` in `src/services/ocr.ts` | `localOcr` (tesseract.js), `pdfText` | Text plus parsed treatment-plan items |
 | EventBridge claims feed | `TingApi.subscribeLedger` → `applyClaim` in `src/engine/ledger.ts` | `fireMockClaim` in the demo panel | Events validated by `claimEventSchema`; idempotent per `claimId` |
+| EventBridge Scheduler + SES reminders | `TingApi.scheduleReminder` / `cancelReminder` | in-memory schedule in `mockApi.ts`; the app shows due reminders itself (`ReminderToast`) | `Reminder` from `buildReminders` in `src/engine/reminders.ts`; same `id` replaces. The Lambda can rebuild the text with `buildReminders` at send time |
 | DynamoDB | `getPlans` / `getLedger` | persona data in `src/data/` | `PlanRules[]` and `Ledger` from `src/engine/types.ts` |
 
 The AWS backend is in `backend/` (Lambdas that import the same `src/` code) and `infra/` (one CDK stack). From `infra/`: `npm ci && npm run deploy`, then `node smoke.mjs` to test prod. The deployed site reads its API and WebSocket URLs from `config.js`, which the stack writes; locally, set `VITE_USE_MOCKS=false` and `VITE_API_URL` / `VITE_WS_URL`.
 
-Engine entry points for Lambda: `optimize(profile, { nextPlan, horizon })`, `evaluateSchedule(profile, placements)`, `compare(profile, planOptions)`, `applyClaim(profile, event)`.
+Engine entry points for Lambda: `optimize(profile, { nextPlan, horizon })`, `evaluateSchedule(profile, placements)`, `compare(profile, planOptions)`, `applyClaim(profile, event)`, `buildReminders(profile, schedule)`.
 
 ### Known limits
 
@@ -84,7 +85,7 @@ Engine entry points for Lambda: `optimize(profile, { nextPlan, horizon })`, `eva
 3. In **When to do it**, compare Cheapest / Balanced / Fastest, then drag **Crown (porcelain) on #30** across the bold **Dec 31** line. The floating delta shows the recompute time in milliseconds. The root canal is locked (urgent). The keyboard works too: ← → moves a week, Shift + ← → moves a month.
 4. Flip the **In-network / Out** toggle in the top bar. Every number changes, including the balance bill.
 5. In the demo panel, click **Fire mock claim**. Lincoln's EOB for the root canal arrives; it's checked against Ting's estimate, and the max gauge, schedule and activity feed update live.
-6. Click **Simulate Dec 1** and go to the **Dashboard**. The "Left on the table" year-end banner appears.
+6. On the **Dashboard**, under **Scheduled reminders**, click **Remind me**: Nov 1, Dec 1 and (with a grace-period FSA) 10 days before the FSA deadline, each with the engine's amounts. **Add to calendar** downloads them as .ics. Then click **Simulate Dec 1**: the Dec 1 reminder fires in the app (and as a browser notification if allowed), it shows as "Due now", and the "Left on the table" year-end banner appears.
 7. Go to **/enroll** for the Enrollment Card: plan choice, FSA election, what to do before Dec 31 and what waits until January, and expected savings. Try **Add to calendar** (.ics) and **Share with my dentist** (opens the printable `/share/:token` page).
 
 8. Go to **/plan** and upload the **sample benefits summary (PDF)**. The compiler reads it into rules, asks the one thing the document doesn't say, and stamps the approved version.

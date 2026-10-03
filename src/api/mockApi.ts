@@ -11,7 +11,7 @@ import { addDays, todayISO } from '../lib/dates';
 import { localOcr } from '../services/ocr';
 import { pdfText } from '../services/pdf';
 import { apiContext as mock } from './context';
-import type { TingApi } from './index';
+import type { ScheduledReminder, TingApi } from './index';
 import { mockClaimEvent } from './mockClaim';
 
 const latency = () => new Promise<void>((r) => setTimeout(r, 300 + Math.random() * 500));
@@ -26,6 +26,14 @@ async function fileText(file: File): Promise<string> {
 // --- ledger events ------------------------------------------------------------
 
 const ledgerListeners = new Set<(e: unknown) => void>();
+
+/** Scheduled reminders, by member. In mock mode the app itself shows them when they come due. */
+const reminders = new Map<string, Map<string, ScheduledReminder>>();
+const remindersFor = () => {
+  const member = PERSONAS[mock.personaId].memberId;
+  if (!reminders.has(member)) reminders.set(member, new Map());
+  return reminders.get(member)!;
+};
 
 export const mockApi: TingApi = {
   async getSession() {
@@ -83,4 +91,16 @@ export const mockApi: TingApi = {
   },
 
   async resetDemo() {},
+
+  async scheduleReminder(reminder) {
+    await latency();
+    const scheduled: ScheduledReminder = { reminderId: reminder.id, sendOn: reminder.sendOn, channels: ['in_app'] };
+    remindersFor().set(reminder.id, scheduled);
+    return scheduled;
+  },
+
+  async cancelReminder(reminderId) {
+    await latency();
+    remindersFor().delete(reminderId);
+  },
 };

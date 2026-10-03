@@ -1,11 +1,12 @@
 import { create } from 'zustand';
-import type { TraceEvent } from './api';
+import type { ScheduledReminder, TraceEvent } from './api';
 import { configureApi } from './api/context';
 import { DEMO_PLAN_OPTIONS } from './data/demo';
 import { isPersonaId, PERSONAS, type PersonaId } from './data/personas';
 import { round2 } from './engine/adjudicate';
 import { compare } from './engine/compare';
 import { applyClaim as applyClaimEvent, claimEventSchema } from './engine/ledger';
+import { buildReminders, reminderStatus } from './engine/reminders';
 import { dentistQuestions, evaluateSchedule, optimize, validatePlacements, type PlannedSchedule } from './engine/schedule';
 import type { FeeTable, Ledger, Placement, PlannedProcedure, PlanRules, Profile, ServiceRecord } from './engine/types';
 import { clampDate, endOfYear, todayISO, yearOf } from './lib/dates';
@@ -49,6 +50,9 @@ export interface AppState {
   liveClaimIds: string[];
   claimChecks: ClaimCheck[];
   lastChange: LastChange | null;
+  /** Year-end reminders the member opted into (null: not opted in). */
+  scheduledReminders: ScheduledReminder[] | null;
+  dismissedReminders: string[];
 
   loadPersona: (id: PersonaId) => void;
   reset: () => void;
@@ -67,6 +71,8 @@ export interface AppState {
   removeProcedure: (id: string) => void;
   applyClaim: (event: unknown) => void;
   addTrace: (e: TraceEvent) => void;
+  setScheduledReminders: (scheduled: ScheduledReminder[] | null) => void;
+  dismissReminder: (id: string) => void;
 }
 
 const MAX_TRACE = 200;
@@ -93,6 +99,8 @@ function personaState(id: PersonaId, asOf: string) {
     liveClaimIds: [],
     claimChecks: [],
     lastChange: null,
+    scheduledReminders: null,
+    dismissedReminders: [],
   };
 }
 
@@ -271,6 +279,17 @@ export const useAppStore = create<AppState>()((set, get) => {
     },
 
     addTrace: (e) => set((s) => ({ trace: [...s.trace, e].slice(-MAX_TRACE) })),
+
+    setScheduledReminders: (scheduled) => {
+      set({ scheduledReminders: scheduled, dismissedReminders: [] });
+      pushTrace({
+        tool: 'reminders',
+        summary: scheduled ? `${scheduled.length} year-end reminder(s) scheduled` : 'Year-end reminders turned off',
+        ms: 0,
+      });
+    },
+
+    dismissReminder: (id) => set((s) => ({ dismissedReminders: [...s.dismissedReminders, id] })),
   };
 });
 
@@ -337,11 +356,18 @@ const comparisonFor = memo((profile: Profile, plans: PlanRules[]) =>
   ),
 );
 
+const remindersFor = memo((profile: Profile, active: ActiveSchedule) => {
+  const reminders = buildReminders(profile, active);
+  return { reminders, status: reminderStatus(reminders, profile.asOf) };
+});
+
 export const selectOptimized = (s: AppState) => optimizeFor(s.profile);
 export const selectActive = (s: AppState) => activeFor(s.profile, s.scheduleKind, s.custom);
 export const selectComparison = (s: AppState) => comparisonFor(s.profile, s.plans);
+export const selectReminders = (s: AppState) => remindersFor(s.profile, selectActive(s));
 
 export const useOptimized = () => useAppStore(selectOptimized);
 export const useActive = () => useAppStore(selectActive);
 export const useComparison = () => useAppStore(selectComparison);
+export const useReminders = () => useAppStore(selectReminders);
 export const useProfile = () => useAppStore((s) => s.profile);
