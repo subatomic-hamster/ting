@@ -11,8 +11,10 @@ const NAV = [
   { to: '/treatment', label: 'Treatment' },
   { to: '/enroll', label: 'Enroll' },
   { to: '/dentists', label: 'Dentists' },
+  { to: '/habits', label: 'SmileStreak' },
   { to: '/onboarding', label: 'Get started' },
   { to: '/admin', label: 'Employer' },
+  { to: '/program', label: 'Lincoln view' },
 ];
 
 export function AppShell() {

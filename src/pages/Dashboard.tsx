@@ -10,6 +10,8 @@ import { SamplePlanNote } from '../components/SamplePlanNote';
 import { PageHeader, Section } from '../components/Section';
 import { Timeline } from '../components/Timeline';
 import { PERSONAS } from '../fixtures/personas';
+import { useSmileStreak } from '../habits/hooks';
+import { useHabitStore } from '../habits/store';
 import { isEnrollmentWindow } from '../lib/dates';
 import { formatDate, formatMoney } from '../lib/format';
 import { selectPlan, useAppStore, useResult } from '../store';
@@ -20,6 +22,8 @@ export default function Dashboard() {
   const plan = useAppStore(selectPlan);
   const result = useResult();
   const gauge = result.gauges[0];
+  const optedIn = useHabitStore((s) => s.consent.optedIn);
+  const smile = useSmileStreak();
 
   return (
     <div className="space-y-5">
@@ -49,6 +53,23 @@ export default function Dashboard() {
           </div>
         </Section>
       </div>
+
+      <Section
+        title="SmileStreak"
+        id="smilestreak"
+        actions={<Link to="/habits" className="btn-ghost">{optedIn ? 'Open' : 'Learn more'}</Link>}
+      >
+        {optedIn ? (
+          <p className="text-sm">
+            <strong className="tabular">{formatMoney(smile.rewards.earned)}</strong> earned of {formatMoney(smile.rewards.cap)} ·{' '}
+            <strong className="tabular">{smile.streak}</strong>-day brushing streak
+          </p>
+        ) : (
+          <p className="text-sm text-muted">
+            Opt in to share smart-brush data and earn up to {formatMoney(smile.rewards.cap)} a year. Your cleanings already count. Rewards only.
+          </p>
+        )}
+      </Section>
 
       <Section title="Treatment timeline" id="timeline" actions={<Link to="/treatment" className="btn-ghost">Details</Link>}>
         <Timeline compact />
