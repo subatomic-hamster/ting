@@ -32,7 +32,7 @@ export function PlanRulesScreen({ ctx }: { ctx: Ctx }) {
       setApproved(undefined);
       setStatus(
         r.questions.length
-          ? `Read ${file.name}. ${r.questions.length} thing${r.questions.length === 1 ? '' : 's'} the document doesn't say; Ting won't guess them.`
+          ? `Read ${file.name}. The document doesn't say ${r.questions.length === 1 ? 'one thing' : `${r.questions.length} things`}, and Ting won't guess.`
           : `Read ${file.name}. Every rule was found in the document.`,
       );
     } catch (err) {

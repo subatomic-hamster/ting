@@ -120,6 +120,7 @@ nav.tabs {
   gap: 4px;
   margin-top: 12px;
   overflow-x: auto;
+  scrollbar-width: none;
 }
 nav.tabs button {
   background: none;
@@ -627,6 +628,10 @@ select {
   }
   .tl-name {
     grid-column: 1 / -1;
+  }
+  .tl-axis > span:first-child,
+  .tl-tick {
+    display: none;
   }
   .panel {
     padding: 16px;

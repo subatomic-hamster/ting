@@ -2,6 +2,7 @@ import { useDeferredValue, useMemo, useState } from 'react';
 import { compare, type Comparison } from '../engine/compare';
 import { evaluateSchedule, optimize, type OptimizeResult } from '../engine/schedule';
 import type { Placement, PlanRules, ScheduleEvaluation } from '../engine/types';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { AddWork } from './screens/AddWork';
 import { ComparePlans } from './screens/ComparePlans';
 import { Decisions } from './screens/Decisions';
@@ -72,6 +73,7 @@ export function App() {
         </div>
       </header>
       <main>
+        <ErrorBoundary resetKey={tab}>
         {!state.onboarded ? (
           <Onboarding ctx={ctx} />
         ) : tab === 'decisions' ? (
@@ -85,6 +87,7 @@ export function App() {
         ) : (
           <PlanRulesScreen ctx={ctx} />
         )}
+        </ErrorBoundary>
       </main>
     </>
   );
