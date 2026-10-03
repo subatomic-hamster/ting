@@ -151,11 +151,11 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
               ))}
               {/* today */}
               <div className="absolute inset-y-0 border-l border-dashed border-brand-500" style={{ left: `${asOfPct}%` }} aria-hidden>
-                <span className="absolute top-1 left-1 rounded bg-brand-500 px-1 text-[10px] font-semibold text-white">{asOf === today ? 'Today' : 'As of'}</span>
+                <span className="absolute top-1 right-1 rounded bg-brand-500 px-1 text-[10px] font-semibold whitespace-nowrap text-white">{asOf === today ? 'Today' : 'As of'}</span>
               </div>
               {/* Dec 31 */}
               <div className="absolute inset-y-0 w-[3px] -translate-x-1/2 bg-ink" style={{ left: `${boundaryPct}%` }} aria-hidden>
-                <span className="absolute bottom-1 left-2 rounded bg-ink px-1.5 py-0.5 text-[10px] font-semibold whitespace-nowrap text-white">
+                <span className="absolute top-1 left-2 rounded bg-ink px-1.5 py-px text-[10px] font-semibold whitespace-nowrap text-white">
                   Dec 31 · max resets
                 </span>
               </div>
