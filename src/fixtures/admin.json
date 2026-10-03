@@ -1,0 +1,12 @@
+{
+  "isDemoData": true,
+  "employer": "Acme Manufacturing",
+  "groups": [
+    { "id": "g1", "title": "Members who scheduled across plan years", "metric": "34%", "detail": "of members with major work moved part of it into January.", "n": 212 },
+    { "id": "g2", "title": "Annual max reached", "metric": "11%", "detail": "of members hit their annual maximum this year.", "n": 640 },
+    { "id": "g3", "title": "Unused preventive cleanings", "metric": "1,180", "detail": "covered cleanings not yet used with 3 months left.", "n": 640 },
+    { "id": "g4", "title": "FSA dollars at risk", "metric": "$41k", "detail": "in dental-eligible FSA balances not yet scheduled.", "n": 188 },
+    { "id": "g5", "title": "Night shift — Plant 3", "metric": "—", "detail": "Ortho usage", "n": 14 },
+    { "id": "g6", "title": "Interns", "metric": "—", "detail": "Plan choice", "n": 9 }
+  ]
+}
