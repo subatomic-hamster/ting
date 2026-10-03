@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useBootstrap } from '../hooks/useBootstrap';
 import { AuditDrawer } from './AuditDrawer';
+import { ErrorBoundary } from './ErrorBoundary';
 import { DemoPanel } from './DemoPanel';
 import { EstimateFooter } from './EstimateFooter';
 import { TopBar } from './TopBar';
@@ -11,6 +12,7 @@ const NAV = [
   { to: '/treatment', label: 'Treatment' },
   { to: '/enroll', label: 'Enroll' },
   { to: '/dentists', label: 'Dentists' },
+  { to: '/plan', label: 'Plan rules' },
   { to: '/onboarding', label: 'Get started' },
   { to: '/admin', label: 'Employer' },
 ];
@@ -18,6 +20,7 @@ const NAV = [
 export function AppShell() {
   const { session } = useBootstrap();
   const [auditOpen, setAuditOpen] = useState(false);
+  const { pathname } = useLocation();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -45,7 +48,9 @@ export function AppShell() {
         </ul>
       </nav>
       <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 py-5 sm:px-6 sm:py-8">
-        <Outlet />
+        <ErrorBoundary resetKey={pathname}>
+          <Outlet />
+        </ErrorBoundary>
       </main>
       <EstimateFooter />
       <AuditDrawer open={auditOpen} onClose={() => setAuditOpen(false)} />
