@@ -7,6 +7,7 @@
 import type { CompileResult } from '../compiler/compile';
 import type { ExplainedStep } from '../engine/explain';
 import type { AdjudicatedLine, Ledger, PlanRules, Profile } from '../engine/types';
+import type { DocumentKind } from '../intake/classify';
 import type { IntakeItem } from '../intake/types';
 import { httpApi } from './httpApi';
 import { mockApi } from './mockApi';
@@ -18,7 +19,7 @@ export interface Session {
   role: 'member' | 'employer_admin' | 'lincoln_analyst';
 }
 
-export type DocumentKind = 'treatment_plan' | 'plan_summary' | 'insurance_card' | 'unknown';
+export type { DocumentKind };
 
 export interface ReadDocument {
   docId: string;
@@ -56,9 +57,12 @@ export interface TingApi {
   /** Demo control: Lincoln's mock claims feed emits an EOB for the next planned procedure. */
   fireMockClaim(profile: Profile): Promise<void>;
   createShareLink(scheduleKind: string): Promise<{ url: string; expiresAt: string }>;
+  /** Demo control: forget this member's claims so the next session starts clean. */
+  resetDemo(): Promise<void>;
 }
 
-export const USE_MOCKS = import.meta.env.VITE_USE_MOCKS !== 'false';
+const runtime = typeof window === 'undefined' ? undefined : window.TING_CONFIG;
+export const USE_MOCKS = runtime?.useMocks ?? import.meta.env.VITE_USE_MOCKS !== 'false';
 
 // --- audit trail: every call is timed and reported to listeners -------------
 

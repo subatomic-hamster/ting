@@ -66,7 +66,7 @@ The API seam returns the engine's types, so the AWS backend runs the same `src/e
 | EventBridge claims feed | `TingApi.subscribeLedger` → `applyClaim` in `src/engine/ledger.ts` | `fireMockClaim` in the demo panel | Events validated by `claimEventSchema`; idempotent per `claimId` |
 | DynamoDB | `getPlans` / `getLedger` | persona data in `src/data/` | `PlanRules[]` and `Ledger` from `src/engine/types.ts` |
 
-Set `VITE_USE_MOCKS=false` and `VITE_API_URL` / `VITE_WS_URL` to use the AWS backend. Endpoint paths in `httpApi.ts` are placeholders until the AWS side publishes them.
+The AWS backend is in `backend/` (Lambdas that import the same `src/` code) and `infra/` (one CDK stack). From `infra/`: `npm ci && npm run deploy`, then `node smoke.mjs` to test prod. The deployed site reads its API and WebSocket URLs from `config.js`, which the stack writes; locally, set `VITE_USE_MOCKS=false` and `VITE_API_URL` / `VITE_WS_URL`.
 
 Engine entry points for Lambda: `optimize(profile, { nextPlan, horizon })`, `evaluateSchedule(profile, placements)`, `compare(profile, planOptions)`, `applyClaim(profile, event)`.
 

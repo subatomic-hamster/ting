@@ -85,7 +85,7 @@ export function DemoPanel() {
         <button
           type="button"
           className="btn-primary px-2 py-1.5 text-xs"
-          disabled={fire.isPending || !USE_MOCKS}
+          disabled={fire.isPending}
           onClick={() => fire.mutate()}
         >
           {fire.isPending ? 'Sending…' : fire.isError ? 'Nothing left to claim' : 'Fire mock claim'}
@@ -95,7 +95,7 @@ export function DemoPanel() {
           className="btn-secondary px-2 py-1.5 text-xs"
           onClick={() => {
             reset();
-            void queryClient.invalidateQueries();
+            void api.resetDemo().finally(() => queryClient.invalidateQueries());
             navigate('/');
           }}
         >

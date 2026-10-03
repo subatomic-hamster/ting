@@ -383,6 +383,9 @@ export function compilePlanText(text: string): CompileResult {
 
 export const localCompiler: PlanCompiler = { compile: async (text) => compilePlanText(text) };
 
+/** Questions for whatever a draft still doesn't say. */
+export const questionsFor = (draft: DraftRules): CompilerQuestion[] => missingPaths(draft).map(questionFor);
+
 // ---------- answers, finalize, approve ----------
 
 function coerce(field: AnswerPath, raw: Answer): unknown {

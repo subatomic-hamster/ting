@@ -9,3 +9,8 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+/** Written by the AWS stack at deploy time (public/config.js locally). Wins over the VITE_* build settings. */
+interface Window {
+  TING_CONFIG?: { useMocks?: boolean; apiUrl?: string; wsUrl?: string };
+}

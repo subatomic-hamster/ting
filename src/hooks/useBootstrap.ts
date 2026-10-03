@@ -36,7 +36,7 @@ export function useBootstrap() {
       console.warn(err);
       return undefined;
     }
-  }, [applyClaim]);
+  }, [applyClaim, personaId]);
 
   return { session: session.data };
 }

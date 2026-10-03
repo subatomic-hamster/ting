@@ -14,10 +14,15 @@ npx vitest run src/engine/engine.test.ts                # one file
 npx vitest run src/engine/engine.test.ts -t "optimizer" # tests whose name matches
 npm run lint         # ESLint
 npm run typecheck    # tsc -b
-npm run build        # tsc -b && vite build into dist/ (Amplify Hosting runs this, see amplify.yml)
+npm run build        # tsc -b && vite build into dist/
+
+# AWS (from infra/, with AWS_PROFILE=ting-aws AWS_REGION=us-west-2)
+npm ci               # infra has its own package.json (CDK)
+npm run deploy       # builds the web app, then cdk deploy; writes infra/outputs.json
+node smoke.mjs       # prod smoke test: every route, Bedrock, Textract, claim → WebSocket round trip
 ```
 
-`VITE_USE_MOCKS=true`, the default, runs everything in the browser on demo data. Set it to `false`, along with `VITE_API_URL` and `VITE_WS_URL`, to use the AWS backend (see `.env.example`).
+Locally, `VITE_USE_MOCKS=true` (the default) runs everything in the browser on demo data. The deployed site gets its settings from `config.js`: the stack writes `window.TING_CONFIG` (useMocks false, API and WebSocket URLs) at deploy time, and those settings win over the `VITE_*` values.
 
 ## Architecture
 
@@ -30,9 +35,28 @@ Stack: React 18, Vite, Tailwind 4, Zustand, React Query and zod.
   - `useComparison()` gives the plan options, tipping points, FSA amount and Enrollment Card.
   - Dragging a visit only re-prices the schedule; the optimizer and comparison rerun when the profile changes.
 - **`src/api/index.ts` is the seam between the UI and the backend.** It defines the `TingApi` interface, which returns engine types, and has two implementations: `mockApi.ts` runs in the browser and `httpApi.ts` calls AWS.
-  - Each AWS service sits behind an interface with a local stand-in: `Explainer`, `PlanCompiler`, `OcrProvider` (tesseract.js and pdf.js), `parseDescription` and `applyClaim`.
-  - AWS work means implementing those interfaces and keeping the UI unchanged. The `httpApi.ts` endpoint paths are placeholders.
+  - Both read the demo persona and "as of" date from `src/api/context.ts`; `httpApi` sends them as `?persona=&asOf=` (stand-in for a Cognito session).
   - Every API call is recorded in the audit trail shown in the audit drawer.
+- **`backend/src/` is the AWS side.** Its Lambdas import the same `src/` code, and esbuild bundles them through CDK:
+  - `api.ts` handles the HTTP API routes.
+  - `ws.ts` handles the WebSocket `$connect`, `$disconnect` and `replay`.
+  - `claims.ts` is the EventBridge target.
+- **Bedrock in `backend/src/ai/` only translates or fills gaps.** Tested code still decides:
+  - `describe.ts`: the model rewrites free text (including Spanish) into phrases `parseDescription` knows, and the parser assigns codes and probabilities.
+  - `compile.ts`: the model may fill only fields the regex compiler left as questions, and only with a quote that is checked to appear in the document.
+  - `explain.ts`: a rewritten sentence is used only if it keeps every template amount and passes `verifyNumbers`; otherwise the template is shown.
+  - Every Bedrock failure falls back to the local code.
+- **The claims feed:**
+  - `POST /mock/claims` → EventBridge bus `ting-claims` → `claims.ts`, which stores the claim in DynamoDB and pushes it to the member's sockets.
+  - On connect, the client sends `replay` and gets its stored claims back, so state survives a reload.
+  - `POST /demo/reset` clears a member's claims.
+- **Documents:** the browser uploads to S3 with a presigned URL, then Textract runs `DetectDocumentText`. `backend/src/lib/layout.ts` rebuilds table rows from line positions. Multi-page PDFs fall back to the PDF's text layer in the browser.
+- **`infra/lib/ting-stack.ts` is one CDK stack:**
+  - DynamoDB single table (`pk`/`sk`/`ttl`).
+  - S3 buckets for documents and the site.
+  - The HTTP API and the WebSocket API.
+  - The EventBridge bus.
+  - CloudFront with a viewer function for single-page-app routing.
 - **Other directories:**
   - `src/intake/`: parsers for typed descriptions, treatment plans and insurance cards, plus the value-of-information questions.
   - `src/compiler/`: benefits summary → `PlanRules`. The schema is in `schema.ts`, and `planRulesJsonSchema` is ready for Bedrock structured output.
@@ -62,12 +86,16 @@ Stack: React 18, Vite, Tailwind 4, Zustand, React Query and zod.
 - **Account:** AWS Workshop Studio event account `648616106975`, Region **us-west-2**. The CLI profile is **`ting-aws`**, so pass `--profile ting-aws` or set `AWS_PROFILE=ting-aws`.
 - **Credentials:** temporary. They come from the event's "Get AWS CLI credentials" page and expire, so get fresh ones and rewrite the `ting-aws` profile in `~/.aws/credentials` when they do. The account itself goes away when the event ends, so treat it as disposable and keep everything reproducible as infrastructure as code.
 - **Role:** `WSParticipantRole`, with `ReadOnlyAccess`, `AmazonBedrockFullAccess` and an event policy (`ws-default-policy`). It can't request quota increases.
+- **Deployed (stack `Ting`):** web https://d3tknbg8ry7x3q.cloudfront.net, API https://j3xj75kqwl.execute-api.us-west-2.amazonaws.com, WebSocket wss://yga09xsli5.execute-api.us-west-2.amazonaws.com/prod. `infra/outputs.json` has the current values.
 - **What works (checked 2026-10-03):**
-  - Bedrock models: Claude Sonnet 5.5 (`us.anthropic.claude-sonnet-5-5`), Haiku 4.5 (`us.anthropic.claude-haiku-4-5-20251001-v1:0`), Mistral Large 3, Nova Lite and gpt-oss-120b.
+  - Claude models: Haiku 4.5 (`us.anthropic.claude-haiku-4-5-20251001-v1:0`, the fast model), Sonnet 5 (`us.anthropic.claude-sonnet-5`, the smart model), Sonnet 4.6, and Opus 4.6 and 4.8.
+  - Sonnet 5 rejects `temperature`, so don't send it.
+  - Other models: Mistral Large 3, Nova Lite, gpt-oss-120b.
   - Automated Reasoning and Guardrails.
-  - Textract, Transcribe, Lambda (400 concurrent runs), API Gateway, EventBridge and Scheduler, Step Functions, DynamoDB, S3, Cognito, SES, CloudFormation, Route 53 and CloudFront.
+  - Textract, Transcribe, Lambda (400 concurrent runs), API Gateway, EventBridge rules, Step Functions, DynamoDB, S3, Cognito, SES, CloudFormation, Route 53 and CloudFront.
 - **What's blocked:**
-  - Claude Opus 5.5 is denied by the event's private Marketplace.
+  - Claude Sonnet 5.5 and Opus 5.5 are denied by the event's private Marketplace. Sonnet 5.5 worked once and then started failing.
+  - EventBridge Scheduler (`scheduler:*`) isn't in the event policy, so use EventBridge rules for notifications.
   - Location Service (`geo-places`) is denied, so the F5 map needs another approach or AWS staff approval.
   - The G/VT GPU quota is 0, so the Winnow g5.2xlarge can't launch until AWS staff raise it.
   - SES is in the sandbox, so it can only send to verified addresses.

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { TraceEvent } from './api';
-import { configureMock } from './api/mockApi';
+import { configureApi } from './api/context';
 import { DEMO_PLAN_OPTIONS } from './data/demo';
 import { isPersonaId, PERSONAS, type PersonaId } from './data/personas';
 import { round2 } from './engine/adjudicate';
@@ -104,7 +104,7 @@ function initialPersona(): PersonaId {
 
 export const useAppStore = create<AppState>()((set, get) => {
   const first = initialPersona();
-  configureMock({ personaId: first, asOf: todayISO() });
+  configureApi({ personaId: first, asOf: todayISO() });
 
   const pushTrace = (e: Omit<TraceEvent, 'ts'>) =>
     set((s) => ({ trace: [...s.trace, { ts: new Date().toISOString(), ...e }].slice(-MAX_TRACE) }));
@@ -116,7 +116,7 @@ export const useAppStore = create<AppState>()((set, get) => {
 
     loadPersona: (id) => {
       const asOf = todayISO();
-      configureMock({ personaId: id, asOf });
+      configureApi({ personaId: id, asOf });
       set(personaState(id, asOf));
       pushTrace({ tool: 'demo.persona', summary: `Switched to ${PERSONAS[id].name}`, ms: 0 });
     },
@@ -124,7 +124,7 @@ export const useAppStore = create<AppState>()((set, get) => {
     reset: () => {
       const id = get().personaId;
       const asOf = todayISO();
-      configureMock({ personaId: id, asOf });
+      configureApi({ personaId: id, asOf });
       set({ ...personaState(id, asOf), trace: [] });
     },
 
@@ -157,7 +157,7 @@ export const useAppStore = create<AppState>()((set, get) => {
     // Demo time travel rebuilds the persona at the new date so its dentist deadlines stay ahead of "today".
     setAsOf: (asOf) => {
       const s = get();
-      configureMock({ asOf });
+      configureApi({ asOf });
       const fresh = PERSONAS[s.personaId].profile(asOf);
       set({
         profile: { ...fresh, currentPlan: s.profile.currentPlan, procedures: withNetwork(fresh.procedures, s.network, fresh.fees) },
