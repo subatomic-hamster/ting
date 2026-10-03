@@ -83,7 +83,7 @@ export const ACME_HIGH: PlanRules = {
   id: 'acme-high',
   name: 'Lincoln DentalConnect High',
   version: 'PLAN-ACME-HIGH-v3',
-  premiumMonthly: 41,
+  premiumMonthly: 48,
   coinsurance: {
     inNetwork: { preventive: 1, basic: 0.9, major: 0.6, ortho: 0.5 },
     outOfNetwork: { preventive: 1, basic: 0.8, major: 0.5, ortho: 0.5 },
