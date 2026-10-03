@@ -5,8 +5,8 @@ import { useAppStore } from '../store';
 
 /**
  * Loads plans, ledger and session through the API seam, wires the audit trail
- * and the live claims feed. The store starts from persona fixtures so the
- * engine always has data; API results replace them when they arrive.
+ * and the live claims feed. The store starts from the persona's profile so the
+ * engine always has data; API results replace it when they arrive.
  */
 export function useBootstrap() {
   const personaId = useAppStore((s) => s.personaId);

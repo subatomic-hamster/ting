@@ -324,9 +324,10 @@ export function optimize(profile: Profile, opts: ScheduleOptions = {}): Optimize
 export function dentistQuestions(profile: Profile, plan: Placement[], soonest: Placement[]): string[] {
   const asap = new Map(soonest.map((p) => [p.id, p.date]));
   const byId = new Map(profile.procedures.map((p) => [p.id, p]));
-  return plan.flatMap((p) => {
+  const questions = plan.flatMap((p) => {
     const proc = byId.get(p.id);
     if (!proc || toDay(p.date) - toDay(asap.get(p.id) ?? p.date) <= DEFAULT_GAP_DAYS) return [];
     return [`Can the ${cdtLabel(proc.cdt, proc.tooth).replace(/^./, (c) => c.toLowerCase())} safely wait until ${formatDate(p.date)}?`];
   });
+  return [...new Set(questions)];
 }

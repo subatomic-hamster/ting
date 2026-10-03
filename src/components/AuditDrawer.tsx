@@ -1,20 +1,21 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useMemo, useRef } from 'react';
-import type { TraceEvent } from '../contracts';
+import type { TraceEvent } from '../api';
 import { formatTime } from '../lib/format';
-import { useAppStore, useResult } from '../store';
+import { useAppStore } from '../store';
 import { CloseIcon } from './Icons';
 
+const originOf = (tool: string) => (tool.startsWith('engine.') ? 'engine' : tool.startsWith('api.') ? 'api' : 'ui');
+
 export function AuditDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const result = useResult();
-  const apiTrace = useAppStore((s) => s.trace);
+  const trace = useAppStore((s) => s.trace);
+  const rulesVersion = useAppStore((s) => s.profile.currentPlan.version);
   const closeRef = useRef<HTMLButtonElement>(null);
 
-  const events = useMemo(() => {
-    const engine = result.trace.map((e) => ({ ...e, origin: 'engine' as const }));
-    const other = apiTrace.map((e) => ({ ...e, origin: e.tool.startsWith('api.') ? ('api' as const) : ('ui' as const) }));
-    return [...engine, ...other].sort((a, b) => (a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0));
-  }, [result.trace, apiTrace]);
+  const events = useMemo(
+    () => trace.map((e) => ({ ...e, origin: originOf(e.tool) })).sort((a, b) => (a.ts < b.ts ? 1 : a.ts > b.ts ? -1 : 0)),
+    [trace],
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -52,7 +53,7 @@ export function AuditDrawer({ open, onClose }: { open: boolean; onClose: () => v
                 <h2 className="text-lg font-semibold">Audit trail</h2>
                 <p className="text-xs text-muted">
                   Show your work: every engine run and API call, newest first. Rules version{' '}
-                  <code className="rounded bg-slate-100 px-1">{result.rulesVersion}</code>.
+                  <code className="rounded bg-slate-100 px-1">{rulesVersion}</code>.
                 </p>
                 <p className="mt-1 text-xs text-muted">The AI translates, tested code decides.</p>
               </div>
@@ -61,7 +62,7 @@ export function AuditDrawer({ open, onClose }: { open: boolean; onClose: () => v
               </button>
             </div>
             <ol className="flex-1 divide-y divide-line overflow-y-auto text-sm">
-              {events.map((e: TraceEvent & { origin: 'engine' | 'api' | 'ui' }, i) => (
+              {events.map((e: TraceEvent & { origin: string }, i) => (
                 <li key={`${e.ts}-${e.tool}-${i}`} className="px-4 py-2.5">
                   <div className="flex items-center justify-between gap-2 text-xs">
                     <span className="flex items-center gap-1.5 font-mono font-semibold">

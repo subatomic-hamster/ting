@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { DemoDataPill } from '../components/DemoDataPill';
 import { DentistList } from '../components/DentistList';
-import { DENTISTS } from '../hooks/useDentistQuotes';
+import { DENTISTS, FEE_ZIP } from '../hooks/useDentistQuotes';
 import { NetworkCompare } from '../components/NetworkCompare';
 import { PageHeader, Section } from '../components/Section';
-import { FEE_ZIP } from '../fixtures/feeSchedule';
-import { PERSONAS } from '../fixtures/personas';
+import { PERSONAS } from '../data/personas';
 import { useAppStore } from '../store';
 
 export default function Dentists() {

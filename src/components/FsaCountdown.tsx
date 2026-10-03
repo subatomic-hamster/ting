@@ -1,6 +1,7 @@
+import { leftOnTable } from '../engine/helpers';
 import { diffDays } from '../lib/dates';
 import { formatDate, formatMoney } from '../lib/format';
-import { useAppStore, useResult } from '../store';
+import { useActive, useProfile } from '../store';
 import { GlossaryTerm } from './GlossaryTerm';
 
 const RULES = {
@@ -10,10 +11,11 @@ const RULES = {
 } as const;
 
 export function FsaCountdown() {
-  const fsa = useAppStore((s) => s.fsa);
-  const asOf = useAppStore((s) => s.asOf);
-  const result = useResult();
-  const days = Math.max(0, diffDays(fsa.forfeitDate, asOf));
+  const profile = useProfile();
+  const { fsaExpiring, fsaDeadline } = leftOnTable(profile, useActive());
+  const { money } = profile;
+  if (!money.fsaOffered) return <p className="text-sm text-muted">No FSA through your employer.</p>;
+  const days = Math.max(0, diffDays(fsaDeadline, profile.asOf));
 
   return (
     <div>
@@ -21,16 +23,16 @@ export function FsaCountdown() {
         <span>
           <GlossaryTerm term="fsa" /> balance
         </span>
-        <span className="text-xs text-muted">{RULES[fsa.rule]}</span>
+        <span className="text-xs text-muted">{RULES[money.fsaRule.kind]}</span>
       </div>
       <div className="flex items-baseline gap-2">
-        <span className="tabular text-2xl font-semibold">{formatMoney(fsa.balance)}</span>
+        <span className="tabular text-2xl font-semibold">{formatMoney(money.fsaBalance)}</span>
         <span className="text-sm text-muted">
-          <span className="tabular font-semibold text-ink">{days}</span> days left (until {formatDate(fsa.forfeitDate, { year: true })})
+          <span className="tabular font-semibold text-ink">{days}</span> days left (until {formatDate(fsaDeadline, { year: true })})
         </span>
       </div>
-      {result.fsa.atRisk > 0 ? (
-        <p className="mt-1 text-sm font-medium text-cost">{formatMoney(result.fsa.atRisk)} at risk of being forfeited</p>
+      {fsaExpiring > 0 ? (
+        <p className="mt-1 text-sm font-medium text-cost">{formatMoney(fsaExpiring)} at risk of being forfeited</p>
       ) : (
         <p className="mt-1 text-sm text-save">Your scheduled work uses it in time.</p>
       )}

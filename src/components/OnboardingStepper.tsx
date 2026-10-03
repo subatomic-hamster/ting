@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
-import { procedureFromCdt } from '../fixtures/feeSchedule';
+import type { PlannedProcedure } from '../engine/types';
+import { toProcedures } from '../intake/questions';
 import { useAppStore } from '../store';
 
 const CLEANING = ['Less than 6 months ago', '6–12 months ago', 'Over a year ago', 'Not sure'];
@@ -18,13 +19,16 @@ export function OnboardingStepper() {
 
   const finish = useMutation({
     mutationFn: async () => {
-      const parsed = work.trim() ? await api.parseDescription(work) : { items: [] };
-      const extra = cleaning && cleaning !== CLEANING[0] ? [procedureFromCdt('D1110', { id: `p-clean-${Date.now()}`, source: 'typed', confidence: 1 })] : [];
-      return [...parsed.items, ...extra];
+      const { profile } = useAppStore.getState();
+      const parsed = work.trim() ? toProcedures(await api.parseDescription(work), profile) : [];
+      const fee = profile.fees.D1110;
+      const extra: PlannedProcedure[] =
+        cleaning && cleaning !== CLEANING[0] && fee ? [{ id: `clean-${Date.now()}`, cdt: 'D1110', fee: fee.billed, allowedFee: fee.inNetwork, inNetwork: true }] : [];
+      return [...parsed, ...extra];
     },
-    onSuccess: (items) => {
-      if (items.length) addProcedures(items);
-      navigate('/treatment');
+    onSuccess: (procedures) => {
+      const error = procedures.length ? addProcedures(procedures) : undefined;
+      if (!error) navigate('/treatment');
     },
   });
 

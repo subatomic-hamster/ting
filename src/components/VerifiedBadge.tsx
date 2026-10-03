@@ -1,20 +1,18 @@
-import type { WaterfallStep } from '../contracts';
+export type Verification = 'verified' | 'unverified' | 'pending';
 
-type State = NonNullable<WaterfallStep['verification']>;
-
-const STYLES: Record<State, { label: string; cls: string; dot: string }> = {
+const STYLES: Record<Verification, { label: string; cls: string; dot: string }> = {
   verified: { label: 'Verified', cls: 'border-emerald-200 bg-emerald-50 text-emerald-800', dot: 'bg-emerald-500' },
   unverified: { label: 'Unverified', cls: 'border-amber-200 bg-amber-50 text-amber-800', dot: 'bg-amber-500' },
   pending: { label: 'Checking…', cls: 'border-line bg-slate-50 text-muted', dot: 'bg-slate-400 animate-pulse' },
 };
 
-const TIPS: Record<State, string> = {
-  verified: 'Checked against the plan document',
-  unverified: 'Not yet checked against the plan document',
-  pending: 'Checking against the plan document…',
+const TIPS: Record<Verification, string> = {
+  verified: 'Every dollar in this explanation matches the engine',
+  unverified: 'A dollar figure in this explanation did not match the engine',
+  pending: 'Checking the explanation against the engine…',
 };
 
-export function VerifiedBadge({ state }: { state: State }) {
+export function VerifiedBadge({ state }: { state: Verification }) {
   const s = STYLES[state];
   return (
     <span

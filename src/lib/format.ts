@@ -1,6 +1,14 @@
 // The only money code in the UI: turning engine numbers into text.
 // Never compute amounts here — only format them.
 
+import { cdtLabel } from '../engine/cdt';
+import type { PlannedProcedure } from '../engine/types';
+
+/** "Crown (porcelain) on #19", or the dentist's own label ("Braces (Arjun)"). */
+export function procedureName(p: Pick<PlannedProcedure, 'cdt' | 'tooth' | 'label'>): string {
+  return p.label ? `${p.label}${p.tooth ? ` on #${p.tooth}` : ''}` : cdtLabel(p.cdt, p.tooth);
+}
+
 const whole = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0, minimumFractionDigits: 0 });
 const cents = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2, minimumFractionDigits: 2 });
 

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { priceDentists, type DentistQuote } from '../engine';
+import { priceDentists, type DentistQuote } from '../engine/helpers';
 import dentistsJson from '../fixtures/dentists.json';
-import { useEngineInput } from '../store';
+import { HORIZON, useActive, useProfile } from '../store';
 
 export interface Dentist {
   id: string;
@@ -14,9 +14,14 @@ export interface Dentist {
 }
 
 export const DENTISTS: Dentist[] = dentistsJson.dentists;
+export const FEE_ZIP = dentistsJson.zip;
 
-/** Every dentist priced by the engine for the current treatment plan. */
+/** Every dentist priced by the engine for the current schedule. */
 export function useDentistQuotes(): Map<string, DentistQuote> {
-  const input = useEngineInput();
-  return useMemo(() => new Map(priceDentists(input, DENTISTS).map((q) => [q.dentistId, q])), [input]);
+  const profile = useProfile();
+  const { placements } = useActive();
+  return useMemo(
+    () => new Map(priceDentists(profile, placements, DENTISTS, { horizon: HORIZON }).map((q) => [q.dentistId, q])),
+    [profile, placements],
+  );
 }

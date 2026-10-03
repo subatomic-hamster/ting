@@ -10,11 +10,12 @@ import {
 } from '@dnd-kit/core';
 import { AnimatePresence, motion, useAnimationControls } from 'framer-motion';
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
-import type { ProcedureItem, ScheduledItem } from '../contracts';
+import { maxGauges } from '../engine/helpers';
+import type { PlannedProcedure } from '../engine/types';
 import { addDays, addMonths, clampDate, diffDays, endOfYear, startOfYear, yearOf } from '../lib/dates';
-import { formatDate, formatMoney } from '../lib/format';
+import { formatDate, formatMoney, formatPercent, procedureName } from '../lib/format';
 import { datePct } from '../lib/geometry';
-import { selectResult, useAppStore, useResult } from '../store';
+import { HORIZON, selectActive, useActive, useAppStore } from '../store';
 import { LockIcon } from './Icons';
 import { MiniMaxGauge } from './MaxGauge';
 
@@ -22,19 +23,24 @@ const LANE_PX = 46;
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const horizontalOnly: Modifier = ({ transform }) => ({ ...transform, y: 0 });
 
-const nameOf = (p?: ProcedureItem) => (p ? (p.tooth ? `${p.label} #${p.tooth}` : p.label) : 'Item');
+interface Visit {
+  procedure: PlannedProcedure;
+  date: string;
+  /** What the member owes if it happens. */
+  owes: number;
+}
 
 export function Timeline({ compact = false }: { compact?: boolean }) {
-  const result = useResult();
-  const procedures = useAppStore((s) => s.procedures);
-  const asOf = useAppStore((s) => s.asOf);
+  const active = useActive();
+  const profile = useAppStore((s) => s.profile);
   const moveProcedure = useAppStore((s) => s.moveProcedure);
   const lastChange = useAppStore((s) => s.lastChange);
   const today = useAppStore((s) => s.today);
+  const { asOf } = profile;
 
   const year = yearOf(asOf);
   const start = startOfYear(year);
-  const end = endOfYear(year + 1);
+  const end = endOfYear(year + HORIZON - 1);
   const totalDays = diffDays(end, start);
   const trackRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -43,56 +49,56 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
   const [preview, setPreview] = useState<{ id: string; date: string } | null>(null);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
-  const byId = new Map(procedures.map((p) => [p.id, p]));
-  const items = result.activeSchedule.items;
-  const itemById = new Map(items.map((i) => [i.procedureId, i]));
-  const lanes = procedures.filter((p) => itemById.has(p.id));
+  const dates = new Map(active.placements.map((p) => [p.id, p.date]));
+  const owes = new Map(active.lines.map((l) => [l.id, l.memberOwes]));
+  const visits: Visit[] = profile.procedures.flatMap((procedure) => {
+    const date = dates.get(procedure.id);
+    return date ? [{ procedure, date, owes: owes.get(procedure.id) ?? 0 }] : [];
+  });
+  const visitById = new Map(visits.map((v) => [v.procedure.id, v]));
 
   const daysFor = (dx: number) => {
     const width = trackRef.current?.offsetWidth ?? 1;
     return Math.round((dx * totalDays) / width);
   };
 
-  const attempt = (id: string, date: string) => {
-    const p = byId.get(id);
-    const res = moveProcedure(id, date);
+  const attempt = (v: Visit, date: string) => {
+    const res = moveProcedure(v.procedure.id, date);
     if (!res.ok) {
-      setShake({ id, n: Date.now() });
-      setMessage(`${nameOf(p)} can't move there: ${res.reason}.`);
+      setShake({ id: v.procedure.id, n: Date.now() });
+      setMessage(`Can't move there. ${res.reason}`);
       return;
     }
-    const after = selectResult(useAppStore.getState());
-    const moved = after.activeSchedule.items.find((i) => i.procedureId === id);
+    const after = selectActive(useAppStore.getState());
+    const moved = after.placements.find((p) => p.id === v.procedure.id);
     setMessage(
-      `${nameOf(p)} moved to ${moved ? formatDate(moved.date, { year: true }) : formatDate(date)}. ` +
-        `You pay ${formatMoney(after.activeSchedule.memberTotal)} in total (${formatMoney(res.delta, { signed: true })}).`,
+      `${procedureName(v.procedure)} moved to ${formatDate(moved?.date ?? date, { year: true })}. ` +
+        `You pay ${formatMoney(after.expectedOwes)} in total (${formatMoney(res.delta, { signed: true })}).`,
     );
   };
 
-  const onDragMove = ({ active, delta }: DragMoveEvent) => {
-    const item = itemById.get(String(active.id));
-    if (!item) return;
-    setPreview({ id: item.procedureId, date: clampDate(addDays(item.date, daysFor(delta.x)), asOf, end) });
+  const onDragMove = ({ active: dragged, delta }: DragMoveEvent) => {
+    const v = visitById.get(String(dragged.id));
+    if (v) setPreview({ id: v.procedure.id, date: clampDate(addDays(v.date, daysFor(delta.x)), asOf, end) });
   };
 
-  const onDragEnd = ({ active, delta }: DragEndEvent) => {
+  const onDragEnd = ({ active: dragged, delta }: DragEndEvent) => {
     setPreview(null);
-    const item = itemById.get(String(active.id));
+    const v = visitById.get(String(dragged.id));
     const days = daysFor(delta.x);
-    if (!item || days === 0) return;
-    attempt(item.procedureId, addDays(item.date, days));
+    if (v && days !== 0) attempt(v, addDays(v.date, days));
   };
 
-  const onKey = (item: ScheduledItem) => (e: KeyboardEvent) => {
+  const onKey = (v: Visit) => (e: KeyboardEvent) => {
     if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
     e.preventDefault();
-    if (item.locked) {
-      setShake({ id: item.procedureId, n: Date.now() });
-      setMessage(`${nameOf(byId.get(item.procedureId))} is locked: your dentist set this deadline.`);
+    if (v.procedure.locked) {
+      setShake({ id: v.procedure.id, n: Date.now() });
+      setMessage(`${procedureName(v.procedure)} is locked: your dentist set this date.`);
       return;
     }
     const dir = e.key === 'ArrowRight' ? 1 : -1;
-    attempt(item.procedureId, e.shiftKey ? addMonths(item.date, dir) : addDays(item.date, dir * 7));
+    attempt(v, e.shiftKey ? addMonths(v.date, dir) : addDays(v.date, dir * 7));
   };
 
   // On narrow screens the timeline scrolls; start it a little before "today".
@@ -101,9 +107,8 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
     if (el && el.scrollWidth > el.clientWidth) el.scrollLeft = (el.scrollWidth * datePct(asOf, start, end)) / 100 - 48;
   }, [asOf, start, end]);
 
-  const months = Array.from({ length: 24 }, (_, i) => addMonths(start, i));
-  const boundary = `${year + 1}-01-01`;
-  const boundaryPct = datePct(boundary, start, end);
+  const months = Array.from({ length: 12 * HORIZON }, (_, i) => addMonths(start, i));
+  const boundaryPct = datePct(`${year + 1}-01-01`, start, end);
   const asOfPct = datePct(asOf, start, end);
 
   return (
@@ -116,7 +121,7 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
         <DeltaPill change={lastChange} />
       </div>
 
-      {lanes.length === 0 ? (
+      {visits.length === 0 ? (
         <p className="rounded-xl border border-dashed border-line p-6 text-center text-sm text-muted">
           No scheduled work yet. Add treatment on the Treatment page.
         </p>
@@ -124,8 +129,8 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
         <div ref={scrollRef} className="-mx-1 overflow-x-auto px-1 pb-2" role="group" aria-label={`Treatment timeline for ${year} and ${year + 1}`}>
           <div className="relative min-w-[860px]">
             <div className="mb-2 grid grid-cols-2 gap-6 pr-2">
-              {result.gauges.slice(0, 2).map((g) => (
-                <MiniMaxGauge key={g.planYear} gauge={g} />
+              {maxGauges(profile, active).map((g) => (
+                <MiniMaxGauge key={g.year} gauge={g} />
               ))}
             </div>
 
@@ -141,24 +146,18 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
               ))}
             </div>
 
-            <div
-              ref={trackRef}
-              className="relative rounded-xl border border-line bg-slate-50/60"
-              style={{ height: lanes.length * LANE_PX + 28 }}
-            >
+            <div ref={trackRef} className="relative rounded-xl border border-line bg-slate-50/60" style={{ height: visits.length * LANE_PX + 28 }}>
               {/* past */}
-              <div
-                className="absolute inset-y-0 left-0 rounded-l-xl bg-slate-200/50"
-                style={{ width: `${asOfPct}%` }}
-                aria-hidden
-              />
+              <div className="absolute inset-y-0 left-0 rounded-l-xl bg-slate-200/50" style={{ width: `${asOfPct}%` }} aria-hidden />
               {/* month grid */}
               {months.map((m) => (
                 <div key={m} className="absolute inset-y-0 w-px bg-line/70" style={{ left: `${datePct(m, start, end)}%` }} aria-hidden />
               ))}
               {/* today */}
               <div className="absolute inset-y-0 border-l border-dashed border-brand-500" style={{ left: `${asOfPct}%` }} aria-hidden>
-                <span className="absolute top-1 right-1 rounded bg-brand-500 px-1 text-[10px] font-semibold whitespace-nowrap text-white">{asOf === today ? 'Today' : 'As of'}</span>
+                <span className="absolute top-1 right-1 rounded bg-brand-500 px-1 text-[10px] font-semibold whitespace-nowrap text-white">
+                  {asOf === today ? 'Today' : 'As of'}
+                </span>
               </div>
               {/* Dec 31 */}
               <div className="absolute inset-y-0 w-[3px] -translate-x-1/2 bg-ink" style={{ left: `${boundaryPct}%` }} aria-hidden>
@@ -168,21 +167,17 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
               </div>
 
               <DndContext sensors={sensors} modifiers={[horizontalOnly]} onDragMove={onDragMove} onDragEnd={onDragEnd} onDragCancel={() => setPreview(null)}>
-                {lanes.map((p, lane) => {
-                  const item = itemById.get(p.id)!;
-                  return (
-                    <Chip
-                      key={p.id}
-                      item={item}
-                      procedure={p}
-                      lane={lane}
-                      leftPct={datePct(item.date, start, end)}
-                      previewDate={preview?.id === p.id ? preview.date : undefined}
-                      shakeN={shake?.id === p.id ? shake.n : 0}
-                      onKeyDown={onKey(item)}
-                    />
-                  );
-                })}
+                {visits.map((v, lane) => (
+                  <Chip
+                    key={v.procedure.id}
+                    visit={v}
+                    lane={lane}
+                    leftPct={datePct(v.date, start, end)}
+                    previewDate={preview?.id === v.procedure.id ? preview.date : undefined}
+                    shakeN={shake?.id === v.procedure.id ? shake.n : 0}
+                    onKeyDown={onKey(v)}
+                  />
+                ))}
               </DndContext>
             </div>
           </div>
@@ -201,35 +196,33 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
 }
 
 function Chip({
-  item,
-  procedure,
+  visit,
   lane,
   leftPct,
   previewDate,
   shakeN,
   onKeyDown,
 }: {
-  item: ScheduledItem;
-  procedure: ProcedureItem;
+  visit: Visit;
   lane: number;
   leftPct: number;
   previewDate?: string;
   shakeN: number;
   onKeyDown: (e: KeyboardEvent) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: item.procedureId,
-    disabled: item.locked,
-  });
+  const { procedure, date, owes } = visit;
+  const locked = Boolean(procedure.locked);
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: procedure.id, disabled: locked });
   const controls = useAnimationControls();
   useEffect(() => {
     if (shakeN) void controls.start({ x: [0, -8, 8, -6, 6, 0], transition: { duration: 0.4 } });
   }, [shakeN, controls]);
 
-  const name = nameOf(procedure);
-  const label = item.locked
-    ? `${name}, ${formatDate(item.date, { year: true })}, you pay ${formatMoney(item.memberPays)}. Locked: your dentist set this deadline.`
-    : `${name}, ${formatDate(item.date, { year: true })}, you pay ${formatMoney(item.memberPays)}. Use left and right arrows to move a week, Shift plus arrows to move a month.`;
+  const name = procedureName(procedure);
+  const maybe = procedure.likelihood !== undefined && procedure.likelihood < 1 ? ` (maybe, ${formatPercent(procedure.likelihood)})` : '';
+  const label = locked
+    ? `${name}, ${formatDate(date, { year: true })}, you pay ${formatMoney(owes)}. Locked: your dentist set this date.`
+    : `${name}${maybe}, ${formatDate(date, { year: true })}, you pay ${formatMoney(owes)}. Use left and right arrows to move a week, Shift plus arrows to move a month.`;
 
   return (
     <div
@@ -247,28 +240,31 @@ function Chip({
         {...attributes}
         {...listeners}
         aria-label={label}
-        aria-disabled={item.locked}
+        aria-disabled={locked}
         onKeyDown={onKeyDown}
         className={`flex h-[38px] touch-none items-center gap-2 rounded-xl border px-2.5 text-left text-xs whitespace-nowrap shadow-sm select-none ${
-          item.locked
+          locked
             ? 'cursor-not-allowed border-slate-300 bg-slate-100 text-slate-700'
-            : `cursor-grab bg-white active:cursor-grabbing ${isDragging ? 'border-brand-500 shadow-lg ring-2 ring-brand-200' : 'border-brand-200 hover:border-brand-500'}`
+            : `cursor-grab bg-white active:cursor-grabbing ${maybe ? 'border-dashed ' : ''}${isDragging ? 'border-brand-500 shadow-lg ring-2 ring-brand-200' : 'border-brand-200 hover:border-brand-500'}`
         }`}
       >
-        {item.locked && <LockIcon className="shrink-0 text-slate-500" />}
+        {locked && <LockIcon className="shrink-0 text-slate-500" />}
         <span className="flex flex-col leading-tight">
-          <span className="font-semibold">{name}</span>
+          <span className="font-semibold">
+            {name}
+            {maybe && <span className="ml-1 font-normal text-violet-800">{formatPercent(procedure.likelihood ?? 1)}</span>}
+          </span>
           <span className="tabular text-muted">
-            {formatDate(previewDate ?? item.date, { year: true })} · {formatMoney(item.memberPays)}
+            {formatDate(previewDate ?? date, { year: true })} · {formatMoney(owes)}
           </span>
         </span>
       </motion.button>
-      {item.locked && (
+      {locked && (
         <span
           role="note"
           className="pointer-events-none absolute top-full left-0 z-30 mt-1 hidden rounded-md bg-ink px-2 py-1 text-[11px] whitespace-nowrap text-white group-focus-within:block group-hover:block"
         >
-          Your dentist set this deadline
+          Your dentist set this date
         </span>
       )}
     </div>

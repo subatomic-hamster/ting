@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { api } from '../api';
 import { useDentistQuestions } from '../hooks/useDentistQuestions';
-import { useResult } from '../store';
+import { useActive } from '../store';
 import { ShareIcon } from './Icons';
 
 export function DentistQuestions() {
@@ -17,9 +17,9 @@ export function DentistQuestions() {
 }
 
 export function ShareWithDentist({ compact = false }: { compact?: boolean }) {
-  const result = useResult();
+  const { kind } = useActive();
   const [copied, setCopied] = useState(false);
-  const share = useMutation({ mutationFn: () => api.createShareLink(result.activeSchedule.kind) });
+  const share = useMutation({ mutationFn: () => api.createShareLink(kind) });
 
   return (
     <div>

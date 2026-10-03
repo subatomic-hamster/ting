@@ -1,18 +1,24 @@
 import { describe, expect, it } from 'vitest';
+import { PERSONAS } from '../data/personas';
+import { applyClaim } from '../engine/ledger';
 import { mockApi } from './mockApi';
 
-describe('mock intake parser', () => {
-  it('finds procedures, counts and tooth numbers', async () => {
-    const { items } = await mockApi.parseDescription('Root canal on #19, a buildup and two crowns. Also a deep cleaning.');
-    const codes = items.map((i) => i.cdt).sort();
-    expect(codes).toEqual(['D2740', 'D2740', 'D2950', 'D3330', 'D4341']);
-    expect(items.find((i) => i.cdt === 'D3330')?.tooth).toBe(19);
+describe('mock API', () => {
+  it('reads a description with the intake parser', async () => {
+    const items = await mockApi.parseDescription('Root canal on #19 and a crown on 19');
+    expect(items.map((i) => i.candidates[0].cdt)).toEqual(['D3330', 'D2740']);
+    expect(items[0].teeth[0].tooth).toBe(19);
   });
 
-  it('marks "maybe" work with a likelihood and asks a follow-up', async () => {
-    const { items, questions } = await mockApi.parseDescription('I might need braces');
-    expect(items[0].cdt).toBe('D8080');
-    expect(items[0].likelihood).toBe(0.5);
-    expect(questions.some((q) => q.id === 'likelihood')).toBe(true);
+  it('emits a claim the ledger accepts and that matches the estimate', async () => {
+    const profile = PERSONAS.dale.profile('2026-10-05');
+    const events: unknown[] = [];
+    const stop = mockApi.subscribeLedger((e) => events.push(e));
+    await mockApi.fireMockClaim(profile);
+    stop();
+    const update = applyClaim(profile, events[0]);
+    expect(update.completed).toEqual(['rc19']);
+    expect(update.checks[0].mismatch).toBe(false);
+    expect(update.profile.ledger.maxUsed).toBeGreaterThan(profile.ledger.maxUsed);
   });
 });

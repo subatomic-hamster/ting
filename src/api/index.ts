@@ -1,16 +1,13 @@
 // THE API SEAM. Every backend call goes through `api`.
 //
-// VITE_USE_MOCKS=true (the default) uses mockApi.ts. Set VITE_USE_MOCKS=false
-// and fill in httpApi.ts to talk to the real backend (VITE_API_URL / VITE_WS_URL).
+// VITE_USE_MOCKS=true (the default) uses mockApi.ts, which runs the engine, intake and OCR in the browser.
+// Set VITE_USE_MOCKS=false to talk to the AWS backend (VITE_API_URL / VITE_WS_URL), which runs the same
+// engine in Lambda and returns the same types.
 
-import type {
-  ClaimAdjudicatedEvent,
-  LedgerEntry,
-  PlanRules,
-  ProcedureItem,
-  TraceEvent,
-  WaterfallStep,
-} from '../contracts';
+import type { CompileResult } from '../compiler/compile';
+import type { ExplainedStep } from '../engine/explain';
+import type { AdjudicatedLine, Ledger, PlanRules, Profile } from '../engine/types';
+import type { IntakeItem } from '../intake/types';
 import { httpApi } from './httpApi';
 import { mockApi } from './mockApi';
 
@@ -21,24 +18,43 @@ export interface Session {
   role: 'member' | 'employer_admin' | 'lincoln_analyst';
 }
 
-export interface IntakeQuestion {
-  id: string;
+export type DocumentKind = 'treatment_plan' | 'plan_summary' | 'insurance_card' | 'unknown';
+
+export interface ReadDocument {
+  docId: string;
+  kind: DocumentKind;
+  /** Text read from the file (OCR or PDF text layer). */
   text: string;
-  why: string;
-  options: string[];
+  /** Procedures found on a treatment plan. */
+  items: IntakeItem[];
+  /** Codes on a treatment plan Ting doesn't know yet. */
+  unrecognized: string[];
 }
 
-export type DocumentKind = 'eob' | 'invoice' | 'treatment_plan' | 'plan_summary' | 'insurance_card' | 'unknown';
+export interface TraceEvent {
+  ts: string;
+  tool: string;
+  summary: string;
+  ms: number;
+}
 
 export interface TingApi {
   getSession(): Promise<Session>;
+  /** Plan options at open enrollment, including waiving coverage and the dentist's membership plan. */
   getPlans(): Promise<PlanRules[]>;
-  getLedger(): Promise<LedgerEntry[]>;
-  parseDescription(text: string): Promise<{ items: ProcedureItem[]; questions: IntakeQuestion[] }>;
-  uploadDocument(file: File): Promise<{ docId: string; kind: DocumentKind; items?: ProcedureItem[] }>;
-  explain(procedureId: string, steps: WaterfallStep[]): Promise<WaterfallStep[]>; // fills explanation + verification
-  subscribeLedger(onEvent: (e: ClaimAdjudicatedEvent) => void): () => void; // WebSocket in real mode
-  fireMockClaim(): Promise<void>; // demo control
+  getLedger(): Promise<Ledger>;
+  /** Typed or spoken description → procedures with confidence (Bedrock in AWS). */
+  parseDescription(text: string): Promise<IntakeItem[]>;
+  /** Photo, PDF or text file → its text and, for a treatment plan, the procedures on it (Textract in AWS). */
+  readDocument(file: File): Promise<ReadDocument>;
+  /** Benefits summary text → draft plan rules, the evidence for each, and questions for what it doesn't say (Bedrock in AWS). */
+  compilePlan(text: string): Promise<CompileResult>;
+  /** One plain sentence per waterfall step; the caller checks every dollar with verifyNumbers before showing it. */
+  explain(line: AdjudicatedLine, rules: PlanRules): Promise<ExplainedStep[]>;
+  /** Live "claim adjudicated" events (WebSocket in AWS); the store validates and applies them. */
+  subscribeLedger(onEvent: (event: unknown) => void): () => void;
+  /** Demo control: Lincoln's mock claims feed emits an EOB for the next planned procedure. */
+  fireMockClaim(profile: Profile): Promise<void>;
   createShareLink(scheduleKind: string): Promise<{ url: string; expiresAt: string }>;
 }
 
@@ -63,8 +79,8 @@ function describe(value: unknown): string {
   if (Array.isArray(value)) return `${value.length} records`;
   if (value && typeof value === 'object') {
     const v = value as Record<string, unknown>;
-    if (Array.isArray(v.items)) return `${v.items.length} items`;
-    if (typeof v.kind === 'string') return `kind: ${v.kind}`;
+    if (Array.isArray(v.items) && typeof v.kind === 'string') return `${v.kind}: ${v.items.length} items`;
+    if (Array.isArray(v.history)) return `${v.history.length} services`;
     if (typeof v.url === 'string') return 'link created';
     if (typeof v.name === 'string') return `signed in as ${v.name}`;
   }

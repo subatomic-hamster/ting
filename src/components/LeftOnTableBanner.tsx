@@ -1,21 +1,21 @@
 import { Link } from 'react-router-dom';
+import { leftOnTable } from '../engine/helpers';
 import { daysLeftInYear, yearOf } from '../lib/dates';
 import { formatDate, formatMoney } from '../lib/format';
-import { useAppStore, useResult } from '../store';
+import { useActive, useProfile } from '../store';
 import { BellIcon } from './Icons';
 
 /** Year-end reminder: shown in the last month of the plan year. */
 export function LeftOnTableBanner({ force = false }: { force?: boolean }) {
-  const asOf = useAppStore((s) => s.asOf);
-  const { leftOnTable, fsa } = useResult();
-  const days = daysLeftInYear(asOf);
+  const profile = useProfile();
+  const left = leftOnTable(profile, useActive());
+  const days = daysLeftInYear(profile.asOf);
   if (!force && days > 31) return null;
 
   const parts: string[] = [];
-  if (leftOnTable.maxRemaining > 0) parts.push(`${formatMoney(leftOnTable.maxRemaining)} of annual max`);
-  if (leftOnTable.unusedCleanings > 0)
-    parts.push(`${leftOnTable.unusedCleanings} covered cleaning${leftOnTable.unusedCleanings > 1 ? 's' : ''}`);
-  if (leftOnTable.fsaExpiring > 0) parts.push(`${formatMoney(leftOnTable.fsaExpiring)} of FSA expiring ${formatDate(fsa.forfeitDate)}`);
+  if (left.maxRemaining > 0) parts.push(`${formatMoney(left.maxRemaining)} of annual max`);
+  if (left.unusedCleanings > 0) parts.push(`${left.unusedCleanings} covered cleaning${left.unusedCleanings > 1 ? 's' : ''}`);
+  if (left.fsaExpiring > 0) parts.push(`${formatMoney(left.fsaExpiring)} of FSA expiring ${formatDate(left.fsaDeadline)}`);
 
   return (
     <div role="status" className="flex flex-col gap-3 rounded-2xl border border-amber-300 bg-amber-50 p-4 sm:flex-row sm:items-center">
@@ -24,12 +24,10 @@ export function LeftOnTableBanner({ force = false }: { force?: boolean }) {
       </span>
       <div className="min-w-0 flex-1">
         <p className="font-semibold text-amber-950">
-          Left on the table: {days} day{days === 1 ? '' : 's'} left in {yearOf(asOf)}
+          Left on the table: {days} day{days === 1 ? '' : 's'} left in {yearOf(profile.asOf)}
         </p>
         <p className="text-sm text-amber-900">
-          {parts.length
-            ? `Before Dec 31 you still have ${parts.join(', ')}. After that, it's gone.`
-            : "You're on track to use this year's benefits. Nice."}
+          {parts.length ? `Before Dec 31 you still have ${parts.join(', ')}. After that, it's gone.` : "You're on track to use this year's benefits. Nice."}
         </p>
       </div>
       {parts.length > 0 && (

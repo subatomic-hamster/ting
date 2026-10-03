@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api, USE_MOCKS } from '../api';
-import { PERSONA_IDS, PERSONAS } from '../fixtures/personas';
+import { PERSONA_IDS, PERSONAS } from '../data/personas';
 import { yearOf } from '../lib/dates';
 import { formatDate } from '../lib/format';
 import { useAppStore } from '../store';
@@ -16,7 +16,7 @@ function initiallyOpen() {
 export function DemoPanel() {
   const [open, setOpen] = useState(initiallyOpen);
   const personaId = useAppStore((s) => s.personaId);
-  const asOf = useAppStore((s) => s.asOf);
+  const asOf = useAppStore((s) => s.profile.asOf);
   const today = useAppStore((s) => s.today);
   const loadPersona = useAppStore((s) => s.loadPersona);
   const simulateDec1 = useAppStore((s) => s.simulateDec1);
@@ -24,7 +24,7 @@ export function DemoPanel() {
   const reset = useAppStore((s) => s.reset);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const fire = useMutation({ mutationFn: () => api.fireMockClaim() });
+  const fire = useMutation({ mutationFn: () => api.fireMockClaim(useAppStore.getState().profile) });
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -88,7 +88,7 @@ export function DemoPanel() {
           disabled={fire.isPending || !USE_MOCKS}
           onClick={() => fire.mutate()}
         >
-          {fire.isPending ? 'Sending…' : 'Fire mock claim'}
+          {fire.isPending ? 'Sending…' : fire.isError ? 'Nothing left to claim' : 'Fire mock claim'}
         </button>
         <button
           type="button"

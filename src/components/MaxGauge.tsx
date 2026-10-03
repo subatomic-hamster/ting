@@ -1,11 +1,11 @@
-import type { MaxGauge as Gauge } from '../contracts';
+import type { MaxGauge as Gauge } from '../engine/helpers';
 import { formatMoney } from '../lib/format';
 import { gaugeSegments } from '../lib/geometry';
 import { GlossaryTerm } from './GlossaryTerm';
 
 function describe(g: Gauge) {
-  const roll = g.rolloverBalance ? `, ${formatMoney(g.rolloverBalance)} rollover` : '';
-  return `${g.planYear} annual maximum ${formatMoney(g.annualMax)}${roll}: ${formatMoney(g.used)} used, ${formatMoney(g.scheduled)} scheduled, ${formatMoney(g.remaining)} remaining.`;
+  const roll = g.rollover ? `, ${formatMoney(g.rollover)} rollover` : '';
+  return `${g.year} annual maximum ${formatMoney(g.annualMax)}${roll}: ${formatMoney(g.used)} used, ${formatMoney(g.scheduled)} scheduled, ${formatMoney(g.remaining)} remaining.`;
 }
 
 function Bar({ g, height = 'h-3' }: { g: Gauge; height?: string }) {
@@ -31,7 +31,7 @@ export function MaxGauge({ gauge }: { gauge: Gauge }) {
     <div>
       <div className="mb-1 flex items-baseline justify-between gap-2">
         <span className="text-sm text-muted">
-          <GlossaryTerm term="annual maximum" /> {gauge.planYear}
+          <GlossaryTerm term="annual maximum" /> {gauge.year}
         </span>
         <span className="tabular text-sm text-muted">of {formatMoney(gauge.annualMax)}</span>
       </div>
@@ -44,7 +44,7 @@ export function MaxGauge({ gauge }: { gauge: Gauge }) {
         <Legend color="bg-plan" label="Used" value={gauge.used} />
         <Legend color="bg-sched" label="Scheduled" value={gauge.scheduled} />
         <Legend color="bg-slate-200" label="Remaining" value={gauge.remaining} />
-        {gauge.rolloverBalance !== undefined && <Legend color="bg-roll" label="Rollover" value={gauge.rolloverBalance} />}
+        {gauge.rollover > 0 && <Legend color="bg-roll" label="Rollover" value={gauge.rollover} />}
       </dl>
     </div>
   );
@@ -65,10 +65,10 @@ export function MiniMaxGauge({ gauge }: { gauge: Gauge }) {
   return (
     <div className="w-full">
       <div className="mb-1 flex items-baseline justify-between gap-2 text-xs">
-        <span className="font-semibold">{gauge.planYear} max</span>
+        <span className="font-semibold">{gauge.year} max</span>
         <span className="tabular text-muted">
           {formatMoney(gauge.remaining)} left of {formatMoney(gauge.annualMax)}
-          {gauge.rolloverBalance ? ` + ${formatMoney(gauge.rolloverBalance)}` : ''}
+          {gauge.rollover ? ` + ${formatMoney(gauge.rollover)} rollover` : ''}
         </span>
       </div>
       <Bar g={gauge} height="h-2" />

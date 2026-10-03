@@ -1,5 +1,6 @@
 {
   "isDemoData": true,
+  "zip": "27401",
   "note": "Fictional practices for the demo. Names, distances and fees are made up.",
   "dentists": [
     { "id": "d01", "name": "Fisher Park Dental Studio", "neighborhood": "Fisher Park", "distanceMiles": 0.8, "inNetwork": true, "feeMultiplier": 1.0, "acceptingNew": true },

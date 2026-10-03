@@ -1,9 +1,10 @@
-import type { ProcedureItem, ScheduleOption } from '../contracts';
+import type { PlannedProcedure } from '../engine/types';
 import { GENERAL_QUESTIONS } from '../hooks/useDentistQuestions';
-import { formatDate } from '../lib/format';
+import { formatDate, formatPercent, procedureName } from '../lib/format';
+import type { ActiveSchedule, ScheduleKind } from '../store';
 import { PrintIcon, ToothIcon } from './Icons';
 
-const KIND: Record<ScheduleOption['kind'], string> = {
+const KIND: Record<ScheduleKind, string> = {
   cheapest: 'lowest-cost order',
   fastest: 'fastest order',
   balanced: 'balanced order',
@@ -13,19 +14,17 @@ const KIND: Record<ScheduleOption['kind'], string> = {
 export function HandoffSheet({
   patientName,
   procedures,
-  option,
+  schedule,
   rulesVersion,
 }: {
   patientName: string;
-  procedures: ProcedureItem[];
-  option: ScheduleOption;
+  procedures: PlannedProcedure[];
+  schedule: ActiveSchedule;
   rulesVersion: string;
 }) {
   const byId = new Map(procedures.map((p) => [p.id, p]));
-  const questions = [
-    ...option.items.map((i) => i.dentistQuestion).filter((q): q is string => Boolean(q)),
-    ...GENERAL_QUESTIONS,
-  ].slice(0, 3);
+  const questions = [...schedule.questions, ...GENERAL_QUESTIONS].slice(0, 3);
+  const rows = [...schedule.placements].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
 
   return (
     <article className="mx-auto max-w-3xl rounded-2xl border border-line bg-white p-5 sm:p-8 print:border-0 print:p-0">
@@ -45,7 +44,7 @@ export function HandoffSheet({
       </header>
 
       <section className="mt-5">
-        <h2 className="text-sm font-semibold">Recommended order ({KIND[option.kind]})</h2>
+        <h2 className="text-sm font-semibold">Recommended order ({KIND[schedule.kind]})</h2>
         <div className="mt-2 overflow-x-auto">
           <table className="w-full min-w-[420px] text-sm">
             <thead>
@@ -58,18 +57,21 @@ export function HandoffSheet({
               </tr>
             </thead>
             <tbody>
-              {option.items.map((i, n) => {
-                const p = byId.get(i.procedureId);
+              {rows.map((pl, n) => {
+                const p = byId.get(pl.id);
                 return (
-                  <tr key={i.procedureId} className="border-b border-line">
+                  <tr key={pl.id} className="border-b border-line">
                     <td className="py-2 pr-2 text-muted">{n + 1}</td>
                     <td className="py-2 pr-2 font-mono">{p?.cdt}</td>
                     <td className="py-2 pr-2">
-                      {p?.label}
-                      {i.locked && <span className="ml-1.5 text-xs text-muted">(deadline set by dentist)</span>}
+                      {p ? procedureName({ ...p, tooth: undefined }) : pl.id}
+                      {p?.locked && <span className="ml-1.5 text-xs text-muted">(urgent, date set by dentist)</span>}
+                      {p?.likelihood !== undefined && p.likelihood < 1 && (
+                        <span className="ml-1.5 text-xs text-muted">(only if needed, {formatPercent(p.likelihood)} likely)</span>
+                      )}
                     </td>
                     <td className="py-2 pr-2">{p?.tooth ? `#${p.tooth}` : '—'}</td>
-                    <td className="py-2">{formatDate(i.date, { year: true })}</td>
+                    <td className="py-2">{formatDate(pl.date, { year: true })}</td>
                   </tr>
                 );
               })}
@@ -88,8 +90,8 @@ export function HandoffSheet({
       </section>
 
       <p className="mt-6 text-xs text-muted">
-        Dates are targets chosen around the patient's annual maximum. Clinical judgment comes first: please tell the patient if any
-        item can't safely wait. Estimate rules version {rulesVersion}.
+        Dates are targets chosen around the patient's annual maximum. Clinical judgment comes first: please tell the patient if any item
+        can't safely wait. Estimate rules version {rulesVersion}.
       </p>
     </article>
   );

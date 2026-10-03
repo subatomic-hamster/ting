@@ -1,6 +1,6 @@
 import type { Session } from '../api';
-import { PERSONAS } from '../fixtures/personas';
-import { selectPlan, useAppStore } from '../store';
+import { PERSONAS } from '../data/personas';
+import { useAppStore } from '../store';
 import { ListIcon, ToothIcon } from './Icons';
 
 export function TopBar({
@@ -13,11 +13,13 @@ export function TopBar({
   auditOpen: boolean;
 }) {
   const personaName = useAppStore((s) => PERSONAS[s.personaId].name);
-  const plans = useAppStore((s) => s.plans);
-  const plan = useAppStore(selectPlan);
+  const allPlans = useAppStore((s) => s.plans);
+  const plan = useAppStore((s) => s.profile.currentPlan);
   const network = useAppStore((s) => s.network);
   const setNetwork = useAppStore((s) => s.setNetwork);
-  const setSelectedPlan = useAppStore((s) => s.setSelectedPlan);
+  const setCurrentPlan = useAppStore((s) => s.setCurrentPlan);
+  // The plan you're on this year; waiving and membership plans are options for next year, not coverage now.
+  const plans = allPlans.filter((p) => p.kind === 'insurance');
 
   return (
     <header className="no-print bg-brand-900 text-white">
@@ -40,8 +42,8 @@ export function TopBar({
             <select
               aria-label="Dental plan"
               className="rounded-lg border border-white/20 bg-white/10 px-2 py-1.5 text-sm text-white [&>option]:text-ink"
-              value={plan?.id}
-              onChange={(e) => setSelectedPlan(e.target.value)}
+              value={plan.id}
+              onChange={(e) => setCurrentPlan(e.target.value)}
             >
               {plans.map((p) => (
                 <option key={p.id} value={p.id}>

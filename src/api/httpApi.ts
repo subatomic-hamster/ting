@@ -1,7 +1,6 @@
-// Real backend client. Thin stubs: endpoints are guesses until Lane C (AWS)
-// publishes the API. Keep the TingApi interface; change paths as needed.
+// AWS backend client. Endpoints are placeholders until the AWS lane publishes the API; keep the TingApi
+// interface and the engine's types, change paths as needed.
 
-import type { ClaimAdjudicatedEvent } from '../contracts';
 import type { TingApi } from './index';
 
 const API_URL = import.meta.env.VITE_API_URL ?? '';
@@ -29,19 +28,19 @@ export const httpApi: TingApi = {
   getPlans: () => http('/plans'),
   getLedger: () => http('/ledger'),
   parseDescription: (text) => http('/intake/parse', post({ text })),
-  uploadDocument: (file) => {
+  readDocument: (file) => {
     const form = new FormData();
     form.append('file', file);
     return http('/documents', { method: 'POST', body: form });
   },
-  explain: (procedureId, steps) => http('/explain', post({ procedureId, steps })),
+  compilePlan: (text) => http('/rules/compile', post({ text })),
+  explain: (line, rules) => http('/explain', post({ line, rulesVersion: rules.version })),
   subscribeLedger: (onEvent) => {
     if (!WS_URL) notWired('VITE_WS_URL is not set (subscribeLedger)');
     const ws = new WebSocket(WS_URL);
     ws.onmessage = (msg) => {
       try {
-        const e = JSON.parse(String(msg.data)) as ClaimAdjudicatedEvent;
-        if (e.type === 'claim.adjudicated') onEvent(e);
+        onEvent(JSON.parse(String(msg.data)));
       } catch {
         /* ignore malformed frames */
       }
