@@ -18,6 +18,7 @@ import { isRec } from './ai/model';
 import { callBedrock } from './lib/bedrock';
 import { deleteClaims, putShare } from './lib/db';
 import { rowsToText } from './lib/layout';
+import { cancelReminder, deliverDue, reminderSchema, scheduleReminder } from './lib/reminders';
 
 const s3 = new S3Client({});
 const textract = new TextractClient({});
@@ -162,6 +163,15 @@ const routes: Record<string, Route> = {
     return json(200, { url: `${trustedOrigin(body.origin)}/share/${token}`, expiresAt: addDays(todayISO(), 30) });
   },
 
+  'POST /reminders': async (e) => {
+    const parsed = reminderSchema.safeParse(bodyOf(e));
+    if (!parsed.success) throw new HttpError(400, `Not a reminder: ${parsed.error.issues[0]?.message ?? 'invalid'}`);
+    return json(200, await scheduleReminder(PERSONAS[context(e).personaId].memberId, parsed.data));
+  },
+
+  // Demo control: send the reminders due on the demo's "as of" date, the way the daily rule does.
+  'POST /demo/reminders/run': async (e) => json(200, { delivered: await deliverDue(context(e).asOf) }),
+
   'POST /demo/reset': async (e) => {
     const removed = await deleteClaims(PERSONAS[context(e).personaId].memberId);
     return json(200, { removed });
@@ -171,7 +181,15 @@ const routes: Record<string, Route> = {
 export async function handler(event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> {
   // CORS preflights reach the $default route; API Gateway adds the CORS headers, the status must be 2xx.
   if (event.requestContext.http.method === 'OPTIONS') return { statusCode: 204, body: '' };
-  const route = routes[`${event.requestContext.http.method} ${event.rawPath}`];
+  const method = event.requestContext.http.method;
+  const reminder = /^\/reminders\/([\w-]{1,40})$/.exec(event.rawPath);
+  const route: Route | undefined =
+    method === 'DELETE' && reminder
+      ? async (e) => {
+          await cancelReminder(PERSONAS[context(e).personaId].memberId, reminder[1]);
+          return { statusCode: 204, body: '' };
+        }
+      : routes[`${method} ${event.rawPath}`];
   if (!route) return json(404, { error: 'Not found' });
   try {
     return await route(event);

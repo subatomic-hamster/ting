@@ -73,7 +73,9 @@ export const httpApi: TingApi = {
       ws.onopen = () => ws?.send(JSON.stringify({ action: 'replay', member }));
       ws.onmessage = (msg) => {
         try {
-          onEvent(JSON.parse(String(msg.data)));
+          const frame: unknown = JSON.parse(String(msg.data));
+          // The socket also carries reminder.due pushes; the ledger only takes claims.
+          if (typeof frame === 'object' && frame !== null && (frame as { type?: unknown }).type === 'claim.adjudicated') onEvent(frame);
         } catch {
           /* ignore malformed frames */
         }

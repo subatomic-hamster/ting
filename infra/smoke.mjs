@@ -157,6 +157,22 @@ await check('claim round trip: POST /mock/claims → EventBridge → Lambda → 
   return `pushed in ${pushMs} ms; replay ${replayed ? 'ok' : 'missing'}`;
 });
 
+await check('reminders: schedule → due run → cancel', async () => {
+  const reminder = {
+    id: '2026-dec1', kind: 'dec1', sendOn: '2026-12-01', title: 'Last month: $190 of annual max left',
+    body: 'You still have $190 of annual max for 2026.', maxRemaining: 190, unusedCleanings: 0, fsaExpiring: 0, fsaDeadline: '2026-12-31',
+  };
+  const s = await call('/reminders', reminder);
+  assert(s.reminderId === '2026-dec1' && s.channels.includes('in_app'), JSON.stringify(s));
+  const early = await (await fetch(`${API}/demo/reminders/run?persona=dale&asOf=2026-11-15`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })).json();
+  assert(!early.delivered.some((d) => d.reminderId === '2026-dec1'), 'sent before its date');
+  const due = await (await fetch(`${API}/demo/reminders/run?persona=dale&asOf=2026-12-01`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })).json();
+  assert(due.delivered.some((d) => d.reminderId === '2026-dec1'), `not delivered: ${JSON.stringify(due)}`);
+  const del = await fetch(`${API}/reminders/2026-dec1?persona=dale`, { method: 'DELETE' });
+  assert(del.status === 204, `DELETE ${del.status}`);
+  return `delivered on Dec 1 (email: ${due.delivered[0].email})`;
+});
+
 await check('rejects a malformed claim', async () => {
   try {
     await call('/mock/claims', { type: 'claim.adjudicated', member: 'x' });

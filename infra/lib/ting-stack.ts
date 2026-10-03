@@ -5,12 +5,13 @@ import { HttpLambdaIntegration, WebSocketLambdaIntegration } from 'aws-cdk-lib/a
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import { S3BucketOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
-import { EventBus, Rule } from 'aws-cdk-lib/aws-events';
+import { EventBus, Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Architecture, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction, type NodejsFunctionProps } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
+import { EmailIdentity, Identity } from 'aws-cdk-lib/aws-ses';
 import { BlockPublicAccess, Bucket, BucketEncryption, HttpMethods } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import type { Construct } from 'constructs';
@@ -33,6 +34,17 @@ export class TingStack extends Stack {
       timeToLiveAttribute: 'ttl',
       removalPolicy: RemovalPolicy.DESTROY,
     });
+    // Pending reminders by send date: gsi1pk = REMINDER#PENDING, gsi1sk = <sendOn>#<member>#<id>.
+    table.addGlobalSecondaryIndex({
+      indexName: 'gsi1',
+      partitionKey: { name: 'gsi1pk', type: AttributeType.STRING },
+      sortKey: { name: 'gsi1sk', type: AttributeType.STRING },
+    });
+
+    // Optional: `cdk deploy -c reminderEmail=you@example.com` verifies that address in SES and sends reminder
+    // emails to it (SES sandbox: sender and recipient must be verified). Without it, reminders are in-app only.
+    const reminderEmail: string = this.node.tryGetContext('reminderEmail') ?? '';
+    if (reminderEmail) new EmailIdentity(this, 'ReminderSender', { identity: Identity.email(reminderEmail) });
 
     const docs = new Bucket(this, 'Documents', {
       encryption: BucketEncryption.S3_MANAGED,
@@ -120,6 +132,8 @@ export class TingStack extends Stack {
         DOCS_BUCKET: docs.bucketName,
         EVENT_BUS: bus.eventBusName,
         WEB_ORIGIN: webOrigin,
+        WS_ENDPOINT: wsStage.callbackUrl,
+        REMINDER_EMAIL: reminderEmail,
         MODEL_FAST,
         MODEL_SMART,
         NODE_OPTIONS: '--enable-source-maps',
@@ -128,6 +142,22 @@ export class TingStack extends Stack {
     table.grantReadWriteData(apiFn);
     docs.grantReadWrite(apiFn); // presigned PUTs are signed as this role; Textract reads with its credentials
     bus.grantPutEventsTo(apiFn);
+    wsApi.grantManageConnections(apiFn); // the demo reminder run pushes to sockets
+
+    // Year-end reminders: a daily rule (EventBridge Scheduler isn't available in event accounts) sends the due ones.
+    const remindersFn = fn('RemindersFn', 'reminders.ts', {
+      timeout: Duration.seconds(60),
+      environment: { TABLE_NAME: table.tableName, WS_ENDPOINT: wsStage.callbackUrl, WEB_ORIGIN: webOrigin, REMINDER_EMAIL: reminderEmail },
+    });
+    table.grantReadWriteData(remindersFn);
+    wsApi.grantManageConnections(remindersFn);
+    const sesSend = new PolicyStatement({ actions: ['ses:SendEmail'], resources: ['*'] });
+    remindersFn.addToRolePolicy(sesSend);
+    apiFn.addToRolePolicy(sesSend);
+    new Rule(this, 'DailyReminders', {
+      schedule: Schedule.cron({ minute: '0', hour: '13' }), // 9am Eastern
+      targets: [new LambdaFunction(remindersFn)],
+    });
     apiFn.addToRolePolicy(new PolicyStatement({ actions: ['textract:DetectDocumentText'], resources: ['*'] }));
     apiFn.addToRolePolicy(
       new PolicyStatement({
@@ -146,7 +176,7 @@ export class TingStack extends Stack {
       defaultIntegration: new HttpLambdaIntegration('ApiIntegration', apiFn),
       corsPreflight: {
         allowOrigins: ['*'],
-        allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.POST, CorsHttpMethod.OPTIONS],
+        allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.POST, CorsHttpMethod.DELETE, CorsHttpMethod.OPTIONS],
         allowHeaders: ['content-type'],
         maxAge: Duration.hours(1),
       },
