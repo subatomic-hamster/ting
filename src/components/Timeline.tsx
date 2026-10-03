@@ -37,6 +37,7 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
   const end = endOfYear(year + 1);
   const totalDays = diffDays(end, start);
   const trackRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [shake, setShake] = useState<{ id: string; n: number } | null>(null);
   const [message, setMessage] = useState('');
   const [preview, setPreview] = useState<{ id: string; date: string } | null>(null);
@@ -94,6 +95,12 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
     attempt(item.procedureId, e.shiftKey ? addMonths(item.date, dir) : addDays(item.date, dir * 7));
   };
 
+  // On narrow screens the timeline scrolls; start it a little before "today".
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el && el.scrollWidth > el.clientWidth) el.scrollLeft = (el.scrollWidth * datePct(asOf, start, end)) / 100 - 48;
+  }, [asOf, start, end]);
+
   const months = Array.from({ length: 24 }, (_, i) => addMonths(start, i));
   const boundary = `${year + 1}-01-01`;
   const boundaryPct = datePct(boundary, start, end);
@@ -114,7 +121,7 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
           No scheduled work yet. Add treatment on the Treatment page.
         </p>
       ) : (
-        <div className="-mx-1 overflow-x-auto px-1 pb-2" role="group" aria-label={`Treatment timeline for ${year} and ${year + 1}`}>
+        <div ref={scrollRef} className="-mx-1 overflow-x-auto px-1 pb-2" role="group" aria-label={`Treatment timeline for ${year} and ${year + 1}`}>
           <div className="relative min-w-[860px]">
             <div className="mb-2 grid grid-cols-2 gap-6 pr-2">
               {result.gauges.slice(0, 2).map((g) => (

@@ -23,13 +23,15 @@ export interface DentistQuote {
   outOfNetworkExtra: number;
   /** Cost given the dentist's actual network status. */
   yourCost: number;
+  /** How much more than the cheapest dentist in the list (0 for the cheapest). */
+  vsCheapest: number;
 }
 
 export function priceDentists(
   input: EngineInput,
   dentists: { id: string; inNetwork: boolean; feeMultiplier: number }[],
 ): DentistQuote[] {
-  return dentists.map((d) => {
+  const quotes = dentists.map((d) => {
     const m = d.feeMultiplier;
     const procedures = input.procedures.map((p) => ({
       ...p,
@@ -47,4 +49,6 @@ export function priceDentists(
       yourCost: d.inNetwork ? inCost : outCost,
     };
   });
+  const cheapest = Math.min(...quotes.map((q) => q.yourCost));
+  return quotes.map((q) => ({ ...q, vsCheapest: round2(q.yourCost - cheapest) }));
 }

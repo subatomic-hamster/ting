@@ -1,3 +1,4 @@
+import { DemoDataPill } from '../components/DemoDataPill';
 import { ComparisonTable } from '../components/ComparisonTable';
 import { EnrollmentCard } from '../components/EnrollmentCard';
 import { FsaCard } from '../components/FsaCard';
@@ -22,7 +23,7 @@ export default function Enroll() {
 
       <EnrollmentCard />
 
-      <Section title="Compare plans" id="compare">
+      <Section title="Compare plans" id="compare" actions={<DemoDataPill label="Demo fees" />}>
         <ComparisonTable />
       </Section>
 
