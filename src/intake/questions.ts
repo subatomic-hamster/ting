@@ -1,5 +1,5 @@
 import { round2 } from '../engine/adjudicate';
-import { cdtLabel } from '../engine/cdt';
+import { CDT, cdtLabel } from '../engine/cdt';
 import { addMonths } from '../engine/dates';
 import { usd } from '../engine/format';
 import { evaluateSchedule } from '../engine/schedule';
@@ -10,15 +10,32 @@ import type { IntakeItem, IntakeQuestion } from './types';
 export const ASK_THRESHOLD = 25;
 const REPLACED_MONTHS_AGO = 36;
 
+/** Clinical order on one tooth: root canal, then buildup/post, then crown or bridge. */
+function stage(cdt: string): number | undefined {
+  if (CDT[cdt]?.category === 'endodontics') return 0;
+  if (cdt === 'D2950' || cdt === 'D2954') return 1;
+  if (CDT[cdt]?.prepDated) return 2;
+  return undefined;
+}
+
 /** Top answer of each item as a planned procedure. Items with no known fee can't be priced and are left out. */
 export function toProcedures(items: IntakeItem[], profile: Profile): PlannedProcedure[] {
-  return items.flatMap((item) => {
+  const procs: PlannedProcedure[] = items.flatMap((item) => {
     const cdt = item.candidates[0]?.cdt;
     if (!cdt) return [];
     const table = profile.fees[cdt];
     const fee = item.fee ?? table?.billed;
     if (fee === undefined) return [];
     return [{ id: item.id, cdt, tooth: item.teeth[0]?.tooth, fee, allowedFee: table?.inNetwork, inNetwork: true }];
+  });
+  // Each step on a tooth depends on the latest earlier step on that tooth.
+  return procs.map((p) => {
+    const s = stage(p.cdt);
+    if (s === undefined || p.tooth === undefined) return p;
+    const before = procs
+      .filter((q) => q.tooth === p.tooth && (stage(q.cdt) ?? 9) < s)
+      .sort((a, b) => (stage(b.cdt) ?? 0) - (stage(a.cdt) ?? 0))[0];
+    return before ? { ...p, dependsOn: [before.id] } : p;
   });
 }
 

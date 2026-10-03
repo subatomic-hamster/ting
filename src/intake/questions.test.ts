@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { DEMO_PROFILE } from '../data/demo';
 import { parseDescription } from './describe';
+import { readFileSync } from 'node:fs';
 import { ASK_THRESHOLD, intakeQuestions, toProcedures } from './questions';
+import { parseTreatmentPlanText } from './treatmentPlan';
 
 describe('toProcedures', () => {
   it('prices the top answer from the fee table, in network, with stable ids', () => {
@@ -12,6 +14,15 @@ describe('toProcedures', () => {
       { id: items[1].id, cdt: 'D4341', tooth: undefined, fee: 300, allowedFee: 210, inNetwork: true },
     ]);
     expect(toProcedures(parseDescription('crown on tooth 19 and a deep cleaning'), DEMO_PROFILE).map((p) => p.id)).toEqual(procs.map((p) => p.id));
+  });
+
+  it('orders work on one tooth: root canal, then buildup, then crown', () => {
+    const { items } = parseTreatmentPlanText(readFileSync(new URL('../../public/samples/treatment-plan.txt', import.meta.url), 'utf8'));
+    const procs = toProcedures(items, DEMO_PROFILE);
+    const by = (cdt: string, tooth?: number) => procs.find((p) => p.cdt === cdt && p.tooth === tooth);
+    expect(by('D2950', 19)?.dependsOn).toEqual([by('D3330', 19)?.id]);
+    expect(by('D2740', 19)?.dependsOn).toEqual([by('D2950', 19)?.id]);
+    expect(by('D2740', 30)?.dependsOn).toBeUndefined();
   });
 
   it('uses the fee the document states', () => {
