@@ -3,7 +3,7 @@
     "id": "low",
     "name": "Low",
     "rulesVersion": "PLAN-SAMPLE-LOW-v1",
-    "monthlyPremium": 14.5,
+    "monthlyPremium": 15,
     "deductible": { "individual": 50, "family": 150, "waivedFor": ["preventive"] },
     "annualMax": 1000,
     "coinsurance": {
@@ -37,7 +37,7 @@
     "id": "high",
     "name": "High",
     "rulesVersion": "PLAN-SAMPLE-HIGH-v1",
-    "monthlyPremium": 31.2,
+    "monthlyPremium": 32,
     "deductible": { "individual": 50, "family": 150, "waivedFor": ["preventive"] },
     "annualMax": 1500,
     "coinsurance": {
