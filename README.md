@@ -27,6 +27,7 @@ Copy `.env.example` to `.env.local`.
 | `VITE_USE_MOCKS` | `true`  | `true` runs everything in the browser on demo data. `false` uses `httpApi.ts`. |
 | `VITE_API_URL`  | –       | Base URL of the real backend (REST).                                    |
 | `VITE_WS_URL`   | –       | WebSocket URL for live `claim.adjudicated` events.                      |
+| `VITE_BRIDGE_URL` | `http://localhost:8787` | Local device bridge for SmileStreak brushes (see `hardware/`). |
 
 ## Architecture
 
@@ -104,6 +105,32 @@ Other personas: **Jordan, 25**, a new hire whose wisdom teeth are still in, and 
 | `/plan`         | Your plan's rules; benefits summary compiler; insurance card scan      |
 | `/share/:token` | Public, printable dentist handoff (no app chrome)                      |
 | `/admin`        | Employer insights, aggregate only; groups under 20 are hidden          |
+| `/habits`       | SmileStreak: opt-in, live brushing, rewards, streak, habit-informed estimate, dentist preview, privacy controls |
+| `/program`      | SmileStreak, Lincoln view: aggregate counts, program economics with an attribution slider |
+
+## SmileStreak: opt-in brushing data for rewards
+
+Like a safe-driving app for teeth, but **rewards only**: sharing data can lower what you pay, never raise it.
+
+- **Earn** (sample terms in `src/habits/program.ts`): $25 per cleaning, verified from Lincoln's own claims (no device needed), plus $10 per month you brush twice a day on 80% of days. Capped at $120 a year and paid next year as an FSA/HSA deposit or rollover.
+- **Reasonable alternative:** no smart brush? A dentist's home-care check earns the same brushing portion.
+- **Devices:** a simulated brush, a real **Oral-B** over Bluetooth, or a **DIY ESP32 clip**, all through the local bridge in `hardware/` (see `hardware/README.md`).
+- **Who benefits:**
+  - *You:* credits, streaks, live coaching, and an optional habit-informed nudge to "maybe" filling odds (±10 points, preventive/basic only, applied only if you choose).
+  - *Your dentist:* a 30-day home-care summary on the handoff page, if you share it: weakest quadrant, pressure warnings, consistency.
+  - *Lincoln:* group counts only (20+), and honest economics with a break-even attribution share, because participants self-select.
+- **Privacy:** opt-in, collects from consent onward, delete everything anytime. The employer sees only the credit amount. Never used for pricing, underwriting or claims.
+- **Anti-gaming:** sessions that are too short, stuck in one spot, left running or missing live readings don't count (`verifySession`).
+- **Code:**
+  - `src/habits/` holds the pure rules, analytics, simulation, bridge client and store, with tests in `habits.test.ts`.
+  - `src/components/habits/` holds the UI.
+  - Reward credits are computed in `rewards.ts`; components only format them.
+
+**Demo:**
+1. Open `/habits` as Dale and click **Brush now**: you'll see the live quadrant map, then a verified session.
+2. Switch to **Jordan** to show the opt-in moment: their cleaning already counts.
+3. Switch to **Priya** and click **Use 27% instead** on her maybe root canal.
+4. Open `/share/dale.cheapest.x` for the dentist's view and `/program` for Lincoln's view.
 
 ## Deploy (AWS Amplify Hosting)
 

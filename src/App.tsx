@@ -4,8 +4,10 @@ import Admin from './pages/Admin';
 import Dashboard from './pages/Dashboard';
 import Dentists from './pages/Dentists';
 import Enroll from './pages/Enroll';
+import Habits from './pages/Habits';
 import Onboarding from './pages/Onboarding';
 import PlanRules from './pages/PlanRules';
+import Program from './pages/Program';
 import Share from './pages/Share';
 import Treatment from './pages/Treatment';
 
@@ -21,6 +23,8 @@ export default function App() {
         <Route path="onboarding" element={<Onboarding />} />
         <Route path="dentists" element={<Dentists />} />
         <Route path="plan" element={<PlanRules />} />
+        <Route path="habits" element={<Habits />} />
+        <Route path="program" element={<Program />} />
         <Route path="admin" element={<Admin />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

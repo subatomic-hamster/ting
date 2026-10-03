@@ -5,6 +5,7 @@ import { api, USE_MOCKS } from '../api';
 import { PERSONA_IDS, PERSONAS } from '../data/personas';
 import { yearOf } from '../lib/dates';
 import { formatDate } from '../lib/format';
+import { useHabitStore } from '../habits/store';
 import { useAppStore } from '../store';
 import { CloseIcon } from './Icons';
 
@@ -25,6 +26,8 @@ export function DemoPanel() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const fire = useMutation({ mutationFn: () => api.fireMockClaim(useAppStore.getState().profile) });
+  const brushNow = useHabitStore((s) => s.brushNow);
+  const brushing = useHabitStore((s) => s.live?.state === 'running');
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -89,6 +92,9 @@ export function DemoPanel() {
           onClick={() => fire.mutate()}
         >
           {fire.isPending ? 'Sending…' : fire.isError ? 'Nothing left to claim' : 'Fire mock claim'}
+        </button>
+        <button type="button" className="btn-secondary px-2 py-1.5 text-xs" disabled={brushing} onClick={brushNow}>
+          {brushing ? 'Brushing…' : 'Brush now'}
         </button>
         <button
           type="button"

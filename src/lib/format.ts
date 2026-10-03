@@ -43,6 +43,12 @@ export function formatDate(iso: string, opts: { year?: boolean } = {}): string {
   return (opts.year ? longDate : shortDate).format(d);
 }
 
+/** Seconds as m:ss, e.g. 124 → "2:04". */
+export function formatDuration(totalSec: number): string {
+  const s = Math.max(0, Math.round(totalSec));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
 export function formatTime(isoTimestamp: string): string {
   return new Date(isoTimestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }

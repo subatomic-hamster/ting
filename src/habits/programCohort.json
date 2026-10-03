@@ -1,0 +1,57 @@
+{
+  "isDemoData": true,
+  "eligibleMembers": 2000,
+  "participants": 640,
+  "preventiveCompletion": {
+    "participants": 0.81,
+    "nonParticipants": 0.54
+  },
+  "restorativeClaimsPer1000": {
+    "participants": 245,
+    "nonParticipants": 390
+  },
+  "avgRestorativeClaimPaid": 940,
+  "avgCleaningPaid": 90,
+  "avgCreditPaid": 78,
+  "deviceSubsidy": {
+    "perDevice": 40,
+    "devices": 210
+  },
+  "groups": [
+    {
+      "id": "g1",
+      "name": "Plant 1",
+      "n": 820,
+      "participationRate": 0.32,
+      "twiceDailyRate": 0.71
+    },
+    {
+      "id": "g2",
+      "name": "Plant 2",
+      "n": 610,
+      "participationRate": 0.27,
+      "twiceDailyRate": 0.66
+    },
+    {
+      "id": "g3",
+      "name": "Headquarters",
+      "n": 550,
+      "participationRate": 0.37,
+      "twiceDailyRate": 0.78
+    },
+    {
+      "id": "g4",
+      "name": "Night shift, Plant 3",
+      "n": 14,
+      "participationRate": 0.5,
+      "twiceDailyRate": 0.6
+    },
+    {
+      "id": "g5",
+      "name": "Interns",
+      "n": 6,
+      "participationRate": 0.33,
+      "twiceDailyRate": 0.5
+    }
+  ]
+}

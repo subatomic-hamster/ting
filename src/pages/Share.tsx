@@ -5,6 +5,10 @@ import { EstimateFooter } from '../components/EstimateFooter';
 import { HandoffSheet } from '../components/HandoffSheet';
 import { isPersonaId, PERSONAS, type PersonaId } from '../data/personas';
 import { optimize } from '../engine/schedule';
+import { HomeCareSummary } from '../components/habits/HomeCareSummary';
+import { dentistSummary } from '../habits/analytics';
+import { SMILESTREAK } from '../habits/program';
+import { useHabitStore } from '../habits/store';
 import { todayISO } from '../lib/dates';
 import { HORIZON, selectActive, useAppStore, type ActiveSchedule } from '../store';
 
@@ -23,6 +27,9 @@ export default function Share() {
   const storePersona = useAppStore((s) => s.personaId);
   const storeProfile = useAppStore((s) => s.profile);
   const storeActive = useAppStore(selectActive);
+  const habits = useHabitStore((s) => (s.personaId === personaId && s.consent.shareWithDentist ? s.sessions : null));
+  const asOf = useAppStore((s) => s.profile.asOf);
+  const homeCare = useMemo(() => (habits ? dentistSummary(habits, asOf, SMILESTREAK) : null), [habits, asOf]);
 
   const { profile, schedule } = useMemo((): { profile: typeof storeProfile; schedule: ActiveSchedule } => {
     // Same browser as the member? Use their live plan. Otherwise rebuild it from the demo persona.
@@ -38,6 +45,14 @@ export default function Share() {
         <DemoDataPill label="Demo handoff" />
       </div>
       <HandoffSheet patientName={PERSONAS[personaId].name} procedures={profile.procedures} schedule={schedule} rulesVersion={profile.currentPlan.version} />
+      <section className="card mx-auto mt-4 max-w-3xl" aria-labelledby="homecare-title">
+        <h2 id="homecare-title" className="text-lg font-semibold">Home-care summary</h2>
+        {homeCare ? (
+          <HomeCareSummary summary={homeCare} patientName={PERSONAS[personaId].name} />
+        ) : (
+          <p className="mt-1 text-sm text-muted">The patient hasn’t shared smart-brush data. You can confirm good home care at the visit instead.</p>
+        )}
+      </section>
       <EstimateFooter />
     </div>
   );
