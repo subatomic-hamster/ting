@@ -1,0 +1,19 @@
+{
+  "isDemoData": true,
+  "zip": "27401",
+  "note": "Fictional practices for the demo. Names, distances and fees are made up.",
+  "dentists": [
+    { "id": "d01", "name": "Fisher Park Dental Studio", "neighborhood": "Fisher Park", "distanceMiles": 0.8, "inNetwork": true, "feeMultiplier": 1.0, "acceptingNew": true },
+    { "id": "d02", "name": "Summit Avenue Smiles", "neighborhood": "Summit Ave", "distanceMiles": 1.4, "inNetwork": false, "feeMultiplier": 1.12, "acceptingNew": true },
+    { "id": "d03", "name": "Lindley Park Dental Care", "neighborhood": "Lindley Park", "distanceMiles": 2.1, "inNetwork": true, "feeMultiplier": 0.94, "acceptingNew": true },
+    { "id": "d04", "name": "Battleground Family Dentistry", "neighborhood": "Battleground", "distanceMiles": 3.6, "inNetwork": true, "feeMultiplier": 1.05, "acceptingNew": false },
+    { "id": "d05", "name": "Irving Park Dental Arts", "neighborhood": "Irving Park", "distanceMiles": 2.7, "inNetwork": false, "feeMultiplier": 1.35, "acceptingNew": true },
+    { "id": "d06", "name": "College Hill Dental", "neighborhood": "College Hill", "distanceMiles": 1.1, "inNetwork": true, "feeMultiplier": 0.98, "acceptingNew": true },
+    { "id": "d07", "name": "Westover Terrace Dental", "neighborhood": "Westover", "distanceMiles": 2.4, "inNetwork": false, "feeMultiplier": 1.08, "acceptingNew": true },
+    { "id": "d08", "name": "Starmount Dental Group", "neighborhood": "Starmount", "distanceMiles": 4.9, "inNetwork": true, "feeMultiplier": 0.9, "acceptingNew": true },
+    { "id": "d09", "name": "Sedgefield Smile Center", "neighborhood": "Sedgefield", "distanceMiles": 7.3, "inNetwork": true, "feeMultiplier": 0.87, "acceptingNew": true },
+    { "id": "d10", "name": "Glenwood Community Dental", "neighborhood": "Glenwood", "distanceMiles": 1.9, "inNetwork": true, "feeMultiplier": 0.92, "acceptingNew": true },
+    { "id": "d11", "name": "Hamilton Lakes Dentistry", "neighborhood": "Hamilton Lakes", "distanceMiles": 5.2, "inNetwork": false, "feeMultiplier": 1.22, "acceptingNew": true },
+    { "id": "d12", "name": "Guilford Hills Dental", "neighborhood": "Guilford Hills", "distanceMiles": 6.0, "inNetwork": true, "feeMultiplier": 1.02, "acceptingNew": true }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "deductible": { "term": "Deductible", "definition": "The amount you pay each year before the plan starts sharing the cost of basic and major work." },
+  "coinsurance": { "term": "Coinsurance", "definition": "The percentage of the allowed fee the plan pays after your deductible; you pay the rest." },
+  "annual maximum": { "term": "Annual maximum", "definition": "The most the plan will pay for your care in one plan year; after that you pay the full allowed fee." },
+  "waiting period": { "term": "Waiting period", "definition": "How long you must be on the plan before certain services, such as crowns, are covered." },
+  "frequency limit": { "term": "Frequency limit", "definition": "How often the plan covers a service, such as two cleanings per calendar year." },
+  "alternate benefit": { "term": "Alternate benefit", "definition": "When the plan pays as if you got a cheaper treatment (for example, a silver filling instead of a tooth-colored one) and you pay the difference." },
+  "balance billing": { "term": "Balance billing", "definition": "When an out-of-network dentist bills you for the gap between their fee and what the plan allows." },
+  "usual and customary": { "term": "Usual and customary (U&C)", "definition": "The fee the plan considers normal for a service in your area, used to set what it pays out of network." },
+  "eob": { "term": "EOB", "definition": "Explanation of Benefits: the statement your insurer sends showing what was billed, allowed, paid and what you owe." },
+  "fsa": { "term": "FSA", "definition": "A flexible spending account that lets you pay for dental care with pre-tax money, but unused money can expire." }
+}

@@ -1,0 +1,13 @@
+Greensboro Family Dental — Treatment Plan
+Patient: Jordan Rivera        Date: 10/02/2026
+Insurance: Lincoln DentalConnect, Group 00412345
+
+Tooth   Code    Description                          Fee
+#19     D3330   Root canal - molar                   $1,180.00
+#19     D2950   Core buildup                         $330.00
+#19     D2740   Crown - porcelain/ceramic            $1,450.00
+#30     D2740   Crown - porcelain/ceramic            $1,450.00
+        D1110   Prophylaxis - adult                  $120.00
+
+Total estimate                                       $4,530.00
+Demo document — not a real patient record.
