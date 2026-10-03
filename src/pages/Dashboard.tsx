@@ -7,6 +7,7 @@ import { FsaCountdown } from '../components/FsaCountdown';
 import { LeftOnTableBanner } from '../components/LeftOnTableBanner';
 import { MaxGauge } from '../components/MaxGauge';
 import { SamplePlanNote } from '../components/SamplePlanNote';
+import { RemindersCard } from '../components/RemindersCard';
 import { PageHeader, Section } from '../components/Section';
 import { Timeline } from '../components/Timeline';
 import { PERSONAS } from '../data/personas';
@@ -53,6 +54,8 @@ export default function Dashboard() {
       <Section title="Treatment timeline" id="timeline" actions={<Link to="/treatment" className="btn-ghost">Details</Link>}>
         <Timeline compact />
       </Section>
+
+      <RemindersCard />
 
       <Section title="Activity" id="activity" actions={<DemoDataPill label="Demo claims feed" />}>
         <ActivityFeed />
