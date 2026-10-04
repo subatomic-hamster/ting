@@ -97,6 +97,8 @@ test("published provider reference retains source and unknown allowance", async 
 
 test("tap date edits survive a live profile refresh", async ({ page }) => {
   await page.goto("/treatment");
+  const typing = page.locator("details", { has: page.getByText("Change dates by typing them") });
+  if (!(await typing.evaluate((d: HTMLDetailsElement) => d.open))) await typing.locator("summary").click();
   const input = page.getByLabel("Date for Crown (porcelain) on #30", { exact: true });
   const before = await input.inputValue();
   const date = `${before.slice(0, 4)}-02-15`;
@@ -104,6 +106,7 @@ test("tap date edits survive a live profile refresh", async ({ page }) => {
   await input.locator("xpath=../..").getByRole("button", { name: "Apply date" }).click();
   await expect(page.getByText(/Crown .* moved to Feb 15/).first()).toBeAttached();
   await page.reload();
+  if (!(await typing.evaluate((d: HTMLDetailsElement) => d.open))) await typing.locator("summary").click();
   await expect(input).toHaveValue(date);
 });
 
