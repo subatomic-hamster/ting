@@ -4,7 +4,7 @@
 // pre-treatment estimates. Pure builders here; storage in carrier.ts.
 import { DEMO_FEES } from '../../../src/engine/cdt';
 import type { PlanRules } from '../../../src/engine/types';
-import { PERSONAS, type PersonaId } from '../../../src/data/personas';
+import type { Member } from '../../../src/data/members';
 import dentists from '../../../src/fixtures/dentists.json';
 
 export const GROUP_NUMBER = '00412345';
@@ -172,17 +172,19 @@ export function totals(lines: ClaimLine[]) {
 }
 
 /** Everything the carrier holds for a demo member, as of a date: enrollment, plan, accumulators, claim history. */
-export function seedRecords(personaId: PersonaId, asOf: string) {
-  const persona = PERSONAS[personaId];
+const PERSONA_EMPLOYEE_IDS: Record<string, string> = { dale: 'E1001', jordan: 'E1002', priya: 'E1003' };
+
+/** Works for a demo persona and for a member who signed up (`U-` id: an employee number derived from the member id). */
+export function seedRecords(persona: Member, asOf: string) {
   const profile = persona.profile(asOf);
   const provider = providerFor(persona.currentDentistId);
   const member: CarrierMember = {
     memberId: persona.memberId,
-    subscriberId: persona.memberId.replace('M-', 'S-'),
+    subscriberId: persona.memberId.replace(/^[MU]-/, 'S-'),
     relationship: 'self',
     firstName: persona.name,
     employer: persona.employer,
-    employeeId: { dale: 'E1001', jordan: 'E1002', priya: 'E1003' }[personaId],
+    employeeId: PERSONA_EMPLOYEE_IDS[persona.id] ?? `E${persona.memberId.slice(-4)}`,
     groupNumber: GROUP_NUMBER,
     planId: profile.currentPlan.id,
     coverageTier: persona.coverage,
@@ -190,7 +192,7 @@ export function seedRecords(personaId: PersonaId, asOf: string) {
     zip: dentists.zip,
     primaryDentistNpi: provider.npi,
     dependents:
-      personaId === 'priya'
+      persona.id === 'priya'
         ? [
             { name: 'Child 1', relationship: 'child', age: 13 },
             { name: 'Child 2', relationship: 'child', age: 9 },

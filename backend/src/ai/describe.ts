@@ -3,6 +3,7 @@
 import { CDT } from '../../../src/engine/cdt';
 import { makeItem, parseDescription, withoutCount } from '../../../src/intake/describe';
 import type { IntakeItem, IntakeSource } from '../../../src/intake/types';
+import { logWarn } from '../lib/log';
 import { isRec, type CallModel } from './model';
 import type { Decide, WinnowQuestion } from './winnow';
 
@@ -35,7 +36,7 @@ export async function describeWithModel(text: string, call: CallModel, source: I
     const out = await call({ model: 'fast', system: SYSTEM, prompt: text.slice(0, 2000), tool: TOOL, maxTokens: 400 });
     rewritten = isRec(out) && typeof out.clauses === 'string' ? out.clauses.trim() : '';
   } catch (err) {
-    console.warn('describe: model call failed, using the parser alone', err);
+    logWarn('describe.model_failed', err);
   }
   if (!rewritten) return direct;
   const viaModel = parseDescription(rewritten, source);

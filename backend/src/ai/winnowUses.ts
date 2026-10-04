@@ -16,6 +16,7 @@ import {
 } from '../../../src/engine/decisions';
 import { pct, usd } from '../../../src/engine/format';
 import type { IntakeItem } from '../../../src/intake/types';
+import { logWarn } from '../lib/log';
 import type { Decide, WinnowQuestion, WinnowResult } from './winnow';
 
 const at = (o: unknown, path: string): unknown => path.split('.').reduce<unknown>((x, k) => (x && typeof x === 'object' ? (x as Record<string, unknown>)[k] : undefined), o);
@@ -127,7 +128,7 @@ export async function enrichDocument<T extends { kind: string; items: IntakeItem
     if (doc.kind === 'invoice' && doc.invoice?.lines.length) return { ...doc, lineChecks: (await classifyLines(doc.invoice.lines, decide)).lines };
     if (doc.kind === 'treatment_plan') return { ...doc, items: await readNotes(doc.items, decide) };
   } catch (err) {
-    console.warn('document checks skipped', err);
+    logWarn('winnow.document_checks_skipped', err);
   }
   return doc;
 }

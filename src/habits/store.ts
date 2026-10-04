@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { readDraft, saveDraft } from "../lib/drafts";
 import { formatDuration } from "../lib/format";
-import { yearOf } from "../lib/dates";
+import { addDays, yearOf } from "../lib/dates";
 import { useAppStore } from "../store";
 import {
   connectBridge,
@@ -54,6 +54,8 @@ export interface HabitState {
 
   optIn: () => void;
   optOut: () => void;
+  /** Sample data: opts in and fills the last 30 days with simulated sessions, as if imported from a brush app. */
+  importSample: () => void;
   setShare: (
     key: "shareWithDentist" | "shareAggregateWithLincoln",
     value: boolean,
@@ -164,6 +166,29 @@ export const useHabitStore = create<HabitState>()((set, get) => ({
     for (const id of Object.keys(get().baseLikelihood))
       get().undoAdjustment(id);
     trace("habits.consent", `Opted out; deleted ${n} brushing sessions`);
+  },
+
+  importSample: () => {
+    const { asOf, personaId, consent, sessions } = get();
+    stopDevice();
+    const consentedAt = addDays(asOf, -30);
+    set({
+      consent: { ...consent, optedIn: true, consentedAt },
+      sessions: [
+        ...seedHistory(personaId, asOf, consentedAt),
+        ...sessions.filter((x) => x.source !== "seed"),
+      ],
+      device: {
+        kind: "simulated",
+        status: "connected",
+        name: habitProfile(personaId).deviceName,
+      },
+      live: null,
+    });
+    trace(
+      "habits.import",
+      "Imported 30 days of sample brushing data from a brush app (demo)",
+    );
   },
 
   setShare: (key, value) => {

@@ -1,5 +1,6 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures';
 import { registerPlanFlows } from '../planFlows';
+import { registerSignupFlows } from '../signupFlows';
 
 let externalRequests: string[] = [];
 // No internet, AWS credentials, remote fonts or OCR CDN may be needed by these flows.
@@ -17,6 +18,7 @@ test.beforeEach(async ({ context, baseURL }) => {
 test.afterEach(() => expect(externalRequests).toEqual([]));
 
 registerPlanFlows();
+registerSignupFlows();
 
 test('container health, worker MIME and direct client routes', async ({ page, request }) => {
   expect((await request.get('/healthz')).status()).toBe(200);

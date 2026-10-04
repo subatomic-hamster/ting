@@ -1,5 +1,9 @@
+import { useState } from "react";
 import { USE_MOCKS } from "../api";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { DentalProfileCard } from "../components/DentalProfileCard";
+import { useMemberRecord } from "../components/useMemberRecord";
+import { YearEndReview } from "../components/YearEndReview";
 import { LeftOnTableBanner } from "../components/LeftOnTableBanner";
 import { ActivityFeed } from "../components/ActivityFeed";
 import { AskTing } from "../components/AskTing";
@@ -21,6 +25,21 @@ export default function Dashboard() {
   const profile = useProfile();
   const active = useActive();
   const [gauge] = maxGauges(profile, active);
+  const record = useMemberRecord();
+  const today = useAppStore((s) => s.today);
+  const welcomeParam = useSearchParams()[0].has("welcome");
+  // Sign-up lands on /?welcome=1, but Welcome.tsx can redirect to "/" first and drop the param, so a member who
+  // signed up today also sees it, until they dismiss it.
+  const seenKey = `ting.welcomed.${record?.memberId}`;
+  const [dismissed, setDismissed] = useState(() => {
+    try {
+      return localStorage.getItem(seenKey) === "1";
+    } catch {
+      return false;
+    }
+  });
+  const welcome =
+    !!record && !dismissed && (welcomeParam || record.createdAt === today);
   return (
     <div className="space-y-8">
       <PageHeader
@@ -58,7 +77,38 @@ export default function Dashboard() {
             : "Add your treatment"}
         </Link>
       </section>
+      {welcome && (
+        <section
+          aria-label="Welcome"
+          className="border-l-2 border-save pl-5"
+          data-testid="welcome"
+        >
+          <h2 className="text-base">
+            Welcome, {record.name}. Your profile is ready.
+          </h2>
+          <p className="mt-1 text-base text-muted">
+            We turned your answers into a starting estimate of your dental
+            year, below. Brush data from SmileStreak can sharpen it later.
+          </p>
+          <button
+            type="button"
+            className="btn-ghost -ml-4"
+            onClick={() => {
+              setDismissed(true);
+              try {
+                localStorage.setItem(seenKey, "1");
+              } catch {
+                /* blocked storage: it just shows again next visit */
+              }
+            }}
+          >
+            Got it
+          </button>
+        </section>
+      )}
+      <DentalProfileCard />
       {isEnrollmentWindow(profile.asOf) && <EnrollmentCard variant="compact" />}
+      <YearEndReview link />
       <LeftOnTableBanner />
       <Section
         title="Treatment timeline"

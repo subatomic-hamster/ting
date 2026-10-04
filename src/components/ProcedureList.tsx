@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { placementReasons } from "../engine/reasons";
 import type { PlannedProcedure } from "../engine/types";
 import { formatDate, formatMoney, groupVisits, visitName } from "../lib/format";
-import { useActive, useAppStore } from "../store";
+import { HORIZON, useActive, useAppStore } from "../store";
 import { CloseIcon, LockIcon } from "./Icons";
 
 /** One card per appointment: "3 × Tooth-colored filling" is one visit, removed or selected together. */
@@ -20,7 +21,13 @@ export function ProcedureList({
     ids: string[];
     name: string;
   }>();
-  const owes = new Map(useActive().lines.map((l) => [l.id, l.memberOwes]));
+  const active = useActive();
+  const profile = useAppStore((s) => s.profile);
+  const owes = new Map(active.lines.map((l) => [l.id, l.memberOwes]));
+  const reasons = useMemo(
+    () => placementReasons(profile, active, { horizon: HORIZON }),
+    [profile, active],
+  );
 
   if (!procedures.length && !undo) {
     return (
@@ -84,6 +91,18 @@ export function ProcedureList({
                       ` · dentist's deadline ${formatDate(p.deadline, { year: true })}`}
                     {!p.inNetwork && " · out of network"}
                   </span>
+                  {reasons[p.id] && (
+                    <span className="w-full text-xs text-ink/80">
+                      {reasons[p.id].text}
+                      {reasons[p.id].maxLeftAfter !== undefined && (
+                        <span className="tabular text-muted">
+                          {" "}
+                          {reasons[p.id].year} annual max left after:{" "}
+                          {formatMoney(reasons[p.id].maxLeftAfter ?? 0)}.
+                        </span>
+                      )}
+                    </span>
+                  )}
                 </button>
                 <button
                   type="button"

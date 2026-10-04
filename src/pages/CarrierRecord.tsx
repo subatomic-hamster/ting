@@ -19,11 +19,13 @@ const CARC: Record<string, string> = {
 export default function CarrierRecord() {
   const personaId = useAppStore((s) => s.personaId);
   const qc = useQueryClient();
+  // Offline, the record is derived from the member's ledger in the browser, so it refetches when the ledger changes.
+  const ledger = useAppStore((s) => s.profile.ledger);
+  const plan = useAppStore((s) => s.profile.currentPlan.id);
   const rec = useQuery({
-    queryKey: ["carrier", personaId],
+    queryKey: USE_MOCKS ? ["carrier", personaId, ledger, plan] : ["carrier", personaId],
     queryFn: () => api.getCarrierRecord(),
-    enabled: !USE_MOCKS,
-    refetchInterval: 5000,
+    refetchInterval: USE_MOCKS ? false : 5000,
   });
   const visit = useMutation({
     mutationFn: () => api.fireMockClaim(useAppStore.getState().profile),
@@ -47,9 +49,7 @@ export default function CarrierRecord() {
       >
         <DemoDataPill label="Demo carrier data" />
       </PageHeader>
-      {USE_MOCKS ? (
-        <p className="text-sm text-muted">Needs the live backend.</p>
-      ) : !r?.member ? (
+      {!r?.member ? (
         <p className="text-sm text-muted">Loading…</p>
       ) : (
         <>

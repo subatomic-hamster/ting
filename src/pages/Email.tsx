@@ -2,7 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { api, type Contact } from "../api";
 import { DemoDataPill } from "../components/DemoDataPill";
+import { TryItSamples } from "../components/demo/EmailDemoControls";
 import { ForwardingCard } from "../components/ForwardingCard";
+import { DeidentifiedNote, PrivacyIngestion } from "../components/PrivacyIngestion";
 import { PageHeader, Section } from "../components/Section";
 import { formatDate, formatMoney } from "../lib/format";
 import { useAppStore } from "../store";
@@ -43,8 +45,9 @@ function EmailSettings() {
         it, updates your record, plans any work and replies.
         {info.data && !info.data.live && (
           <span className="block text-xs text-muted">
-            Email delivery isn&rsquo;t connected yet. Messages show under
-            &ldquo;What Ting sent&rdquo;.
+            Offline demo: this address is simulated in your browser. Ting reads
+            what you &ldquo;send&rdquo; here on this device, and the replies
+            show under &ldquo;What Ting sent&rdquo;.
           </span>
         )}
       </p>
@@ -123,6 +126,25 @@ function EmailSettings() {
   );
 }
 
+/** The agent's address, big, so a visitor on a phone knows where mail goes. */
+function AgentAddress() {
+  const personaId = useAppStore((s) => s.personaId);
+  const info = useQuery({ queryKey: ["contact", personaId], queryFn: () => api.getContact() });
+  if (!info.data) return null;
+  return (
+    <div className="mb-3 rounded-xl border border-brand-500/30 bg-brand-50 p-3 text-sm">
+      <p className="text-xs text-muted">Ting&rsquo;s email address</p>
+      <p className="break-all font-mono text-base font-semibold">{info.data.agent}</p>
+      {!info.data.live && (
+        <p className="mt-1 text-xs text-muted">
+          Offline demo: the address is simulated in your browser. The buttons
+          below send mail to Ting&rsquo;s reader on this device.
+        </p>
+      )}
+    </div>
+  );
+}
+
 function Received() {
   const personaId = useAppStore((s) => s.personaId);
   const docs = useQuery({
@@ -155,8 +177,10 @@ function Received() {
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <span className="font-medium">{d.subject || "(no subject)"}</span>
             <span className="text-xs text-muted">
-              {d.role === "dentist" ? "from your dentist" : "from you"} ·{" "}
-              {new Date(d.receivedAt).toLocaleString()}
+              {d.role === "dentist" ? "from your dentist" : "from you"}
+              {Number.isNaN(new Date(d.receivedAt).getTime())
+                ? ""
+                : ` · ${new Date(d.receivedAt).toLocaleString()}`}
             </span>
           </div>
           {d.urgent && (
@@ -188,8 +212,9 @@ function Received() {
                         {p.memberOwes !== undefined &&
                           `, you owe ${formatMoney(p.memberOwes)}`}
                         {p.billed !== undefined &&
-                          p.planPaid === undefined &&
-                          `, ${formatMoney(p.billed)}`}
+                          `, billed ${formatMoney(p.billed)}`}
+                        {d.plan?.items.find((x) => x.label === p.label) &&
+                          ` · you pay about ${formatMoney(d.plan.items.find((x) => x.label === p.label)?.memberOwes ?? 0)}`}
                         {p.deadline &&
                           `, by ${formatDate(p.deadline, { year: true })}`}
                       </li>
@@ -207,7 +232,7 @@ function Received() {
                     {d.plan.items
                       .map(
                         (i) =>
-                          `${i.label} ${formatDate(i.date)} (${formatMoney(i.memberOwes)})`,
+                          `${i.label} ${formatDate(i.date)}, you pay about ${formatMoney(i.memberOwes)}`,
                       )
                       .join("; ")}
                     {d.plan.dentist &&
@@ -217,6 +242,7 @@ function Received() {
               </>
             )
           )}
+          <DeidentifiedNote deidentified={d.deidentified} />
         </li>
       ))}
     </ul>
@@ -289,10 +315,10 @@ export default function EmailPage() {
       >
         <DemoDataPill label="Demo mail" />
       </PageHeader>
-      <Section title="Your email and alerts" id="settings">
-        <EmailSettings />
+      <Section title="Try it: email Ting" id="try">
+        <AgentAddress />
+        <TryItSamples />
       </Section>
-      <ForwardingCard />
       <div className="grid gap-5 lg:grid-cols-2">
         <Section title="What Ting read" id="received">
           <Received />
@@ -301,6 +327,11 @@ export default function EmailPage() {
           <Outbox />
         </Section>
       </div>
+      <PrivacyIngestion />
+      <Section title="Your email and alerts" id="settings">
+        <EmailSettings />
+      </Section>
+      <ForwardingCard />
     </div>
   );
 }

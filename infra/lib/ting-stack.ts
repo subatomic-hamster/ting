@@ -190,12 +190,17 @@ export class TingStack extends Stack {
     acme.addDomain('AcmeDomain', { cognitoDomain: { domainPrefix: `acme-sso-${this.account}` } });
 
     const preTokenFn = fn('PreTokenFn', 'pretoken.ts');
+    // Visitors (the QR code) sign themselves up with email + password. SES is in the sandbox, so there is no
+    // verification email: the pre-sign-up trigger confirms the account and marks the address verified.
+    // These are in-place updates of the existing pool (sign-in aliases and attributes stay as they were).
+    const preSignUpFn = fn('PreSignUpFn', 'presignup.ts');
     const members = new UserPool(this, 'Members', {
       userPoolName: 'ting-members',
-      selfSignUpEnabled: false,
+      selfSignUpEnabled: true,
+      passwordPolicy: { minLength: 8, requireLowercase: true, requireDigits: true, requireUppercase: false, requireSymbols: false },
       signInAliases: { email: true },
       customAttributes: employeeAttrs,
-      lambdaTriggers: { preTokenGeneration: preTokenFn },
+      lambdaTriggers: { preSignUp: preSignUpFn, preTokenGeneration: preTokenFn },
       removalPolicy: RemovalPolicy.DESTROY,
     });
     const membersDomain = members.addDomain('MembersDomain', { cognitoDomain: { domainPrefix: `ting-${this.account}` } });
@@ -231,8 +236,13 @@ export class TingStack extends Stack {
     });
     const webClient = members.addClient('Web', {
       generateSecret: false,
-      supportedIdentityProviders: [UserPoolClientIdentityProvider.custom('AcmeCorp')],
+      // The app calls SignUp / InitiateAuth (USER_PASSWORD_AUTH) directly for password members; Acme SSO stays on OAuth.
+      authFlows: { userPassword: true, userSrp: true },
+      supportedIdentityProviders: [UserPoolClientIdentityProvider.COGNITO, UserPoolClientIdentityProvider.custom('AcmeCorp')],
       readAttributes: employeeRead,
+      // Self sign-up must never let a visitor set employer_id / employee_id / role (they decide the group): only the
+      // email can be written from the browser. Federated Acme attributes come from the identity provider mapping.
+      writeAttributes: new ClientAttributes().withStandardAttributes({ email: true }),
       oAuth: {
         flows: { authorizationCodeGrant: true },
         scopes: [OAuthScope.OPENID, OAuthScope.EMAIL, OAuthScope.PROFILE],
@@ -310,7 +320,12 @@ export class TingStack extends Stack {
       schedule: Schedule.cron({ minute: '0', hour: '13' }), // 9am Eastern
       targets: [new LambdaFunction(remindersFn)],
     });
-    apiFn.addToRolePolicy(new PolicyStatement({ actions: ['textract:DetectDocumentText'], resources: ['*'] }));
+    // Multi-page PDFs are read with Textract's asynchronous job (DetectDocumentText accepts one page only).
+    const textractRead = new PolicyStatement({
+      actions: ['textract:DetectDocumentText', 'textract:StartDocumentTextDetection', 'textract:GetDocumentTextDetection'],
+      resources: ['*'],
+    });
+    apiFn.addToRolePolicy(textractRead);
     apiFn.addToRolePolicy(
       new PolicyStatement({
         actions: ['bedrock:InvokeModel'],
@@ -372,7 +387,7 @@ export class TingStack extends Stack {
       f.addToRolePolicy(bedrockInvoke);
     }
     docs.grantReadWrite(emailAgentFn);
-    emailAgentFn.addToRolePolicy(new PolicyStatement({ actions: ['textract:DetectDocumentText'], resources: ['*'] }));
+    emailAgentFn.addToRolePolicy(textractRead);
     carrierSyncFn.addEventSource(new DynamoEventSource(carrier, { startingPosition: StartingPosition.LATEST, batchSize: 10, retryAttempts: 2 }));
     // The API takes webhooks and demo emails and hands them to the agent.
     carrier.grantReadWriteData(apiFn);
@@ -401,7 +416,7 @@ export class TingStack extends Stack {
     docs.grantRead(ingestFn);
     table.grantReadData(ingestFn); // the Winnow worker's heartbeat and answers
     winnowQueue.grantSendMessages(ingestFn);
-    ingestFn.addToRolePolicy(new PolicyStatement({ actions: ['textract:DetectDocumentText'], resources: ['*'] }));
+    ingestFn.addToRolePolicy(textractRead);
     ingestFn.addToRolePolicy(
       new PolicyStatement({
         actions: ['bedrock:InvokeModel', 'aws-marketplace:ViewSubscriptions', 'aws-marketplace:Subscribe'],
@@ -422,6 +437,7 @@ export class TingStack extends Stack {
         'contentType.$': '$.contentType',
         'text.$': '$.read.text',
         'hash.$': '$.read.hash',
+        'member.$': '$.member',
       }),
       payloadResponseOnly: true,
       resultPath: '$.doc',
@@ -469,7 +485,7 @@ export class TingStack extends Stack {
         Source.data(
           'config.js',
           `window.TING_CONFIG = {"useMocks":false,"apiUrl":"${apiUrl}","wsUrl":"${wsStage.url}",` +
-            `"auth":{"domain":"${membersDomain.baseUrl()}","clientId":"${webClient.userPoolClientId}","idp":"AcmeCorp"}};\n`,
+            `"auth":{"domain":"${membersDomain.baseUrl()}","clientId":"${webClient.userPoolClientId}","idp":"AcmeCorp","region":"${this.region}","userPoolId":"${members.userPoolId}"}};\n`,
         ),
       ],
       destinationBucket: site,

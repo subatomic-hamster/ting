@@ -127,8 +127,9 @@ export function CredentialsForm({ mode }: { mode: 'signIn' | 'signUp' }) {
       </button>
       {signUp && (
         <p className="text-sm text-muted">
-          Your email is also how Ting recognizes messages you forward to its inbox. Ting never reads your mailbox, and your employer never sees
-          your dental data.
+          By creating an account you agree that Ting reads your dental plan, your claims and anything you type, upload or email to it, never your
+          inbox. Your employer sees only de-identified totals for groups of 20 or more. You can delete your data anytime. Your email is also how
+          Ting recognizes messages you send to its inbox.
         </p>
       )}
     </form>

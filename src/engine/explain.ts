@@ -28,7 +28,14 @@ const CLASS_NAME = {
   excluded: "Excluded",
 } as const;
 
-export function explainLine(line: AdjudicatedLine): ExplainedStep[] {
+/** "basic and major": the classes this plan's deductible applies to (the line's own class when the rules aren't given). */
+function deductibleClasses(line: AdjudicatedLine, rules?: PlanRules): string {
+  const names = (rules?.deductible.appliesTo ?? [line.serviceClass]).map((c) => CLASS_NAME[c].toLowerCase());
+  return names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : (names[0] ?? "covered");
+}
+
+/** `rules` (the plan in force for the line's year) lets the deductible sentence name the classes the plan really applies it to. */
+export function explainLine(line: AdjudicatedLine, rules?: PlanRules): ExplainedStep[] {
   const name = nameOf(line).replace(/^./, (c) => c.toLowerCase());
   const category = CDT[line.cdt]?.category;
   return line.waterfall.map((step) => {
@@ -63,7 +70,7 @@ export function explainLine(line: AdjudicatedLine): ExplainedStep[] {
         );
       case "deductible":
         return s(
-          `The first ${usd(line.deductibleApplied)} of ${line.year} basic and major care is yours (the deductible), adding ${amount} to your share.`,
+          `The first ${usd(line.deductibleApplied)} of ${line.year} ${deductibleClasses(line, rules)} care is yours (the deductible), adding ${amount} to your share.`,
         );
       case "maxCap":
         return s(
@@ -86,7 +93,7 @@ export function explainLine(line: AdjudicatedLine): ExplainedStep[] {
 }
 
 export const localExplainer: Explainer = {
-  explain: async (line) => explainLine(line),
+  explain: async (line, rules) => explainLine(line, rules),
 };
 
 /** Dollar amounts in a sentence. */

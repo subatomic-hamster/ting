@@ -1,6 +1,24 @@
+import { deductibleAfter } from '../engine/localAgent';
 import { topoOrder, evaluateSchedule } from '../engine/schedule';
 import type { ClaimEvent } from '../engine/ledger';
 import type { Profile } from '../engine/types';
+import { useAppStore } from '../store';
+
+/**
+ * A past service from an EOB (uploaded or emailed) goes on the member's ledger through the store's claim path, so the
+ * annual max used moves, matching planned work is marked done, and a reload or demo time jump replays it. The EOB's own
+ * deductible is added on top. Idempotent per claim id.
+ */
+export function recordPastClaim(event: ClaimEvent, eobDeductible: number): 'recorded' | 'duplicate' {
+  const before = useAppStore.getState().profile;
+  if (before.ledger.history.some((h) => h.claimId === event.claimId)) return 'duplicate';
+  useAppStore.getState().applyClaim(event);
+  const after = useAppStore.getState().profile;
+  if (after === before) return 'duplicate';
+  const met = deductibleAfter(after.currentPlan, before.ledger, after.ledger.deductibleMet, event.serviceDate, eobDeductible);
+  if (met !== after.ledger.deductibleMet) useAppStore.setState({ profile: { ...after, ledger: { ...after.ledger, deductibleMet: met } } });
+  return 'recorded';
+}
 
 /**
  * Lincoln adjudicates the next certain procedure today, exactly as the engine estimated it.

@@ -1,0 +1,14 @@
+Acme Dental - Explanation of Benefits
+This is not a bill.
+Patient: Jordan Rivera
+Member ID: ACM-4471920
+Date of birth: 04/17/1989
+Address: 128 Maple Street, Greensboro NC 27401
+Claim number: C-2026-03-0412
+Date of service: 03/11/2026
+Provider: Greensboro Family Dental (in network)
+
+Tooth   Code    Description             Billed     Allowed    Deductible   Plan paid   You owe
+#17     D7240   Wisdom tooth removal    $557.00    $369.00    $50.00       $255.20     $113.80
+Total                                   $557.00    $369.00    $50.00       $255.20     $113.80
+Demo document - not a real patient record.

@@ -3,8 +3,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { DetectDocumentTextCommand, TextractClient } from '@aws-sdk/client-textract';
-import { PERSONAS, type PersonaId } from '../../src/data/personas';
 import { planNewWork } from '../../src/engine/agentPlan';
 import { CDT } from '../../src/engine/cdt';
 import { countIn, makeItem } from '../../src/intake/describe';
@@ -14,23 +12,26 @@ import { HEDGED } from '../../src/engine/decisions';
 import { usd } from '../../src/engine/format';
 import { claimsFromLedger, decideMatch, heuristicMatch, overbilling } from '../../src/engine/reconcile';
 import type { PlannedProcedure } from '../../src/engine/types';
-import { triageDocument } from './ai/winnow';
+import { triageDocument, type Decide } from './ai/winnow';
 import { makeDecide } from './ai/winnowDecide';
 import { understand, type DocRecord } from './ai/understand';
 import { callBedrock } from './lib/bedrock';
 import { getContact, memberByEmail, putDoc, putPlanned } from './lib/corpus';
 import { agentAddress, fetchAttachment, fetchMessage, sendEmail } from './lib/email';
 import { replyEmail, unknownSenderEmail, urgentEmail } from './lib/emailTemplates';
-import { rowsToText } from './lib/layout';
+import { deidentify, deidentifiedDecide, knownOf, summaryOf } from './lib/deid';
+import { dentistInNetwork, priceEmailed } from './lib/emailPricing';
+import { logWarn } from './lib/log';
+import { memberOf } from './lib/members';
 import { memberProfile } from './lib/profile';
 import { pushToMember } from './lib/push';
+import { readText } from './lib/textract';
 
 const BUS = process.env.EVENT_BUS ?? '';
 const BUCKET = process.env.DOCS_BUCKET ?? '';
 const WS_ENDPOINT = process.env.WS_ENDPOINT ?? '';
 const events = new EventBridgeClient({});
 const s3 = new S3Client({});
-const textract = new TextractClient({});
 const { decide } = makeDecide();
 
 export interface InboundEmail {
@@ -65,46 +66,33 @@ async function ocr(bytes: Uint8Array, contentType: string): Promise<string> {
       ContentType: contentType,
     }),
   );
-  const res = await textract.send(
-    new DetectDocumentTextCommand({
-      Document: { S3Object: { Bucket: BUCKET, Name: key } },
-    }),
-  );
-  return rowsToText(
-    (res.Blocks ?? [])
-      .filter((b) => b.BlockType === 'LINE' && b.Text && b.Geometry?.BoundingBox)
-      .map((b) => ({
-        text: b.Text ?? '',
-        top: b.Geometry?.BoundingBox?.Top ?? 0,
-        left: b.Geometry?.BoundingBox?.Left ?? 0,
-        height: b.Geometry?.BoundingBox?.Height ?? 0,
-      })),
-  );
+  return readText(BUCKET, key, contentType);
 }
 
-/** Body plus every attachment's text (AgentMail's extraction for PDFs and documents, Textract for images). */
+/** Body plus every attachment's text (AgentMail's extraction for PDFs and documents, Textract for images).
+ * File names are left out: they often carry the patient's name and nothing the reader needs. */
 async function gatherText(mail: InboundEmail): Promise<string> {
   const parts = [mail.text];
   for (const a of mail.attachments.slice(0, 5)) {
     try {
-      if (a.text) parts.push(`--- Attachment ${a.filename ?? ''}\n${a.text}`);
+      if (a.text) parts.push(`--- Attachment\n${a.text}`);
       else if (mail.messageId && a.attachmentId) {
         const got = await fetchAttachment(mail.messageId, a.attachmentId);
-        if (got.text) parts.push(`--- Attachment ${a.filename ?? ''}\n${got.text}`);
+        if (got.text) parts.push(`--- Attachment\n${got.text}`);
         else if (got.bytes && /^(image\/(png|jpeg|tiff)|application\/pdf)/.test(got.contentType ?? a.contentType ?? ''))
-          parts.push(`--- Attachment ${a.filename ?? ''}\n${await ocr(got.bytes, got.contentType ?? a.contentType ?? 'image/png')}`);
+          parts.push(`--- Attachment\n${await ocr(got.bytes, got.contentType ?? a.contentType ?? 'image/png')}`);
       }
     } catch (err) {
-      console.warn('attachment skipped', a.filename, err);
+      logWarn('email_agent.attachment_skipped', err);
     }
   }
   return parts.join('\n\n').slice(0, 40_000);
 }
 
 /** Importance: Winnow's probability that it needs attention within days, with Claude's reason as a second signal. */
-async function importance(r: DocRecord): Promise<{ urgent: boolean; p: number; source: string }> {
+async function importance(r: DocRecord, ask: Decide): Promise<{ urgent: boolean; p: number; source: string }> {
   try {
-    const { answers, source } = await decide(
+    const { answers, source } = await ask(
       {
         summary: r.summary,
         docType: r.docType,
@@ -153,8 +141,9 @@ export async function handler(mail: InboundEmail) {
     }
     return { ok: false, reason: 'unknown sender' };
   }
-  const { member, personaId, role } = who;
-  const name = PERSONAS[personaId as PersonaId].name;
+  const { member, key, role } = who;
+  const owner = await memberOf(key);
+  const name = owner.name;
   const contact = await getContact(member);
   if (mail.source === 'agentmail' && mail.messageId && !mail.text) {
     const full = await fetchMessage(mail.messageId);
@@ -163,8 +152,14 @@ export async function handler(mail: InboundEmail) {
   const text = await gatherText(mail);
   const docId = `mail-${createHash('sha256').update(`${from}|${mail.subject}|${text}`).digest('hex').slice(0, 12)}`;
 
+  // HIPAA: Winnow and Claude read only the de-identified text (names, member id, contact details, birth dates,
+  // SSNs and street addresses removed); this function keeps the original for the parsers and the member's own record.
+  const phi = knownOf(owner);
+  const deid = deidentify(`${mail.subject}\n${text}`, phi);
+  const safeDecide = deidentifiedDecide(decide, phi);
+
   // Screen before any model reads it.
-  const triage = await triageDocument(text, decide).catch(() => undefined);
+  const triage = await triageDocument(deid.text, decide).catch(() => undefined);
   if (triage?.quarantined) {
     await putDoc(member, {
       docId,
@@ -173,6 +168,7 @@ export async function handler(mail: InboundEmail) {
       subject: mail.subject,
       quarantined: true,
       triage,
+      deidentified: summaryOf(deid),
     });
     if (role === 'member') {
       const r = replyEmail(
@@ -199,10 +195,11 @@ export async function handler(mail: InboundEmail) {
     return { ok: true, quarantined: true };
   }
 
-  const record = await understand(mail.subject, text, callBedrock);
+  // The subject is part of the de-identified text; the reader gets one block.
+  const record = await understand('', deid.text, callBedrock);
   const recorded: string[] = [];
   const flags: string[] = [];
-  let profile = await memberProfile(personaId as PersonaId, today());
+  let profile = await memberProfile(owner, today());
 
   // An EOB's completed lines become a claim on the member's ledger (idempotent per claim number).
   const paid = record.procedures.filter((p) => p.status === 'completed' && p.cdt && p.planPaid !== undefined);
@@ -289,7 +286,10 @@ export async function handler(mail: InboundEmail) {
       visit: visitId.get(key),
     });
   });
-  const fresh: PlannedProcedure[] = toProcedures(items, profile).map((proc) => {
+  const inNetwork = dentistInNetwork(owner.currentDentistId);
+  const fresh: PlannedProcedure[] = toProcedures(items, profile).map((priced) => {
+    // A quoted fee stays the billed fee; the in-network allowance prices it like the member's other work.
+    const proc = priceEmailed(priced, profile, inNetwork);
     const p = todo[items.findIndex((item) => item.id === proc.id)];
     const urgent = p.urgency === 'urgent';
     return {
@@ -309,7 +309,7 @@ export async function handler(mail: InboundEmail) {
       plan = planNewWork(
         profile,
         fresh.map((f) => f.id),
-        PERSONAS[personaId as PersonaId].currentDentistId,
+        owner.currentDentistId,
       );
       recorded.push(
         `Added ${fresh.length} procedure${fresh.length === 1 ? '' : 's'} to your plan and scheduled ${fresh.length === 1 ? 'it' : 'them'} around your benefits.`,
@@ -320,7 +320,7 @@ export async function handler(mail: InboundEmail) {
   }
   if (record.docType === 'plan_notice' && record.planChange) flags.push(`Plan change: ${record.planChange}`);
 
-  const imp = await importance(record);
+  const imp = await importance(record, safeDecide);
   const urgentText = imp.urgent ? (record.urgentReason ?? record.procedures.find((p) => p.urgency === 'urgent')?.description ?? record.summary) : undefined;
 
   await putDoc(member, {
@@ -337,6 +337,7 @@ export async function handler(mail: InboundEmail) {
     urgentP: imp.p,
     urgentSource: imp.source,
     triage,
+    deidentified: summaryOf(deid),
   });
 
   const u = {

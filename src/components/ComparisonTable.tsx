@@ -38,6 +38,12 @@ export function ComparisonTable() {
               {o === best && <RecommendedTag moving={!!portability} />}
             </div>
             {PLAN_BASIS[o.plan.id] && <p className="mt-1 text-xs text-muted">{PLAN_BASIS[o.plan.id]}</p>}
+            {o.plan.kind === "waive" && (
+              <p className="mt-1 text-xs text-muted">
+                Out of pocket: no premium and no insurance, so you pay the
+                dentist’s fee for every visit.
+              </p>
+            )}
             <dl className="mt-2 grid grid-cols-2 gap-y-1 text-sm">
               <dt className="text-muted">Premiums after tax</dt>
               <dd className="tabular text-right">
@@ -54,6 +60,12 @@ export function ComparisonTable() {
                 {formatMoney(o.badYearTotal)}
               </dd>
             </dl>
+            {o.premiumDiscount > 0 && (
+              <p className="mt-1 text-xs text-save">
+                Premiums include your wellness discount: −
+                {formatMoney(o.premiumDiscount)} before tax.
+              </p>
+            )}
             <p className="mt-2 text-xs text-muted">{why(o)}</p>
           </li>
         ))}
@@ -101,12 +113,22 @@ export function ComparisonTable() {
                     </span>
                   )}
                   {o === best && <RecommendedTag moving={!!portability} />}
+                  {o.plan.kind === "waive" && (
+                    <span className="mt-1 block max-w-56 text-xs font-normal text-muted">
+                      Out of pocket: no premium, no insurance.
+                    </span>
+                  )}
                   {PLAN_BASIS[o.plan.id] && (
                     <span className="mt-1 block max-w-56 text-xs font-normal text-muted">{PLAN_BASIS[o.plan.id]}</span>
                   )}
                 </th>
                 <td className="tabular py-3 pr-3 text-right">
                   {formatMoney(o.premiumCost)}
+                  {o.premiumDiscount > 0 && (
+                    <span className="block text-xs text-save">
+                      incl. −{formatMoney(o.premiumDiscount)} wellness discount
+                    </span>
+                  )}
                 </td>
                 <td className="tabular py-3 pr-3 text-right">
                   {formatMoney(o.careCost)}

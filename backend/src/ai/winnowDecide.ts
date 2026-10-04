@@ -1,6 +1,7 @@
 // Picks the Winnow backend: a reachable server URL, the queue to the Mac worker, or the labelled simulation.
 // Whatever is chosen, a failure falls back to the simulation (the spec's "slower but still correct" path).
 import { callBedrock } from '../lib/bedrock';
+import { logWarn } from '../lib/log';
 import { queuedWinnow } from '../lib/winnowQueue';
 import { liveWinnow, simulatedWinnow, type Decide } from './winnow';
 
@@ -15,7 +16,7 @@ export function makeDecide(): { decide: Decide; mode: 'live' | 'queue' | 'simula
     try {
       return await primary(state, questions);
     } catch (err) {
-      console.warn('Winnow unavailable, using the simulation:', err instanceof Error ? err.message : err);
+      logWarn('winnow.unavailable_using_simulation', err);
       return simulated(state, questions);
     }
   };

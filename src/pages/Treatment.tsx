@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DentistQuestions, ShareWithDentist } from "../components/DentistQuestions";
+import { EstimateFooter } from "../components/EstimateFooter";
 import { IntakeBox } from "../components/IntakeBox";
 import { ProcedureCatalog } from "../components/ProcedureCatalog";
 import { ProcedureList } from "../components/ProcedureList";
@@ -35,6 +36,7 @@ export default function Treatment() {
             <p className="tabular mt-1 text-[32px] leading-[38px] font-medium">
               {formatMoney(active.expectedOwes)}
             </p>
+            <EstimateFooter />
             {active.lines.some((l) => l.pricingWarning) && (
               <p className="mt-3">
                 Items with missing allowances budget the full fee.

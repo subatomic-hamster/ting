@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 /** Shared journeys: run against the local production build and the deployed API. */
 export function registerPlanFlows() {

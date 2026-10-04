@@ -237,6 +237,19 @@ export interface Placement {
   date: ISODate;
 }
 
+/** Why one visit sits on its date, in plain language tied to the plan year (see `placementReasons`). */
+export interface PlacementReason {
+  id: string;
+  kind: "overdue" | "locked" | "waiting" | "frequency" | "dependency" | "moved" | "rollover" | "kept";
+  text: string;
+  /** Plan year of the visit. */
+  year: number;
+  /** Annual max left in that plan year right after this visit (rollover included). Absent when no annual max applies. */
+  maxLeftAfter?: number;
+  /** The dentist's deadline already passed: book as soon as possible. */
+  overdue?: boolean;
+}
+
 export type WaterfallKey =
   | "fee"
   | "networkDiscount"

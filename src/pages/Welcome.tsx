@@ -33,7 +33,7 @@ export default function Welcome() {
     },
   });
   if (kind !== 'password' && kind !== 'local') return <Navigate to="/signup" replace />;
-  if (status === 'member') return <Navigate to="/" replace />;
+  if (status === 'member') return <Navigate to="/?welcome=1" replace />;
   return (
     <AuthLayout title="Set up your dental year" subtitle="Six quick questions. Ting uses them to load your plan and estimate what your year will cost.">
       {status === 'loading' ? (

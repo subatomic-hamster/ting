@@ -1,5 +1,6 @@
 import { ApiGatewayManagementApiClient, GoneException, PostToConnectionCommand } from '@aws-sdk/client-apigatewaymanagementapi';
 import { connectionsFor, removeConnection } from './db';
+import { logWarn } from './log';
 
 const clients = new Map<string, ApiGatewayManagementApiClient>();
 const clientFor = (endpoint: string) => {
@@ -15,7 +16,7 @@ export async function sendTo(endpoint: string, connectionId: string, data: unkno
     return true;
   } catch (err) {
     if (err instanceof GoneException) await removeConnection(connectionId);
-    else console.warn('push failed', connectionId, err);
+    else logWarn('push.send_failed', err);
     return false;
   }
 }

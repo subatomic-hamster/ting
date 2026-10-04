@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { api, USE_MOCKS } from "../api";
 import { PERSONA_IDS, PERSONAS } from "../data/personas";
@@ -37,7 +37,11 @@ function initiallyOpen() {
 }
 
 export function DemoPanel() {
+  // `open`: the panel is on the page at all (?demo=1 or Ctrl+Shift+D). `expanded`: the full controls, not just the pill.
   const [open, setOpen] = useState(initiallyOpen);
+  // ?demo=1 is the presenter asking for the controls; the page is padded below them, so nothing hides behind it.
+  const [expanded, setExpanded] = useState(initiallyOpen);
+  const panelRef = useRef<HTMLElement>(null);
   const personaId = useAppStore((s) => s.personaId);
   const asOf = useAppStore((s) => s.profile.asOf);
   const today = useAppStore((s) => s.today);
@@ -63,29 +67,79 @@ export function DemoPanel() {
       if (e.ctrlKey && e.shiftKey && (e.key === "D" || e.key === "d")) {
         e.preventDefault();
         setOpen((o) => !o);
+        setExpanded(false);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  // While expanded, leave room under the page for the panel so no control stays hidden behind it.
+  useEffect(() => {
+    const el = panelRef.current;
+    if (!open || !expanded || !el) return;
+    const pad = () => {
+      document.body.style.paddingBottom = `${el.offsetHeight + 24}px`;
+    };
+    pad();
+    const ro = new ResizeObserver(pad);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      document.body.style.paddingBottom = "";
+    };
+  }, [open, expanded]);
+
   if (!open) return null;
 
-  return (
-    <aside
-      aria-label="Demo controls"
-      className="no-print fixed right-3 bottom-3 left-3 z-30 max-h-[75vh] overflow-y-auto rounded-2xl border border-amber-300 bg-amber-50/95 p-3 shadow-xl backdrop-blur sm:left-auto sm:w-80"
-    >
-      <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-amber-900">Demo panel</h2>
+  if (!expanded)
+    return (
+      <div className="no-print fixed right-3 bottom-3 z-30 flex items-center overflow-hidden rounded-full border border-amber-300 bg-amber-50/95 text-xs font-semibold text-amber-900 shadow-md">
         <button
           type="button"
-          className="rounded p-1 text-amber-900 hover:bg-amber-100"
+          className="px-3 py-1.5 hover:bg-amber-100"
+          onClick={() => setExpanded(true)}
+          aria-label="Show demo controls"
+        >
+          Demo
+        </button>
+        <button
+          type="button"
+          className="border-l border-amber-300 px-2 py-1.5 hover:bg-amber-100"
           onClick={() => setOpen(false)}
           aria-label="Hide demo panel"
         >
-          <CloseIcon />
+          ×
         </button>
+      </div>
+    );
+
+  return (
+    <aside
+      ref={panelRef}
+      aria-label="Demo controls"
+      className="no-print fixed right-3 bottom-3 left-3 z-30 max-h-[50vh] overflow-y-auto rounded-2xl border border-amber-300 bg-amber-50/95 p-3 shadow-xl backdrop-blur sm:left-auto sm:w-80"
+    >
+      <div className="mb-2 flex items-center justify-between">
+        <h2 className="text-sm font-semibold text-amber-900">Demo panel</h2>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            className="rounded px-2 py-1 text-xs font-medium text-amber-900 hover:bg-amber-100"
+            onClick={() => setExpanded(false)}
+            aria-label="Collapse demo panel"
+          >
+            Collapse
+          </button>
+          <button
+            type="button"
+            className="rounded p-1 text-amber-900 hover:bg-amber-100"
+            onClick={() => setOpen(false)}
+            aria-label="Hide demo panel"
+          >
+            <CloseIcon />
+          </button>
+        </div>
       </div>
       <p className="mb-2 text-xs text-amber-900">
         As of <strong>{formatDate(asOf, { year: true })}</strong>

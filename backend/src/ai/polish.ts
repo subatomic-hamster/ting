@@ -1,6 +1,7 @@
 // Rewords a deterministic draft without touching its amounts: the result must mention exactly the allowed
 // dollar figures (all of them, nothing else), or the draft is returned unchanged.
 import { dollarsIn } from '../../../src/engine/explain';
+import { logWarn } from '../lib/log';
 import { isRec, type CallModel } from './model';
 
 export async function polish(draft: string, allowed: number[], call: CallModel, purpose: string): Promise<{ text: string; source: 'model' | 'template' }> {
@@ -19,7 +20,7 @@ export async function polish(draft: string, allowed: number[], call: CallModel, 
     const same = got.size === want.size && [...want].every((n) => got.has(n));
     if (text && same) return { text, source: 'model' };
   } catch (err) {
-    console.warn(`polish (${purpose}) failed, using the draft`, err);
+    logWarn('polish.model_failed', err);
   }
   return { text: draft, source: 'template' };
 }

@@ -118,6 +118,28 @@ export function dentalProfile(prefs: PlanPreferences, habits?: HabitSignal): Den
   return { caries: c, gums: g, recallMonths, year: heavy ? 'Heavy' : light ? 'Light' : 'Routine', predicted, habitNote };
 }
 
+export interface HabitEffect {
+  before: DentalProfile;
+  after: DentalProfile;
+  /** "Cavity risk: moderate → low. Filling likelihood 25% → removed." */
+  text: string;
+}
+
+const fillingOf = (p: DentalProfile) => p.predicted.find((x) => x.cdt === 'D2391')?.likelihood;
+const percent = (n: number) => `${Math.round(n * 100)}%`;
+
+/** What shared brushing data changed in the profile; undefined when it doesn't count (under two weeks, or mid-range). */
+export function habitEffect(prefs: PlanPreferences, habits?: HabitSignal): HabitEffect | undefined {
+  if (!habits || habitPoints(habits) === 0) return undefined;
+  const before = dentalProfile(prefs);
+  const after = dentalProfile(prefs, habits);
+  const [fb, fa] = [fillingOf(before), fillingOf(after)];
+  const risk = before.caries === after.caries ? `Cavity risk stays ${after.caries}.` : `Cavity risk: ${before.caries} → ${after.caries}.`;
+  const filling =
+    fb === fa ? '' : ` Filling likelihood ${fb === undefined ? 'none' : percent(fb)} → ${fa === undefined ? 'removed' : percent(fa)}.`;
+  return { before, after, text: risk + filling };
+}
+
 export const GOALS: Record<NonNullable<PlanPreferences['goals']>[number], Omit<PredictedItem, 'likelihood' | 'because'> | undefined> = {
   wisdomTeeth: { cdt: 'D7240', label: 'Wisdom tooth removal' },
   braces: { cdt: 'D8080', label: 'Braces' },

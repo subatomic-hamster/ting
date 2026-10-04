@@ -4,6 +4,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 import { PutCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { db } from './db';
+import { logWarn } from './log';
 
 const TABLE = process.env.TABLE_NAME ?? '';
 const SECRET_ARN = process.env.AGENTMAIL_SECRET_ARN ?? '';
@@ -93,7 +94,7 @@ export async function sendEmail(mail: OutgoingEmail): Promise<{ delivered: 'agen
       delivered = 'agentmail';
     } catch (err) {
       error = err instanceof Error ? err.message : String(err);
-      console.warn('email send failed, kept in the outbox', error);
+      logWarn('email.send_failed_kept_in_outbox', err);
     }
   }
   const at = new Date().toISOString();

@@ -47,6 +47,8 @@ export interface ReadDocument {
   lineChecks?: { text: string; amount: number; category: string; p: number; ask: boolean }[];
   /** Winnow's read of the file (AWS only): document type and whether it tries to instruct an AI. */
   triage?: DocumentTriage;
+  /** What was removed before any AI read the text. */
+  deidentified?: ReceivedDoc['deidentified'];
 }
 
 export interface DocumentTriage {

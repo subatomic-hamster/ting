@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useAppStore } from '../store';
-import { adherence, calendarDays, currentStreak, dentistSummary } from './analytics';
+import { adherence, calendarDays, currentStreak, dentistSummary, habitSignal } from './analytics';
 import { SMILESTREAK } from './program';
 import { computeRewards } from './rewards';
 import { useHabitStore } from './store';
@@ -18,6 +18,7 @@ export function useSmileStreak() {
       program: SMILESTREAK,
       rewards: computeRewards({ program: SMILESTREAK, sessions, ledger, consent, asOf, dentistCheck }),
       adherence: adherence(sessions, asOf, SMILESTREAK),
+      signal: consent.optedIn ? habitSignal(sessions, asOf, SMILESTREAK, consent.consentedAt) : null,
       streak: currentStreak(sessions, asOf, SMILESTREAK),
       calendar: calendarDays(sessions, asOf, SMILESTREAK, consent.consentedAt),
       dentist: dentistSummary(sessions, asOf, SMILESTREAK),

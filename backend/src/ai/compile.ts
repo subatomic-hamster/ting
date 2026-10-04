@@ -11,6 +11,7 @@ import {
   type CompileResult,
   type CompilerQuestion,
 } from '../../../src/compiler/compile';
+import { logWarn } from '../lib/log';
 import { isRec, type CallModel } from './model';
 
 const SYSTEM = `You read a US dental plan benefits summary and answer specific questions about it.
@@ -82,7 +83,7 @@ export async function compileWithModel(text: string, call: CallModel): Promise<C
       maxTokens: 2000,
     });
   } catch (err) {
-    console.warn('compile: model call failed, using the regex reader alone', err);
+    logWarn('compile.model_failed', err);
     return { ...local, modelFilled: [] };
   }
 

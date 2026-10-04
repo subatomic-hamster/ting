@@ -32,6 +32,10 @@ export function topoOrder(procs: PlannedProcedure[]): PlannedProcedure[] {
 
 const likelihoodOf = (p: PlannedProcedure) => p.likelihood ?? 1;
 
+/** The dentist's deadline already passed: the visit goes at the earliest date and is shown as overdue, never skipped. */
+export const isOverdue = (profile: Pick<Profile, 'asOf'>, p: Pick<PlannedProcedure, 'deadline'>): boolean =>
+  !!p.deadline && p.deadline < profile.asOf;
+
 interface Scenario {
   prob: number;
   include: Set<string>;
@@ -184,7 +188,8 @@ export function validatePlacements(profile: Profile, placements: Placement[]): V
     if (!date) continue;
     const name = nameOf(p);
     if (date < profile.asOf) out.push({ id: p.id, message: `${name} can't be scheduled in the past.` });
-    if (p.deadline && date > p.deadline)
+    // An overdue deadline can't be met any more; book it as soon as possible instead of blocking every move.
+    if (p.deadline && date > p.deadline && !isOverdue(profile, p))
       out.push({ id: p.id, message: `${name} is past your dentist's deadline of ${formatDate(p.deadline)}.` });
     for (const d of p.dependsOn ?? []) {
       const depDate = at.get(d);
@@ -200,6 +205,8 @@ export function validatePlacements(profile: Profile, placements: Placement[]): V
 export interface PlannedSchedule extends ScheduleEvaluation {
   /** Questions for the dentist, one per procedure this plan delays. */
   questions: string[];
+  /** Plain-language notes when the rules left no ideal schedule (e.g. deadlines that can't all be met). */
+  warnings?: string[];
 }
 
 export interface OptimizeResult {
@@ -226,9 +233,17 @@ export function optimize(profile: Profile, opts: ScheduleOptions = {}): Optimize
   const index = new Map(procs.map((p, i) => [p.id, i]));
   const deps = procs.map((p) => (p.dependsOn ?? []).map((d) => index.get(d)).filter((d): d is number => d !== undefined));
   const firstDate = (y: number) => (y === y0 ? profile.asOf : firstBusinessDay(y));
-  const choices = procs.map((p) =>
-    p.locked ? [y0] : planYears.map((py) => py.year).filter((y) => !p.deadline || firstDate(y) <= p.deadline),
-  );
+  // Last resort when no schedule meets every future deadline: ignore them and return the fastest schedule instead.
+  let relaxed = false;
+  const late = procs.map((p) => isOverdue(profile, p));
+  const deadlineOf = (i: number) => (relaxed || late[i] ? undefined : procs[i].deadline);
+  const computeChoices = () =>
+    procs.map((p, i) =>
+      p.locked || late[i]
+        ? [y0]
+        : planYears.map((py) => py.year).filter((y) => firstDate(y) <= (deadlineOf(i) ?? '9999-12-31')),
+    );
+  let choices = computeChoices();
   const history = profile.ledger.history;
   // One appointment: every procedure in a visit takes the year its first member takes.
   const leader = procs.map((p, i) => (p.visit ? procs.findIndex((q) => q.visit === p.visit) : i));
@@ -247,15 +262,17 @@ export function optimize(profile: Profile, opts: ScheduleOptions = {}): Optimize
         const after = addDays(dates[d], p.gapDays ?? DEFAULT_GAP_DAYS);
         if (after > start) start = after;
       }
-      if (yearOf(start) !== y) return null;
+      // An overdue visit goes at the earliest date even if that spills into the next calendar year.
+      if (yearOf(start) !== y && !late[i]) return null;
+      const deadline = deadlineOf(i);
       // Prefer the first date the plan actually covers it, if that still fits the year and the deadline.
       let covered = start;
       const waitEnd = waitingPeriodEnds(serviceClassOf(p.cdt, py.rules), py);
       if (waitEnd && waitEnd > covered) covered = waitEnd;
       const freq = frequencyEligibleFrom(p, py.rules, history, covered);
       if (freq > covered) covered = freq;
-      const date = yearOf(covered) === y && (!p.deadline || covered <= p.deadline) ? covered : start;
-      if (p.deadline && date > p.deadline) return null;
+      const date = !late[i] && yearOf(covered) === y && (!deadline || covered <= deadline) ? covered : start;
+      if (deadline && date > deadline) return null;
       dates.push(date);
     }
     return procs.map((p, i) => ({ id: p.id, date: dates[i] }));
@@ -332,17 +349,43 @@ export function optimize(profile: Profile, opts: ScheduleOptions = {}): Optimize
     }
   };
   search(0);
-  if (!frontier.length) throw new Error('No schedule meets every deadline');
+  const warnings: string[] = [];
+  if (!frontier.length) {
+    relaxed = true;
+    choices = computeChoices();
+    search(0);
+    if (!frontier.length) {
+      // Even that failed (e.g. a visit that can't share a year with what it follows): everything as soon as it can go.
+      const date = new Map<string, ISODate>();
+      const asap = procs.map((p) => {
+        let d = profile.asOf;
+        for (const dep of p.dependsOn ?? []) {
+          const depDate = date.get(dep);
+          const after = depDate ? addDays(depDate, p.gapDays ?? DEFAULT_GAP_DAYS) : d;
+          if (after > d) d = after;
+        }
+        date.set(p.id, d);
+        return { id: p.id, date: d };
+      });
+      consider(evaluateWith(profile, planYears, asap));
+    }
+    warnings.push(
+      "Ting couldn't fit every visit inside your dentist's deadlines, so this is the fastest order the plan's rules allow. Ask your dentist which visit matters most.",
+    );
+  }
 
   frontier.sort((a, b) => (a.finish < b.finish ? -1 : a.finish > b.finish ? 1 : a.expectedCost - b.expectedCost));
   const fastest = frontier[0];
-  const cheapest = frontier[frontier.length - 1];
+  const cheapest = warnings.length ? fastest : frontier[frontier.length - 1];
   const savings = fastest.expectedCost - cheapest.expectedCost;
-  const balanced = frontier.find((f) => fastest.expectedCost - f.expectedCost >= BALANCED_SHARE * savings - EPS) ?? cheapest;
+  const balanced = warnings.length
+    ? fastest
+    : (frontier.find((f) => fastest.expectedCost - f.expectedCost >= BALANCED_SHARE * savings - EPS) ?? cheapest);
 
   const withQuestions = (ev: ScheduleEvaluation): PlannedSchedule => ({
     ...ev,
     questions: dentistQuestions(profile, ev.placements, fastest.placements),
+    ...(warnings.length && { warnings }),
   });
   return {
     cheapest: withQuestions(cheapest),

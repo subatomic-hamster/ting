@@ -1,14 +1,21 @@
 // HTTP API Lambda: the TingApi routes. Engine, intake and compiler are the same src/ code the browser runs.
+//
+// Who a request acts for: a signed-in member with a password account acts as themselves (`U-` member id), an Acme SSO
+// user as their demo persona, and a signed-out request as the public demo persona from ?persona=. See `context`.
+//
+// Logging privacy (backend-wide, see lib/log.ts): console output carries event codes and error class names only;
+// never member, claim or connection IDs, email addresses, file names, document text or provider exception messages.
+// Model and Winnow calls receive de-identified text only (lib/deid.ts).
 import { createHash, randomUUID } from 'node:crypto';
 import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { DetectDocumentTextCommand, TextractClient } from '@aws-sdk/client-textract';
 import { SFNClient, StartSyncExecutionCommand } from '@aws-sdk/client-sfn';
 import { DeleteCommand, GetCommand, PutCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
 import { DEMO_PLAN_OPTIONS } from '../../src/data/demo';
-import { isPersonaId, PERSONAS, type PersonaId } from '../../src/data/personas';
+import { memberFromRecord, type Member } from '../../src/data/members';
+import { isPersonaId, PERSONAS } from '../../src/data/personas';
 import { claimEventSchema } from '../../src/engine/ledger';
 import type { AdjudicatedLine } from '../../src/engine/types';
 import { approveRules, compilePlanText } from '../../src/compiler/compile';
@@ -33,12 +40,15 @@ import { callBedrock } from './lib/bedrock';
 import { AuthError, callerOf, type Caller } from './lib/auth';
 import { db, deleteClaims, getShare, putShare } from './lib/db';
 import admin from '../../src/fixtures/admin.json';
-import { rowsToText } from './lib/layout';
+import { readFailureCode, readText } from './lib/textract';
 import { checkLine } from './lib/reasoning';
 import { InvokeCommand, LambdaClient } from '@aws-sdk/client-lambda';
-import { carrierRecord, changePlan, recordVisit, resetMember } from './lib/carrier';
+import { carrierRecord, changePlan, recordVisit, resetMember, seedMemberCarrier } from './lib/carrier';
 import { PROVIDERS } from './lib/carrierModel';
-import { approveDentistSender, clearCorpus, docsFor, getContact, memberByEmail, plannedFor, setContact } from './lib/corpus';
+import { approveDentistSender, clearCorpus, deleteMemberData, docsFor, getContact, memberByEmail, plannedFor, setContact } from './lib/corpus';
+import { deidentify, deidentifiedDecide, deidentifiedModel, knownOf, summaryOf } from './lib/deid';
+import { logError, logWarn } from './lib/log';
+import { getRecord, habitsSchema, memberOf, newMemberSchema, putRecord, recordFromInput } from './lib/members';
 import { agentAddress, agentMail, outboxFor, sendEmail, verifySvix } from './lib/email';
 import { welcomeEmail } from './lib/emailTemplates';
 import { sendMonthly, sendUrgent } from './lib/notify';
@@ -51,7 +61,6 @@ import { digestFor, getPrefs, prefsSchema, putPrefs, sendDigest } from './lib/di
 import { cancelReminder, deliverDue, reminderSchema, scheduleReminder } from './lib/reminders';
 
 const s3 = new S3Client({});
-const textract = new TextractClient({});
 const events = new EventBridgeClient({});
 const BUCKET = process.env.DOCS_BUCKET ?? '';
 const BUS = process.env.EVENT_BUS ?? '';
@@ -75,12 +84,13 @@ const TABLE = process.env.TABLE_NAME ?? '';
 // Winnow: its server, the queue to the Mac worker, or the labelled simulation (see ai/winnowDecide.ts).
 const { decide, mode: winnowMode } = makeDecide();
 
-async function safeTriage(text: string): Promise<Triage | undefined> {
+/** Winnow reads the de-identified text only. */
+async function safeTriage(text: string, who: Member): Promise<Triage | undefined> {
   if (!text.trim()) return undefined;
   try {
-    return await triageDocument(text, decide);
+    return await triageDocument(deidentify(text, knownOf(who)).text, decide);
   } catch (err) {
-    console.warn('triage failed', err);
+    logWarn('triage.failed', err);
     return undefined;
   }
 }
@@ -89,6 +99,8 @@ class HttpError extends Error {
   constructor(
     readonly status: number,
     message: string,
+    /** A stable code the app can branch on. */
+    readonly code?: string,
   ) {
     super(message);
   }
@@ -120,13 +132,22 @@ const str = (v: unknown, name: string, max = 20_000): string => {
 
 const callers = new WeakMap<APIGatewayProxyEventV2, Caller>();
 
-/** Signed in: the member from the Cognito token. Public demo: the persona the demo panel picked. */
-function context(event: APIGatewayProxyEventV2): { personaId: PersonaId; asOf: string } {
+const asOfOf = (event: APIGatewayProxyEventV2) => {
+  const asOf = event.queryStringParameters?.asOf;
+  return asOf && /^\d{4}-\d{2}-\d{2}$/.test(asOf) ? asOf : todayISO();
+};
+
+/**
+ * Who this request is for. `key` is the persona id (Acme SSO user, or the public demo's ?persona=) or, for a member who
+ * signed up with a password, their own `U-` member id. `member` is the persona-shaped member either way.
+ */
+async function context(event: APIGatewayProxyEventV2): Promise<{ key: string; asOf: string; member: Member }> {
+  const caller = callers.get(event);
+  const asOf = asOfOf(event);
+  if (caller?.memberId) return { key: caller.memberId, asOf, member: await memberOf(caller.memberId, { email: caller.email }) };
   const q = event.queryStringParameters ?? {};
-  const signedIn = callers.get(event)?.personaId;
-  const personaId = signedIn ?? (q.persona && isPersonaId(q.persona) ? q.persona : 'dale');
-  const asOf = q.asOf && /^\d{4}-\d{2}-\d{2}$/.test(q.asOf) ? q.asOf : todayISO();
-  return { personaId, asOf };
+  const key = caller?.personaId ?? (q.persona && isPersonaId(q.persona) ? q.persona : 'dale');
+  return { key, asOf, member: PERSONAS[key] };
 }
 
 /** Share links point at the web app; only the app's own origin (or local dev) is trusted. */
@@ -147,26 +168,26 @@ async function plainLanguage(sentences: string[]) {
   );
 }
 
-/** Accepted mail: only the text is kept long enough to classify and screen it. */
-async function readMailText(mail: InboundEmail) {
-  const text = `${mail.subject}\n${mail.text}`.slice(0, 60_000);
-  const doc = await enrichDocument(classifyDocument(text, false), decide);
-  return { docId: `mail-${randomUUID().slice(0, 8)}`, text, ...doc, triage: await safeTriage(text) };
+/**
+ * A read document's response. The deterministic parsers (classifyDocument) work on the original text; Winnow's
+ * extra checks and triage see only the de-identified text, and the response says what was removed.
+ */
+async function screenedDocument(docId: string, text: string, isImage: boolean, who: Member) {
+  const known = knownOf(who);
+  const doc = await enrichDocument(classifyDocument(text, isImage), deidentifiedDecide(decide, known));
+  return { docId, text, ...doc, triage: await safeTriage(text, who), deidentified: summaryOf(deidentify(text, known)) };
 }
 
-async function readUpload(key: string, contentType: string) {
+/** Accepted mail: only the text is kept long enough to classify and screen it. */
+async function readMailText(mail: InboundEmail, who: Member) {
+  const text = `${mail.subject}\n${mail.text}`.slice(0, 60_000);
+  return screenedDocument(`mail-${randomUUID().slice(0, 8)}`, text, false, who);
+}
+
+async function readUpload(key: string, contentType: string, who: Member) {
   if (!/^uploads\/[\w-]+\/[\w.-]+$/.test(key)) throw new HttpError(400, 'Unknown upload');
-  const res = await textract.send(new DetectDocumentTextCommand({ Document: { S3Object: { Bucket: BUCKET, Name: key } } }));
-  const text = rowsToText(
-    (res.Blocks ?? [])
-      .filter((b) => b.BlockType === 'LINE' && b.Text && b.Geometry?.BoundingBox)
-      .map((b) => {
-        const box = b.Geometry?.BoundingBox;
-        return { text: b.Text ?? '', top: box?.Top ?? 0, left: box?.Left ?? 0, height: box?.Height ?? 0 };
-      }),
-  );
-  const doc = await enrichDocument(classifyDocument(text, contentType.startsWith('image/')), decide);
-  return { docId: key, text, ...doc, triage: await safeTriage(text) };
+  const text = await readText(BUCKET, key, contentType);
+  return screenedDocument(key, text, contentType.startsWith('image/'), who);
 }
 
 type Route = (event: APIGatewayProxyEventV2) => Promise<APIGatewayProxyResultV2>;
@@ -175,8 +196,50 @@ const routes: Record<string, Route> = {
   'GET /health': async () => json(200, { ok: true }),
 
   'GET /session': async (e) => {
-    const p = PERSONAS[context(e).personaId];
+    const { member: p } = await context(e);
     return json(200, { memberId: p.memberId, name: p.name, employer: p.employer, role: 'member' });
+  },
+
+  // Self sign-up: the member's own record (the onboarding survey). Signed out → 401; an Acme SSO user has no record.
+  'GET /me': async (e) => {
+    const caller = callers.get(e);
+    if (!caller) throw new HttpError(401, 'Sign in first');
+    return json(200, { member: caller.memberId ? ((await getRecord(caller.memberId)) ?? null) : null });
+  },
+  // Finish sign-up (or update the survey): stores the record, seeds the insurer's records and links the member's
+  // email to the agent. Every step is idempotent, so a failed request is simply sent again.
+  'POST /me': async (e) => {
+    const caller = callers.get(e);
+    if (!caller) throw new HttpError(401, 'Sign in first');
+    if (!caller.memberId) throw new HttpError(403, 'Only members who signed up with an email and password have a profile to save');
+    const parsed = newMemberSchema.safeParse(bodyOf(e));
+    if (!parsed.success) throw new HttpError(400, `Not a valid sign-up: ${parsed.error.issues[0]?.path.join('.') || 'body'} ${parsed.error.issues[0]?.message ?? 'invalid'}`);
+    const asOf = asOfOf(e);
+    const record = await putRecord(recordFromInput(parsed.data, { memberId: caller.memberId, email: caller.email }, asOf, await getRecord(caller.memberId)));
+    await seedMemberCarrier(memberFromRecord(record), asOf);
+    // The address they signed up with is the one the email agent recognizes (keeps notification settings already chosen).
+    if (record.email) {
+      const prev = await getContact(record.memberId);
+      if (prev?.email.toLowerCase() !== record.email.toLowerCase())
+        await setContact(record.memberId, record.memberId, {
+          email: record.email,
+          monthly: prev?.monthly ?? true,
+          urgent: prev?.urgent ?? true,
+          detail: prev?.detail ?? 'detailed',
+        });
+    }
+    return json(200, { member: record });
+  },
+  // SmileStreak: brushing data the member chose to share; it updates their dental profile.
+  'POST /me/habits': async (e) => {
+    const caller = callers.get(e);
+    if (!caller) throw new HttpError(401, 'Sign in first');
+    if (!caller.memberId) throw new HttpError(403, 'Only members who signed up with an email and password can share brushing data');
+    const parsed = habitsSchema.safeParse(bodyOf(e));
+    if (!parsed.success) throw new HttpError(400, 'twiceDailyRate must be 0 to 1 and days a whole number from 0 to 400');
+    const record = await getRecord(caller.memberId);
+    if (!record) throw new HttpError(409, 'Finish sign-up first');
+    return json(200, { member: await putRecord({ ...record, habits: parsed.data }) });
   },
 
   // Demo options plus every plan version a Lincoln analyst approved.
@@ -226,19 +289,21 @@ const routes: Record<string, Route> = {
 
   // The persona's starting ledger; claims arrive over the WebSocket (replayed on connect), like a live feed.
   'GET /ledger': async (e) => {
-    const { personaId, asOf } = context(e);
-    return json(200, PERSONAS[personaId].profile(asOf).ledger);
+    const { member, asOf } = await context(e);
+    return json(200, member.profile(asOf).ledger);
   },
 
   // Bedrock translates the words; Winnow (or its labelled simulation) sets the probabilities the questions price.
   'POST /intake/parse': async (e) => {
     const text = str(bodyOf(e).text, 'text', 2000);
-    const items = await describeWithModel(text, callBedrock);
+    const known = knownOf((await context(e)).member);
+    const safe = deidentifiedDecide(decide, known);
+    const items = await describeWithModel(text, deidentifiedModel(callBedrock, known));
     try {
       // Winnow use 1 (field probabilities) and use 6 (the dentist's own wording on "maybe" items).
-      return json(200, await readNotes(await withWinnow(text, items, decide), decide));
+      return json(200, await readNotes(await withWinnow(deidentify(text, known).text, items, safe), safe));
     } catch (err) {
-      console.warn('intake: Winnow step failed, keeping the parser probabilities', err);
+      logWarn('intake.winnow_failed', err);
       return json(200, items);
     }
   },
@@ -255,8 +320,7 @@ const routes: Record<string, Route> = {
 
   'POST /documents/text': async (e) => {
     const text = str(bodyOf(e).text, 'text', 60_000);
-    const doc = await enrichDocument(classifyDocument(text, false), decide);
-    return json(200, { docId: `text-${randomUUID().slice(0, 8)}`, text, ...doc, triage: await safeTriage(text) });
+    return json(200, await screenedDocument(`text-${randomUUID().slice(0, 8)}`, text, false, (await context(e)).member));
   },
 
   // Winnow use 3: which EOB is this invoice for? The thresholds (0.9 link / 0.5 confirm) live in the engine.
@@ -271,7 +335,7 @@ const routes: Record<string, Route> = {
     claims.forEach((c, i) => (criteria[labels[i]] = `EOB ${c.claimId}: service ${c.date}, codes ${c.codes.join(' ')}, member owes $${c.memberOwes}`));
     criteria.none = 'none of these';
     try {
-      const { answers, source } = await decide(
+      const { answers, source } = await deidentifiedDecide(decide, knownOf((await context(e)).member))(
         { invoice: { provider: invoice.provider, serviceDate: invoice.serviceDate, amountDue: invoice.amountDue, codes: invoice.codes } },
         { match: { type: 'choice', instructions:
             'Which EOB is for the same dental visit as this invoice? Offices and insurers can record dates of service a day or two apart, so dates within 3 days can be the same visit; matching procedure codes matter most.', criteria } },
@@ -282,14 +346,14 @@ const routes: Record<string, Route> = {
       claims.forEach((c, i) => (probs[c.claimId] = dist[labels[i]] ?? 0));
       return json(200, { probs, source });
     } catch (err) {
-      console.warn('invoice match fell back to the heuristic', err);
+      logWarn('invoice_match.heuristic_fallback', err);
       return json(200, { probs: heuristicMatch(invoice, claims), source: 'heuristic' });
     }
   },
 
   // F2 channel 2: the member's forwarding address. Production receives mail with SES inbound; the demo posts it.
   'GET /inbox': async (e) => {
-    const member = PERSONAS[context(e).personaId].memberId;
+    const { memberId: member } = (await context(e)).member;
     return json(200, { address: forwardingAddress(member), senders: await sendersFor(member), held: await heldFor(member) });
   },
   'POST /mock/inbound-email': async (e) => {
@@ -301,22 +365,25 @@ const routes: Record<string, Route> = {
       text: str(body.text, 'text', 60_000),
       auth: { spf: auth.spf !== false, dkim: auth.dkim !== false, dmarc: auth.dmarc !== false },
     };
-    const member = PERSONAS[context(e).personaId].memberId;
+    const who = (await context(e)).member;
+    const member = who.memberId;
     const decision = decideInbound(mail, callers.get(e)?.email, await sendersFor(member));
     if (decision.action === 'reject') return json(200, { status: 'rejected', reason: decision.reason });
     if (decision.action === 'hold') return json(200, { status: 'held', reason: decision.reason, heldId: await holdMail(member, mail) });
-    return json(200, { status: 'accepted', doc: await readMailText(mail) });
+    return json(200, { status: 'accepted', doc: await readMailText(mail, who) });
   },
   'POST /inbox/senders': async (e) => {
     const body = bodyOf(e);
-    const member = PERSONAS[context(e).personaId].memberId;
+    const who = (await context(e)).member;
+    const member = who.memberId;
     const senders = await addSender(member, str(body.address, 'address', 200));
     const held = typeof body.heldId === 'string' ? await takeHeld(member, body.heldId) : undefined;
-    return json(200, { senders, doc: held ? await readMailText(held) : undefined });
+    return json(200, { senders, doc: held ? await readMailText(held, who) : undefined });
   },
 
   'POST /documents': async (e) => {
     const body = bodyOf(e);
+    const { member: who } = await context(e);
     // The ingestion workflow (Step Functions) when deployed: read → screen → record, with duplicate detection.
     if (INGEST_ARN) {
       const key = str(body.key, 'key', 300);
@@ -324,20 +391,23 @@ const routes: Record<string, Route> = {
       const run = await sfnClient.send(
         new StartSyncExecutionCommand({
           stateMachineArn: INGEST_ARN,
-          input: JSON.stringify({ bucket: BUCKET, key, contentType: str(body.contentType, 'contentType', 100), member: PERSONAS[context(e).personaId].memberId }),
+          input: JSON.stringify({ bucket: BUCKET, key, contentType: str(body.contentType, 'contentType', 100), member: who.memberId }),
         }),
       );
-      const out = run.output ? (JSON.parse(run.output) as { doc?: Record<string, unknown>; duplicate?: boolean; error?: string }) : {};
-      if (run.status !== 'SUCCEEDED' || out.error || !out.doc) throw new HttpError(422, 'Ting could not read this file');
+      const out = run.output ? (JSON.parse(run.output) as { doc?: Record<string, unknown>; duplicate?: boolean; error?: string; cause?: string }) : {};
+      // A multi-page PDF Textract could not finish in time (or refused) is the app's cue to read the PDF's own text layer.
+      if (run.status !== 'SUCCEEDED' || out.error || !out.doc) {
+        const code = readFailureCode(out.cause ?? run.cause ?? run.error);
+        throw new HttpError(422, code === 'pdf_not_readable' ? 'Ting could not read this PDF; read its text in the app instead' : 'Ting could not read this file', code);
+      }
       return json(200, { ...out.doc, duplicate: out.duplicate === true, pipeline: run.executionArn?.split(':').slice(-2).join(':') });
     }
     try {
-      return json(200, await readUpload(str(body.key, 'key', 300), str(body.contentType, 'contentType', 100)));
+      return json(200, await readUpload(str(body.key, 'key', 300), str(body.contentType, 'contentType', 100), who));
     } catch (err) {
       if (err instanceof HttpError) throw err;
       const name = err instanceof Error ? err.name : '';
-      // Multi-page PDFs need async Textract; the client falls back to the PDF's text layer.
-      if (/UnsupportedDocument|BadDocument|DocumentTooLarge/.test(name)) throw new HttpError(422, `Textract could not read this file (${name})`);
+      if (/UnsupportedDocument|BadDocument|DocumentTooLarge|TextractTimeout/.test(name)) throw new HttpError(422, `Textract could not read this file (${name})`, readFailureCode(name));
       throw err;
     }
   },
@@ -345,7 +415,7 @@ const routes: Record<string, Route> = {
   // Winnow screens the document first; a quarantined document is read by the regex compiler only.
   'POST /rules/compile': async (e) => {
     const text = str(bodyOf(e).text, 'text', 120_000);
-    const triage = await safeTriage(text);
+    const triage = await safeTriage(text, (await context(e)).member);
     if (triage?.quarantined) return json(200, { ...compilePlanText(text), modelFilled: [], triage });
     // Winnow use 4 runs alongside the Claude step: an independent reading of each rule the regex compiler found
     // (anything under 0.7 goes to human review). Both together stay well inside API Gateway's 30 s limit.
@@ -353,7 +423,7 @@ const routes: Record<string, Route> = {
     const [compiled, reader] = await Promise.all([
       compileWithModel(text, callBedrock),
       secondReader(text, local.draft, Object.keys(local.evidence), decide).catch((err: unknown) => {
-        console.warn('second reader skipped', err);
+        logWarn('rules.second_reader_skipped', err);
         return undefined;
       }),
     ]);
@@ -367,21 +437,24 @@ const routes: Record<string, Route> = {
     const body = bodyOf(e);
     const line = body.line as AdjudicatedLine | undefined;
     if (!isRec(line) || !Array.isArray(line.waterfall)) throw new HttpError(400, 'line is required');
+    // Rules only name the deductible's classes; bad or missing rules fall back to the line's own class.
+    const parsedRules = planRulesSchema.safeParse(body.rules);
+    const rules = parsedRules.success ? (parsedRules.data as PlanRules) : undefined;
     // Same line, same words: the model, Winnow and Automated Reasoning run once per distinct line, then it's a lookup.
     const { id: _id, ...content } = line;
-    const cacheKey = { pk: 'EXPLAIN', sk: createHash('sha256').update(`v1|${JSON.stringify(content)}`).digest('hex') };
+    const cacheKey = { pk: 'EXPLAIN', sk: createHash('sha256').update(`v2|${JSON.stringify(content)}|${JSON.stringify(rules?.deductible.appliesTo ?? null)}`).digest('hex') };
     const hit = await db.send(new GetCommand({ TableName: TABLE, Key: cacheKey })).catch(() => undefined);
     if (hit?.Item?.steps) return json(200, hit.Item.steps);
     const [steps, reasoning] = await Promise.all([
-      explainWithModel(line, callBedrock),
+      explainWithModel(line, callBedrock, rules),
       checkLine(line).catch((err: unknown) => {
-        console.warn('automated reasoning failed', err);
+        logWarn('explain.reasoning_failed', err);
         return undefined;
       }),
     ]);
     // Winnow use 9: a sentence scored as confusing gets one plainer rewrite, with every amount kept.
     const plain = await plainLanguage(steps.map((s) => s.text)).catch((err: unknown) => {
-      console.warn('plain-language gate skipped', err);
+      logWarn('explain.plain_language_skipped', err);
       return undefined;
     });
     const out = steps.map((s, i) => ({ ...s, text: plain?.[i]?.text ?? s.text, clarity: plain?.[i]?.clarity }));
@@ -390,7 +463,7 @@ const routes: Record<string, Route> = {
     if (steps.every((x) => x.source === 'model') && reasoning)
       await db
         .send(new PutCommand({ TableName: TABLE, Item: { ...cacheKey, steps: result, ttl: Math.floor(Date.now() / 1000) + 30 * 86_400 } }))
-        .catch((err: unknown) => console.warn('explain cache write failed', err));
+        .catch((err: unknown) => logWarn('explain.cache_write_failed', err));
     return json(200, result);
   },
 
@@ -414,38 +487,39 @@ const routes: Record<string, Route> = {
     const body = bodyOf(e);
     const kind = str(body.scheduleKind, 'scheduleKind', 20);
     if (!/^(cheapest|fastest|balanced|custom)$/.test(kind)) throw new HttpError(400, 'Unknown schedule');
-    const { personaId } = context(e);
-    // Unguessable token; the persona/kind prefix keeps old mock-style links readable.
-    const token = `${personaId}.${kind}.${randomUUID().replace(/-/g, '')}`;
+    const { key } = await context(e);
+    // Unguessable token; the member key (persona id or `U-` member id) and kind prefix keep old mock-style links readable.
+    const token = `${key}.${kind}.${randomUUID().replace(/-/g, '')}`;
     const snapshot = body.snapshot;
     if (snapshot !== undefined && (!isRec(snapshot) || JSON.stringify(snapshot).length > 200_000)) throw new HttpError(400, 'Bad snapshot');
     const expiresAt = addDays(todayISO(), 30);
-    await putShare(token, { personaId, scheduleKind: kind, snapshot: snapshot ? { ...snapshot, sharedAt: new Date().toISOString(), expiresAt } : undefined }, 30);
+    await putShare(token, { key, scheduleKind: kind, snapshot: snapshot ? { ...snapshot, sharedAt: new Date().toISOString(), expiresAt } : undefined }, 30);
     return json(200, { url: `${trustedOrigin(body.origin)}/share/${token}`, expiresAt });
   },
 
   'POST /reminders': async (e) => {
     const parsed = reminderSchema.safeParse(bodyOf(e));
     if (!parsed.success) throw new HttpError(400, `Not a reminder: ${parsed.error.issues[0]?.message ?? 'invalid'}`);
-    return json(200, await scheduleReminder(PERSONAS[context(e).personaId].memberId, parsed.data));
+    return json(200, await scheduleReminder((await context(e)).member.memberId, parsed.data));
   },
 
   // Demo control: send the reminders due on the demo's "as of" date, the way the daily rule does.
-  'POST /demo/reminders/run': async (e) => json(200, { delivered: await deliverDue(context(e).asOf, decide) }),
+  'POST /demo/reminders/run': async (e) => json(200, { delivered: await deliverDue(asOfOf(e), decide) }),
 
   // Winnow use 8: route a typed question. Engine and plan questions are answered by tested code in the app;
   // medical questions go to the dentist; explanations get a model answer built only from the facts sent.
   'POST /ask': async (e) => {
     const body = bodyOf(e);
     const question = str(body.question, 'question', 1000);
-    const r = await routeQuestion(question, decide);
+    const known = knownOf((await context(e)).member);
+    const r = await routeQuestion(question, deidentifiedDecide(decide, known));
     if (r.intent === 'medical_advice')
       return json(200, { ...r, answer: "That's a question for your dentist. Ting helps with costs and timing, not with what treatment you need." });
     if (r.intent === 'out_of_scope') return json(200, { ...r, answer: 'Ting can answer questions about your dental plan, your costs and when to schedule work.' });
     if (!r.viaModel) return json(200, { ...r, answerBy: 'engine' });
     const facts = String(body.facts ?? '').slice(0, 6000);
     const allowed = dollarsIn(facts);
-    const draft = await callBedrock({
+    const draft = await deidentifiedModel(callBedrock, known)({
       model: 'fast',
       system:
         'Answer the dental-benefits question in at most three plain sentences, using only the facts given. Use only dollar amounts that appear in the facts, exactly as written. If the facts do not answer it, say so. No medical advice.',
@@ -471,22 +545,21 @@ const routes: Record<string, Route> = {
     return json(200, await polish(draft, appealAmounts(d), callBedrock, 'message to an insurance company'));
   },
 
-  'GET /preferences': async (e) => json(200, await getPrefs(PERSONAS[context(e).personaId].memberId)),
+  'GET /preferences': async (e) => json(200, await getPrefs((await context(e)).member.memberId)),
   'POST /preferences': async (e) => {
     const parsed = prefsSchema.safeParse(bodyOf(e));
     if (!parsed.success) throw new HttpError(400, 'cadence must be weekly, monthly or off; detail private or detailed');
-    const { personaId } = context(e);
-    return json(200, await putPrefs(PERSONAS[personaId].memberId, personaId, parsed.data));
+    const { key, member } = await context(e);
+    return json(200, await putPrefs(member.memberId, key, parsed.data));
   },
   'GET /digest': async (e) => {
-    const { personaId, asOf } = context(e);
-    return json(200, await digestFor(personaId, asOf));
+    const { member, asOf } = await context(e);
+    return json(200, await digestFor(member, asOf));
   },
   // Demo control: send this member's digest now (on stage), with their privacy preference applied.
   'POST /demo/digest/send': async (e) => {
-    const { personaId, asOf } = context(e);
-    const member = PERSONAS[personaId].memberId;
-    const r = await sendDigest(member, personaId, await getPrefs(member), asOf);
+    const { member, asOf } = await context(e);
+    const r = await sendDigest(member, await getPrefs(member.memberId), asOf);
     return json(200, { emailed: r.emailed, pushedTo: r.pushedTo, private: r.private, digest: r.digest });
   },
 
@@ -514,23 +587,25 @@ const routes: Record<string, Route> = {
     return json(200, res.Item ? { version: res.Item.version, at: res.Item.at } : {});
   },
 
-  // "Delete everything": claims, reminders and consent for the signed-in member.
+  // "Delete everything": claims, reminders and consent for the signed-in member; for a member who signed up, also
+  // their sign-up record, emailed documents, contact (and the address mapping), preferences and sent mail.
+  // The sign-in account itself is the app's to delete (Cognito DeleteUser with the member's own access token).
   'POST /me/delete': async (e) => {
     const caller = callers.get(e);
     if (!caller) throw new HttpError(401, 'Sign in first');
-    const member = caller.personaId ? PERSONAS[caller.personaId].memberId : undefined;
-    const removed = member ? await deleteClaims(member) : 0;
-    if (member) for (const id of ['nov1', 'dec1', 'fsa']) await cancelReminder(member, `${todayISO().slice(0, 4)}-${id}`);
+    const member = caller.personaId ? PERSONAS[caller.personaId].memberId : caller.memberId;
+    let removed = member ? await deleteClaims(member) : 0;
+    if (caller.memberId) removed += await deleteMemberData(caller.memberId);
+    else if (member) for (const id of ['nov1', 'dec1', 'fsa']) await cancelReminder(member, `${todayISO().slice(0, 4)}-${id}`);
     await db.send(new DeleteCommand({ TableName: TABLE, Key: { pk: `USER#${caller.sub}`, sk: 'CONSENT' } }));
     return json(200, { removed });
   },
 
   'POST /demo/reset': async (e) => {
-    const { personaId, asOf } = context(e);
-    const member = PERSONAS[personaId].memberId;
-    const removed = await deleteClaims(member);
-    const visits = await resetMember(personaId, asOf).catch(() => 0);
-    const docs = await clearCorpus(member).catch(() => 0);
+    const { member, asOf } = await context(e);
+    const removed = await deleteClaims(member.memberId);
+    const visits = await resetMember(member, asOf).catch(() => 0);
+    const docs = await clearCorpus(member.memberId).catch(() => 0);
     return json(200, { removed, visits, docs });
   },
 
@@ -573,13 +648,15 @@ const routes: Record<string, Route> = {
   // Demo composer: the same agent, for an email typed in the app (from the member, or from their dentist).
   'POST /demo/email': async (e) => {
     const body = bodyOf(e);
-    const { personaId } = context(e);
-    const member = PERSONAS[personaId].memberId;
+    const { key, member: who } = await context(e);
+    const member = who.memberId;
     const fromDentist = body.fromDentist === true;
-    let from = fromDentist ? 'frontdesk@greensborofamilydental.example' : ((await getContact(member))?.email ?? `${personaId}@demo.ting.test`);
-    if (fromDentist) await approveDentistSender(member, personaId, from);
+    // Each signed-up member gets their own demo front desk address, so two members never share a sender.
+    const frontDesk = isPersonaId(key) ? 'frontdesk' : `frontdesk+${key.toLowerCase()}`;
+    let from = fromDentist ? `${frontDesk}@greensborofamilydental.example` : ((await getContact(member))?.email ?? `${key.toLowerCase()}@demo.ting.test`);
+    if (fromDentist) await approveDentistSender(member, key, from);
     else if (!(await memberByEmail(from))) {
-      await setContact(member, personaId, {
+      await setContact(member, key, {
         email: from,
         monthly: true,
         urgent: true,
@@ -606,7 +683,7 @@ const routes: Record<string, Route> = {
   },
 
   'GET /contact': async (e) => {
-    const member = PERSONAS[context(e).personaId].memberId;
+    const member = (await context(e)).member.memberId;
     return json(200, {
       contact: (await getContact(member)) ?? null,
       agent: await agentAddress(),
@@ -615,19 +692,19 @@ const routes: Record<string, Route> = {
   },
   'POST /contact': async (e) => {
     const body = bodyOf(e);
-    const { personaId } = context(e);
-    const member = PERSONAS[personaId].memberId;
+    const { key, member: who } = await context(e);
+    const member = who.memberId;
     const email = str(body.email, 'email', 200).trim();
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new HttpError(400, 'Enter a valid email address');
     const prev = await getContact(member);
-    const contact = await setContact(member, personaId, {
+    const contact = await setContact(member, key, {
       email,
       monthly: body.monthly !== false,
       urgent: body.urgent !== false,
       detail: body.detail === 'private' ? 'private' : 'detailed',
     });
     if (prev?.email !== contact.email) {
-      const r = welcomeEmail(PERSONAS[personaId].name, await agentAddress());
+      const r = welcomeEmail(who.name, await agentAddress());
       await sendEmail({
         member,
         kind: 'welcome',
@@ -639,9 +716,9 @@ const routes: Record<string, Route> = {
     }
     return json(200, { contact });
   },
-  'GET /outbox': async (e) => json(200, await outboxFor(PERSONAS[context(e).personaId].memberId)),
+  'GET /outbox': async (e) => json(200, await outboxFor((await context(e)).member.memberId)),
   'GET /corpus': async (e) => {
-    const member = PERSONAS[context(e).personaId].memberId;
+    const member = (await context(e)).member.memberId;
     const [docs, planned] = await Promise.all([docsFor(member), plannedFor(member)]);
     return json(200, {
       docs: docs.map(({ pk: _pk, sk: _sk, ...d }) => d),
@@ -650,12 +727,12 @@ const routes: Record<string, Route> = {
   },
   /** The member's live profile: carrier records + Ting's corpus + claims since, as the engine's Profile. */
   'GET /profile': async (e) => {
-    const { personaId, asOf } = context(e);
-    return json(200, await memberProfile(personaId, asOf, e.queryStringParameters?.claims !== '0'));
+    const { member, asOf } = await context(e);
+    return json(200, await memberProfile(member, asOf, e.queryStringParameters?.claims !== '0'));
   },
   'POST /demo/monthly/send': async (e) => {
-    const { personaId, asOf } = context(e);
-    const r = await sendMonthly(PERSONAS[personaId].memberId, personaId, asOf);
+    const { member, asOf } = await context(e);
+    const r = await sendMonthly(member, asOf);
     return json(200, {
       sent: r.sent,
       delivered: 'delivered' in r ? r.delivered : undefined,
@@ -665,16 +742,15 @@ const routes: Record<string, Route> = {
 
   // --- Carrier (Lincoln's system of record) --------------------------------------------------------------------------
   'GET /carrier/record': async (e) => {
-    const member = PERSONAS[context(e).personaId].memberId;
+    const member = (await context(e)).member.memberId;
     const rec = await carrierRecord(member);
     return json(200, { ...rec, providers: PROVIDERS });
   },
   // Demo: a dentist visit happens. Lincoln's claims system records and adjudicates it; the stream does the rest.
   'POST /carrier/visits': async (e) => {
     const body = bodyOf(e);
-    const { personaId, asOf } = context(e);
-    const persona = PERSONAS[personaId];
-    const profile = await memberProfile(personaId, asOf);
+    const { member: persona, asOf } = await context(e);
+    const profile = await memberProfile(persona, asOf);
     const next = topoOrder(profile.procedures).find((p) => (p.likelihood ?? 1) >= 1);
     if (!next) throw new HttpError(409, 'No planned procedure left to do');
     const [line] = evaluateSchedule({ ...profile, procedures: [next] }, [{ id: next.id, date: asOf }]).lines;
@@ -700,17 +776,17 @@ const routes: Record<string, Route> = {
   },
   // Demo: the employer moves the member to another plan mid-year (an urgent email follows).
   'POST /carrier/plan-change': async (e) => {
-    const { personaId } = context(e);
-    const rec = await carrierRecord(PERSONAS[personaId].memberId);
+    const { memberId } = (await context(e)).member;
+    const rec = await carrierRecord(memberId);
     const planId = str(bodyOf(e).planId, 'planId', 40);
     if (!['acme-low', 'acme-high'].includes(planId)) throw new HttpError(400, 'Unknown plan');
     if (rec.member?.planId === planId) return json(200, { unchanged: true });
-    await changePlan(PERSONAS[personaId].memberId, planId);
+    await changePlan(memberId, planId);
     return json(202, { planId });
   },
   'POST /demo/urgent': async (e) => {
-    const { personaId } = context(e);
-    return json(200, await sendUrgent(PERSONAS[personaId].memberId, personaId, str(bodyOf(e).what, 'what', 200), [], []));
+    const { member } = await context(e);
+    return json(200, await sendUrgent(member, str(bodyOf(e).what, 'what', 200), [], []));
   },
 };
 
@@ -736,7 +812,7 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
   const route: Route | undefined =
     method === 'DELETE' && reminder
       ? async (e) => {
-          await cancelReminder(PERSONAS[context(e).personaId].memberId, reminder[1]);
+          await cancelReminder((await context(e)).member.memberId, reminder[1]);
           return { statusCode: 204, body: '' };
         }
       : routes[`${method} ${event.rawPath}`];
@@ -744,8 +820,8 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
   try {
     return await route(event);
   } catch (err) {
-    if (err instanceof HttpError) return json(err.status, { error: err.message });
-    console.error(event.rawPath, err);
+    if (err instanceof HttpError) return json(err.status, { error: err.message, ...(err.code && { code: err.code }) });
+    logError('api.unhandled', err);
     return json(500, { error: 'Internal error' });
   }
 }

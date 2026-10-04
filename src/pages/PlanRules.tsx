@@ -31,6 +31,8 @@ export default function PlanRules() {
   const [status, setStatus] = useState("");
   const [readError, setReadError] = useState(false);
   const [approved, setApproved] = useState<{ rules: Rules; hash: string }>();
+  // The last file picked, kept so a failed read can be retried without choosing it again.
+  const [lastFile, setLastFile] = useState<{ file: File; kind: "summary" | "card" }>();
 
   const compile = useMutation({
     mutationFn: async (file: File) =>
@@ -168,10 +170,16 @@ export default function PlanRules() {
           {upload(
             "Upload benefits summary",
             "application/pdf,.txt,image/*",
-            (f) => compile.mutate(f),
+            (f) => {
+              setLastFile({ file: f, kind: "summary" });
+              compile.mutate(f);
+            },
             true,
           )}
-          {upload("Scan insurance card", "image/*,.txt", (f) => card.mutate(f))}
+          {upload("Scan insurance card", "image/*,.txt", (f) => {
+            setLastFile({ file: f, kind: "card" });
+            card.mutate(f);
+          })}
           <a
             className="text-xs font-medium text-brand-700 underline-offset-2 hover:underline"
             href="/samples/acme-benefits-summary.pdf"
@@ -184,6 +192,16 @@ export default function PlanRules() {
         <p className={`mt-3 min-h-5 text-sm ${readError ? "text-cost" : "text-muted"}`} role={readError ? "alert" : "status"}>
           {status}
         </p>
+        {readError && lastFile && (
+          <button
+            type="button"
+            className="btn-secondary mt-2"
+            disabled={compile.isPending || card.isPending}
+            onClick={() => (lastFile.kind === "card" ? card : compile).mutate(lastFile.file)}
+          >
+            Try again with {lastFile.file.name}
+          </button>
+        )}
 
         {result && (
           <div className="mt-2 space-y-3">

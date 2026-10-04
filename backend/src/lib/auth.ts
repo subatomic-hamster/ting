@@ -2,6 +2,7 @@
 // demo (persona from the query string). A token that fails verification is rejected, never ignored.
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
+import { isUserMemberId, memberIdFor } from '../../../src/data/members';
 import { isPersonaId, type PersonaId } from '../../../src/data/personas';
 import type { Group } from './identity';
 
@@ -16,6 +17,8 @@ export interface Caller {
   sub: string;
   group: Group;
   personaId?: PersonaId;
+  /** A member who signed up with email + password (no demo persona): `U-XXXXXXXXXX`. */
+  memberId?: string;
   email?: string;
   /** When the user last actually signed in (epoch seconds), for step-up checks. */
   authTime: number;
@@ -34,13 +37,22 @@ export async function callerOf(event: APIGatewayProxyEventV2): Promise<Caller | 
   } catch {
     throw new AuthError('Your session has expired. Sign in again.');
   }
+  return callerFromClaims(claims);
+}
+
+/** Verified ID-token claims → the caller. A member with no demo persona (self sign-up) gets their own `U-` member id. */
+export function callerFromClaims(claims: Record<string, unknown>): Caller {
   const groups = Array.isArray(claims['cognito:groups']) ? (claims['cognito:groups'] as string[]) : [];
   const group: Group = groups.includes('employer_admin') ? 'employer_admin' : groups.includes('lincoln_analyst') ? 'lincoln_analyst' : 'member';
   const persona = String(claims['ting:persona'] ?? '');
+  const sub = String(claims.sub);
+  const personaId = isPersonaId(persona) ? persona : undefined;
+  const claimed = String(claims['ting:member'] ?? '');
   return {
-    sub: String(claims.sub),
+    sub,
     group,
-    personaId: isPersonaId(persona) ? persona : undefined,
+    personaId,
+    memberId: !personaId && group === 'member' ? (isUserMemberId(claimed) ? claimed : memberIdFor(sub)) : undefined,
     email: typeof claims.email === 'string' ? claims.email : undefined,
     authTime: Number(claims.auth_time ?? 0),
   };

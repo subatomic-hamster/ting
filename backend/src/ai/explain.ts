@@ -1,7 +1,8 @@
 // Explanations: the model rewrites the engine's template sentences in plainer words. Any sentence with a
 // dollar figure the engine didn't produce is replaced by the template, so every number stays the engine's.
 import { dollarsIn, explainLine, verifyNumbers, type ExplainedStep } from '../../../src/engine/explain';
-import type { AdjudicatedLine } from '../../../src/engine/types';
+import type { AdjudicatedLine, PlanRules } from '../../../src/engine/types';
+import { logWarn } from '../lib/log';
 import { isRec, type CallModel } from './model';
 
 const SYSTEM = `You rewrite sentences that explain a dental insurance estimate so a patient with no insurance knowledge understands them.
@@ -23,8 +24,9 @@ const TOOL = {
 export async function explainWithModel(
   line: AdjudicatedLine,
   call: CallModel,
+  rules?: PlanRules,
 ): Promise<(ExplainedStep & { source: 'model' | 'template' })[]> {
-  const steps = explainLine(line);
+  const steps = explainLine(line, rules);
   let sentences: unknown[] = [];
   try {
     const out = await call({
@@ -36,7 +38,7 @@ export async function explainWithModel(
     });
     if (isRec(out) && Array.isArray(out.sentences)) sentences = out.sentences;
   } catch (err) {
-    console.warn('explain: model call failed, using templates', err);
+    logWarn('explain.model_failed', err);
   }
   return steps.map((step, i) => {
     const text = typeof sentences[i] === 'string' ? sentences[i].trim() : '';

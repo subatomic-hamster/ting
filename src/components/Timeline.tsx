@@ -9,9 +9,10 @@ import {
   type Modifier,
 } from "@dnd-kit/core";
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { maxGauges } from "../engine/helpers";
-import type { PlannedProcedure } from "../engine/types";
+import { placementReasons } from "../engine/reasons";
+import type { PlacementReason, PlannedProcedure } from "../engine/types";
 import {
   addDays,
   addMonths,
@@ -30,6 +31,7 @@ import {
 } from "../lib/format";
 import { datePct } from "../lib/geometry";
 import { HORIZON, selectActive, useActive, useAppStore } from "../store";
+import { EstimateFooter } from "./EstimateFooter";
 import { LockIcon } from "./Icons";
 import { MiniMaxGauge } from "./MaxGauge";
 
@@ -59,6 +61,10 @@ interface Visit {
   date: string;
   /** What the member owes if it happens. */
   owes: number;
+  /** Why the visit sits on this date, and the annual max left right after it. */
+  reason?: PlacementReason;
+  maxLeft?: number;
+  overdue: boolean;
 }
 
 export function Timeline({ compact = false }: { compact?: boolean }) {
@@ -86,11 +92,16 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
 
   const dates = new Map(active.placements.map((p) => [p.id, p.date]));
   const owes = new Map(active.lines.map((l) => [l.id, l.memberOwes]));
+  const reasons = useMemo(
+    () => placementReasons(profile, active, { horizon: HORIZON }),
+    [profile, active],
+  );
   const visits: Visit[] = groupVisits(profile.procedures).flatMap(
     (procedures) => {
       const procedure = procedures[0];
       const date = dates.get(procedure.id);
       const total = procedures.reduce((s, p) => s + (owes.get(p.id) ?? 0), 0);
+      const left = procedures.flatMap((p) => reasons[p.id]?.maxLeftAfter ?? []);
       return date
         ? [
             {
@@ -99,10 +110,16 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
               name: visitName(procedures),
               date,
               owes: total,
+              reason: reasons[procedure.id],
+              maxLeft: left.length ? Math.min(...left) : undefined,
+              overdue: procedures.some((p) => reasons[p.id]?.overdue),
             },
           ]
         : [];
     },
+  );
+  const byDate = [...visits].sort((a, b) =>
+    a.date < b.date ? -1 : a.date > b.date ? 1 : 0,
   );
   const visitById = new Map(visits.map((v) => [v.procedure.id, v]));
 
@@ -280,6 +297,47 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
         )}
       </div>
       {!compact && visits.length > 0 && (
+        <div className="mt-5 border-t border-line pt-4">
+          <h3 className="text-base font-semibold">Visit by visit</h3>
+          <ol className="mt-2 divide-y divide-line">
+            {byDate.map((v) => (
+              <li key={v.procedure.id} className="py-3">
+                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                  <span className="font-medium">
+                    {v.name}
+                    {v.overdue && (
+                      <span className="ml-2 rounded bg-cost/10 px-1.5 py-0.5 text-xs font-semibold text-cost">
+                        Overdue
+                      </span>
+                    )}
+                  </span>
+                  <span className="tabular text-sm">
+                    {formatDate(v.date, { year: true })} · you pay{" "}
+                    <span className="font-medium">{formatMoney(v.owes)}</span>
+                  </span>
+                </div>
+                {v.reason && (
+                  <p className="mt-1 text-sm text-ink/80">{v.reason.text}</p>
+                )}
+                {v.maxLeft !== undefined && v.reason && (
+                  <p className="tabular mt-0.5 text-xs text-muted">
+                    {v.reason.year} annual max left after this visit:{" "}
+                    <span className="font-medium text-ink">
+                      {formatMoney(v.maxLeft)}
+                    </span>
+                  </p>
+                )}
+              </li>
+            ))}
+          </ol>
+          <p className="mt-2 text-xs text-muted">
+            Max left comes from the plan rules; it resets on Jan 1 and counts
+            rollover money once it is deposited.
+          </p>
+          <EstimateFooter className="mt-1" />
+        </div>
+      )}
+      {!compact && visits.length > 0 && (
         // Typing a date is the accessible alternative to dragging; it's open by default on phones.
         <details className="mt-5 border-t border-line" open={narrowScreen()}>
           <summary className="text-brand-700">Change dates by typing them</summary>
@@ -342,8 +400,8 @@ function Chip({
       ? ` (maybe, ${formatPercent(procedure.likelihood)})`
       : "";
   const label = locked
-    ? `${name}, ${formatDate(date, { year: true })}, you pay ${formatMoney(owes)}. Locked: your dentist set this date.`
-    : `${name}${maybe}, ${formatDate(date, { year: true })}, you pay ${formatMoney(owes)}. Use left and right arrows to move a week, Shift plus arrows to move a month.`;
+    ? `${name}, ${formatDate(date, { year: true })}, you pay ${formatMoney(owes)}. Locked: your dentist set this date.${visit.overdue ? " Overdue: book as soon as possible." : ""}`
+    : `${name}${maybe}, ${formatDate(date, { year: true })}, you pay ${formatMoney(owes)}.${visit.overdue ? " Overdue: book as soon as possible." : ""} Use left and right arrows to move a week, Shift plus arrows to move a month.`;
 
   return (
     <div
@@ -374,9 +432,18 @@ function Chip({
           <span className="font-semibold">
             {name}
             {maybe && (
-              <span className="ml-1 font-normal text-brand-700">
-                {formatPercent(procedure.likelihood ?? 1)}
-              </span>
+              <>
+                {" "}
+                <span className="font-normal text-brand-700">
+                  maybe {formatPercent(procedure.likelihood ?? 1)}
+                </span>
+              </>
+            )}
+            {visit.overdue && (
+              <>
+                {" "}
+                <span className="font-normal text-cost">overdue</span>
+              </>
             )}
           </span>
           <span className="tabular text-muted">

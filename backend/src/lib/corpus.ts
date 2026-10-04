@@ -6,7 +6,6 @@
 //   EMAIL#<addr> MEMBER                     who an address belongs to (members and their approved dentists)
 import { DeleteCommand, GetCommand, PutCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import type { PlannedProcedure } from '../../../src/engine/types';
-import type { PersonaId } from '../../../src/data/personas';
 import { db } from './db';
 
 const TABLE = process.env.TABLE_NAME ?? '';
@@ -24,7 +23,8 @@ export interface Contact {
   detail: 'detailed' | 'private';
 }
 
-export async function setContact(member: string, personaId: PersonaId, contact: Contact) {
+/** `key` names the member for the backend: a persona id ('dale') or a signed-up member's id ('U-…'). */
+export async function setContact(member: string, key: string, contact: Contact) {
   const prev = await getContact(member);
   if (prev && norm(prev.email) !== norm(contact.email))
     await db.send(
@@ -42,7 +42,7 @@ export async function setContact(member: string, personaId: PersonaId, contact: 
         sk: 'CONTACT',
         ...contact,
         email: norm(contact.email),
-        personaId,
+        key,
         member,
         gsi1pk: 'CONTACT',
         gsi1sk: member,
@@ -56,7 +56,7 @@ export async function setContact(member: string, personaId: PersonaId, contact: 
         pk: `EMAIL#${norm(contact.email)}`,
         sk: 'MEMBER',
         member,
-        personaId,
+        key,
         role: 'member',
       },
     }),
@@ -75,7 +75,7 @@ export async function getContact(member: string): Promise<Contact | undefined> {
 }
 
 /** A dentist's office the member approved may email Ting about them directly. */
-export async function approveDentistSender(member: string, personaId: PersonaId, address: string) {
+export async function approveDentistSender(member: string, key: string, address: string) {
   await db.send(
     new PutCommand({
       TableName: TABLE,
@@ -83,27 +83,24 @@ export async function approveDentistSender(member: string, personaId: PersonaId,
         pk: `EMAIL#${norm(address)}`,
         sk: 'MEMBER',
         member,
-        personaId,
+        key,
         role: 'dentist',
       },
     }),
   );
 }
 
-export async function memberByEmail(address: string): Promise<{ member: string; personaId: PersonaId; role: 'member' | 'dentist' } | undefined> {
+/** Items written before signed-up members existed call the key `personaId`. */
+const keyOf = (item: Record<string, unknown>) => String(item.key ?? item.personaId);
+
+export async function memberByEmail(address: string): Promise<{ member: string; key: string; role: 'member' | 'dentist' } | undefined> {
   const res = await db.send(
     new GetCommand({
       TableName: TABLE,
       Key: { pk: `EMAIL#${norm(address)}`, sk: 'MEMBER' },
     }),
   );
-  return res.Item
-    ? (res.Item as unknown as {
-        member: string;
-        personaId: PersonaId;
-        role: 'member' | 'dentist';
-      })
-    : undefined;
+  return res.Item ? { member: String(res.Item.member), key: keyOf(res.Item), role: res.Item.role === 'dentist' ? 'dentist' : 'member' } : undefined;
 }
 
 export async function putDoc(member: string, doc: Record<string, unknown> & { docId: string }) {
@@ -158,7 +155,7 @@ export async function clearCorpus(member: string) {
   return items.length;
 }
 
-export async function allContacts(): Promise<(Contact & { member: string; personaId: PersonaId })[]> {
+export async function allContacts(): Promise<(Contact & { member: string; key: string })[]> {
   const res = await db.send(
     new QueryCommand({
       TableName: TABLE,
@@ -167,8 +164,26 @@ export async function allContacts(): Promise<(Contact & { member: string; person
       ExpressionAttributeValues: { ':p': 'CONTACT' },
     }),
   );
-  return (res.Items ?? []) as unknown as (Contact & {
-    member: string;
-    personaId: PersonaId;
-  })[];
+  return (res.Items ?? []).map((i) => ({ ...(i as Contact), member: String(i.member), key: keyOf(i) }));
+}
+
+/** "Delete everything": the member's contact (and the address mapping that links their mail to them), preferences,
+ * emailed documents, planned work, sent mail, sign-up record and forwarding-inbox state. */
+export async function deleteMemberData(member: string) {
+  const contact = await getContact(member);
+  if (contact?.email) await db.send(new DeleteCommand({ TableName: TABLE, Key: { pk: `EMAIL#${norm(contact.email)}`, sk: 'MEMBER' } }));
+  const items = [
+    ...(await byPrefix(member, 'DOC#')),
+    ...(await byPrefix(member, 'PLANNED#')),
+    ...(await byPrefix(member, 'OUTBOX#')),
+    ...(await byPrefix(member, 'HELD#')),
+    ...(await byPrefix(member, 'REMINDER#')),
+    ...(await byPrefix(member, 'PUSHES#')),
+    ...(await byPrefix(member, 'CONTACT')),
+    ...(await byPrefix(member, 'PREFS')),
+    ...(await byPrefix(member, 'SENDERS')),
+    ...(await byPrefix(member, 'SEED')),
+  ];
+  for (const i of items) await db.send(new DeleteCommand({ TableName: TABLE, Key: { pk: i.pk, sk: i.sk } }));
+  return items.length;
 }

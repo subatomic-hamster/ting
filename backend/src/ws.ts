@@ -6,6 +6,7 @@ import { sendTo } from './lib/push';
 
 type WsEvent = APIGatewayProxyWebsocketEventV2 & { queryStringParameters?: Record<string, string | undefined> };
 
+/** A member id: a demo member ('M-10456') or a member who signed up ('U-3F9A1C2E77'). */
 const MEMBER = /^[\w-]{1,64}$/;
 
 export async function handler(event: WsEvent): Promise<APIGatewayProxyResultV2> {

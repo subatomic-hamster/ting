@@ -1,6 +1,7 @@
 // Monthly overview: the month's activity, what's coming, whether the member is on track to use their plan, and what
 // to do differently. Every amount comes from the engine; the email only formats it.
 import { cdtLabel, nameOf } from './cdt';
+import type { Comparison } from './compare';
 import { addDays, yearOf } from './dates';
 import { usd } from './format';
 import { leftOnTable } from './helpers';
@@ -134,5 +135,83 @@ export function monthlyOverview(profile: Profile, ev: ScheduleEvaluation): Month
     owedNextYear,
     suggestions,
     amounts,
+  };
+}
+
+// --- Year-end review: how this plan year is going, what next year holds, and which plan fits ------------------
+
+export interface YearEndReview {
+  year: number;
+  nextYear: number;
+  /** "over": planned work needs more than the max; "under": most of the max is unplanned; otherwise "on track". */
+  status: 'over' | 'under' | 'on track';
+  annualMax: number;
+  used: number;
+  scheduled: number;
+  /** Max left after what's done and scheduled (0 when over). */
+  unplanned: number;
+  /** Planned work beyond the max (0 unless over). */
+  overBy: number;
+  message: string;
+  /** The most recent past year's signal from the ledger (survey or claims). */
+  lastYear?: { year: number; planPaid: number; annualMax: number; signal: 'ran out' | 'barely used' | 'some' };
+  /** Next year's planned and predicted work under the recommended option. */
+  nextYearItems: { id: string; label: string; likelihood: number; memberOwes: number }[];
+  recommendation: {
+    plan: string;
+    stay: boolean;
+    total: number;
+    currentTotal: number;
+    /** What switching saves vs. the current plan in an expected year (0 when staying). */
+    saves: number;
+    badYearTotal: number;
+    /** Wellness discount already taken off this plan's premiums. */
+    discount: number;
+    reasons: string[];
+    waitingCaveats: string[];
+  };
+}
+
+/** Every amount comes from the engine's schedule and comparison; the UI only formats them. */
+export function yearEndReview(profile: Profile, ev: ScheduleEvaluation, cmp: Comparison): YearEndReview {
+  const o = monthlyOverview(profile, ev);
+  const year = yearOf(profile.asOf);
+  const nextYear = year + 1;
+  const spent = round2(o.maxUsed + o.maxScheduled);
+  const unplanned = Math.max(0, round2(o.annualMax - spent));
+  const over = o.onTrack.status === 'over the max';
+  const under = !over && unplanned > 0.25 * o.annualMax;
+  const last = profile.ledger.pastYears.at(-1);
+  const byId = new Map(profile.procedures.map((p) => [p.id, p]));
+  const best = cmp.best;
+  const current = cmp.options.find((x) => !x.switching) ?? best;
+  const stay = !best.switching;
+  return {
+    year,
+    nextYear,
+    status: over ? 'over' : under ? 'under' : 'on track',
+    annualMax: o.annualMax,
+    used: o.maxUsed,
+    scheduled: o.maxScheduled,
+    unplanned,
+    overBy: over ? round2(spent - o.annualMax) : 0,
+    message: under ? `${usd(unplanned)} is still unplanned, and it resets on Jan 1.` : o.onTrack.message,
+    lastYear: last
+      ? { ...last, signal: last.planPaid >= last.annualMax ? 'ran out' : last.planPaid < 0.2 * last.annualMax ? 'barely used' : 'some' }
+      : undefined,
+    nextYearItems: best.schedule.lines
+      .filter((l) => l.year === nextYear)
+      .map((l) => ({ id: l.id, label: nameOf(l), likelihood: byId.get(l.id)?.likelihood ?? 1, memberOwes: l.memberOwes })),
+    recommendation: {
+      plan: best.plan.name,
+      stay,
+      total: best.total,
+      currentTotal: current.total,
+      saves: stay ? 0 : Math.max(0, round2(current.total - best.total)),
+      badYearTotal: best.badYearTotal,
+      discount: best.premiumDiscount,
+      reasons: cmp.insights.filter((i) => i.id !== 'waitingPeriod').map((i) => i.text),
+      waitingCaveats: cmp.insights.filter((i) => i.id === 'waitingPeriod' && i.text.startsWith(`${best.plan.name} `)).map((i) => i.text),
+    },
   };
 }

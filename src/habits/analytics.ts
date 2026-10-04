@@ -2,7 +2,8 @@
 // estimate), the dentist (a 30-day home-care summary) and Lincoln (aggregate program
 // economics). Pure functions; the UI only formats their output.
 
-import { addDays } from '../lib/dates';
+import type { HabitSignal } from '../engine/risk';
+import { addDays, diffDays } from '../lib/dates';
 import { countsByDay, isGoodDay, sessionDate, verifySession } from './rewards';
 import type { BrushSession, RewardProgram } from './types';
 
@@ -29,6 +30,16 @@ export function adherence(sessions: BrushSession[], asOf: string, program: Rewar
   let good = 0;
   for (let i = 1; i <= days; i++) if (isGoodDay(byDay, addDays(asOf, -i), program)) good += 1;
   return { goodDays: good, days, rate: days ? round2(good / days) : 0 };
+}
+
+/**
+ * What "Share with Ting" sends: the twice-a-day rate over the days that actually have data (up to 30, counted from
+ * consent), so a new opt-in is never scored against days before it started. Null until there is any history.
+ */
+export function habitSignal(sessions: BrushSession[], asOf: string, program: RewardProgram, consentedAt: string | undefined): HabitSignal | null {
+  if (!consentedAt) return null;
+  const days = Math.min(30, diffDays(asOf, consentedAt));
+  return days > 0 ? { twiceDailyRate: adherence(sessions, asOf, program, days).rate, days } : null;
 }
 
 /** Consecutive good days ending yesterday (or today, once today's goal is met). */

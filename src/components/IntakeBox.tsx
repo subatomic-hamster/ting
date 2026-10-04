@@ -2,11 +2,17 @@ import { InvoiceCheck } from "./InvoiceCheck";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { api, type ReadDocument } from "../api";
+import { api, type ReadDocument, type ReceivedDoc } from "../api";
+import { recordPastClaim } from "../api/mockClaim";
+import { memberFor } from "../data/members";
+import { cdtLabel } from "../engine/cdt";
+import { redactPhi } from "../engine/phi";
+import { eobToClaim, parseEob } from "../intake/eob";
 import type { ServiceRecord } from "../engine/types";
+import { DeidentifiedNote } from "./PrivacyIngestion";
 import { intakeQuestions, toProcedures } from "../intake/questions";
 import type { IntakeItem, IntakeQuestion } from "../intake/types";
-import { formatMoney, groupVisits, visitName } from "../lib/format";
+import { formatDate, formatMoney, groupVisits, visitName } from "../lib/format";
 import { isSpeechSupported, listen } from "../lib/speech";
 import { useAppStore, useProfile } from "../store";
 import { CameraIcon, MicIcon } from "./Icons";
@@ -24,9 +30,25 @@ interface Extra {
   likelihood: number;
 }
 
+type Deid = NonNullable<ReceivedDoc["deidentified"]>;
+
+/** What an AI would be given for this document: the transport's own record when it has one, else computed here. */
+function deidentifiedFor(doc: ReadDocument, personaId: string): Deid {
+  if (doc.deidentified) return doc.deidentified;
+  const m = memberFor(personaId);
+  const r = redactPhi(doc.text, { names: m.name === "Member" ? [] : [m.name], ids: [m.memberId] });
+  return { removed: r.removed, preview: r.text.slice(0, 600) };
+}
+
+const SAMPLE_DOCS = [
+  { path: "/samples/treatment-plan.png", label: "Sample: dentist's treatment plan" },
+  { path: "/samples/eob-wisdom-tooth.png", label: "Sample: insurance EOB for a past surgery" },
+];
+
 /** Text, voice and photo all end up as the same items; Ting only asks when a wrong guess would change the bill. */
 export function IntakeBox({ initialText = "" }: { initialText?: string } = {}) {
   const profile = useProfile();
+  const personaId = useAppStore((s) => s.personaId);
   const addProcedures = useAppStore((s) => s.addProcedures);
   const [text, setText] = useState(initialText);
   const [listening, setListening] = useState(false);
@@ -87,10 +109,44 @@ export function IntakeBox({ initialText = "" }: { initialText?: string } = {}) {
       ),
   });
 
+  // An insurer's EOB is a past service: it goes on the ledger (annual max used, deductible met), not on the plan.
+  const recordEob = (r: ReadDocument) => {
+    const eob = parseEob(r.text);
+    if (!eob.lines.length) {
+      setNote("This looks like an EOB, but Ting couldn't read its service lines. Try a sharper photo.");
+      return;
+    }
+    const s = useAppStore.getState();
+    const paid = eob.lines.reduce((t, l) => t + l.planPaid, 0);
+    const owes = eob.lines.reduce((t, l) => t + l.memberOwes, 0);
+    const ded = eob.lines.reduce((t, l) => t + l.deductible, 0);
+    const ev = eobToClaim(eob, {
+      member: s.personaId,
+      rulesVersion: s.profile.currentPlan.version,
+      today: s.profile.asOf,
+      fallbackId: `EOB-${eob.serviceDate ?? "undated"}-${eob.lines.map((l) => l.cdt).join("")}-${Math.round(paid * 100)}`,
+    });
+    const before = s.profile.ledger;
+    const names = eob.lines.map((l) => cdtLabel(l.cdt, l.tooth)).join(", ");
+    const when = formatDate(ev.serviceDate, { year: true });
+    if (recordPastClaim(ev, ded) === "duplicate") {
+      setNote(`Already on your record: ${names} on ${when}. Nothing was counted twice.`);
+      return;
+    }
+    const { ledger, currentPlan } = useAppStore.getState().profile;
+    setNote(
+      `Recorded: ${names} on ${when}. Plan paid ${formatMoney(paid)}, you owe ${formatMoney(owes)}. Annual max used: ${formatMoney(before.maxUsed)} to ${formatMoney(ledger.maxUsed)} of ${formatMoney(currentPlan.annualMax)}. Deductible met: ${formatMoney(before.deductibleMet)} to ${formatMoney(ledger.deductibleMet)} of ${formatMoney(currentPlan.deductible.amount)}.`,
+    );
+  };
+
   const upload = useMutation({
     mutationFn: (f: File) => api.readDocument(f),
     onSuccess: (r) => {
       setDoc(r);
+      if (r.kind === "eob") {
+        recordEob(r);
+        return;
+      }
       if (r.duplicate)
         setNote(
           "You've uploaded this file before. Ting won't count anything on it twice.",
@@ -306,6 +362,25 @@ export function IntakeBox({ initialText = "" }: { initialText?: string } = {}) {
         </div>
       </form>
 
+      <div className="mt-3 flex flex-col gap-1.5 sm:flex-row" aria-label="Sample documents">
+        {SAMPLE_DOCS.map((s) => (
+          <button
+            key={s.path}
+            type="button"
+            className="btn-secondary px-2.5 py-1.5 text-xs"
+            disabled={busy}
+            onClick={() => {
+              fetch(s.path)
+                .then((res) => (res.ok ? res.blob() : Promise.reject(new Error("sample missing"))))
+                .then((blob) => upload.mutate(new File([blob], s.path.split("/").pop() ?? "sample.png", { type: "image/png" })))
+                .catch(() => setNote("Couldn't load the sample file."));
+            }}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+
       <details className="mt-4 border-t border-line">
         <summary>Example descriptions</summary>
         <div className="flex flex-col" aria-label="Examples">
@@ -345,6 +420,8 @@ export function IntakeBox({ initialText = "" }: { initialText?: string } = {}) {
       {doc?.kind === "invoice" && doc.invoice && (
         <InvoiceCheck invoice={doc.invoice} lineChecks={doc.lineChecks} />
       )}
+
+      {doc?.text && <DeidentifiedNote deidentified={deidentifiedFor(doc, personaId)} />}
 
       {doc?.text && (
         <details className="mt-1 text-xs text-muted">

@@ -3,6 +3,8 @@ import { DemoDataPill } from "../components/DemoDataPill";
 import { EnrollmentCard } from "../components/EnrollmentCard";
 import { FsaCard } from "../components/FsaCard";
 import { MaybeSlider } from "../components/MaybeSlider";
+import { NetworkChoice } from "../components/NetworkChoice";
+import { YearEndReview } from "../components/YearEndReview";
 import { SamplePlanNote } from "../components/SamplePlanNote";
 import { PageHeader, Section } from "../components/Section";
 import { yearOf } from "../lib/dates";
@@ -34,6 +36,12 @@ export default function Enroll() {
       >
         <ComparisonTable />
       </Section>
+
+      <Section title="In network or out of network" id="network">
+        <NetworkChoice />
+      </Section>
+
+      <YearEndReview />
 
       <div className="grid gap-5 lg:grid-cols-5">
         <Section className="lg:col-span-3" title={'"Maybe" work'} id="maybes">

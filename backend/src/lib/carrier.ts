@@ -9,6 +9,7 @@
 import { BatchWriteCommand, DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DEMO_PLAN_OPTIONS } from '../../../src/data/demo';
+import type { Member } from '../../../src/data/members';
 import { isPersonaId, PERSONAS, type PersonaId } from '../../../src/data/personas';
 import type { PlanRules } from '../../../src/engine/types';
 import { claimLine, GROUP_NUMBER, PROVIDERS, providerFor, seedRecords, totals, type Accumulators, type CarrierClaim, type CarrierMember } from './carrierModel';
@@ -31,19 +32,9 @@ export async function seedCarrier(asOf: string) {
   for (const p of PROVIDERS) await put({ pk: `PROVIDER#${p.npi}`, sk: 'META', ...p });
   const plans = new Map<string, PlanRules>();
   for (const id of Object.keys(PERSONAS) as PersonaId[]) {
-    const r = seedRecords(id, asOf);
+    const r = seedRecords(PERSONAS[id], asOf);
     plans.set(r.plan.id, r.plan);
-    await put({
-      pk: `MEMBER#${r.member.memberId}`,
-      sk: 'PROFILE',
-      ...r.member,
-    });
-    await put({
-      pk: `MEMBER#${r.member.memberId}`,
-      sk: `ACCUM#${r.accumulators.planYear}`,
-      ...r.accumulators,
-    });
-    for (const c of r.claims) await put({ pk: `MEMBER#${c.memberId}`, sk: `CLAIM#${c.claimId}`, ...c });
+    await writeSeed(r);
   }
   // Every plan the group offers, so a mid-year plan change has a plan of record to point at.
   for (const plan of DEMO_PLAN_OPTIONS.filter((p) => p.kind === 'insurance')) plans.set(plan.id, plan);
@@ -53,6 +44,21 @@ export async function seedCarrier(asOf: string) {
     providers: PROVIDERS.length,
     plans: plans.size,
   };
+}
+
+async function writeSeed(r: ReturnType<typeof seedRecords>) {
+  await put({ pk: `MEMBER#${r.member.memberId}`, sk: 'PROFILE', ...r.member });
+  await put({ pk: `MEMBER#${r.member.memberId}`, sk: `ACCUM#${r.accumulators.planYear}`, ...r.accumulators });
+  for (const c of r.claims) await put({ pk: `MEMBER#${c.memberId}`, sk: `CLAIM#${c.claimId}`, ...c });
+}
+
+/** A member who signed up: Lincoln's enrollment record and accumulators for them. Safe to run again (it rewrites the seed). */
+export async function seedMemberCarrier(member: Member, asOf: string) {
+  const r = seedRecords(member, asOf);
+  await writeSeed(r);
+  // The plan of record, in case this carrier table was seeded before the plan existed (e.g. acme-basic).
+  await put({ pk: `PLAN#${r.plan.id}`, sk: 'CURRENT', plan: r.plan });
+  return r.member;
 }
 
 async function memberItems(memberId: string) {
@@ -172,8 +178,8 @@ export async function changePlan(memberId: string, planId: string) {
 }
 
 /** Demo reset: drops visits recorded during the demo and restores the seeded accumulators and plan. */
-export async function resetMember(personaId: PersonaId, asOf: string) {
-  const seed = seedRecords(personaId, asOf);
+export async function resetMember(member: Member, asOf: string) {
+  const seed = seedRecords(member, asOf);
   const items = await memberItems(seed.member.memberId);
   const visits = items.filter((i) => String(i.sk).startsWith('CLAIM#') && i.origin === 'visit');
   for (let i = 0; i < visits.length; i += 25)

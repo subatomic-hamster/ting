@@ -11,9 +11,13 @@ export const CONSENT_VERSION = "2026-10";
 export function ConsentDialog() {
   const client = useQueryClient();
   const claims = useAuth((s) => s.claims);
-  // About the member's own dental data; admins and analysts never have any.
+  const kind = useAuth((s) => s.kind);
+  // About the member's own dental data; admins and analysts never have any. Members who signed up with a
+  // password agreed to the same terms on the sign-up form.
   const isMember =
     !!claims &&
+    kind !== "password" &&
+    kind !== "local" &&
     !claims.groups.includes("employer_admin") &&
     !claims.groups.includes("lincoln_analyst");
   const consent = useQuery({

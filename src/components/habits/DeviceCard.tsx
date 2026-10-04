@@ -2,8 +2,12 @@ import { BRIDGE_URL } from "../../habits/bridge";
 import { useHabitStore } from "../../habits/store";
 import type { DeviceKind } from "../../habits/types";
 
-// Real devices only; the simulated brush and the bridge commands live in the demo panel.
 const OPTIONS: { kind: DeviceKind; title: string; detail: string }[] = [
+  {
+    kind: "simulated",
+    title: "Simulated brush (sample data)",
+    detail: "No brush? Try the flow with a built-in simulated one.",
+  },
   {
     kind: "oralb",
     title: "Oral-B smart brush",

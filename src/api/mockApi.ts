@@ -13,10 +13,16 @@ import { currentMemberId, useAuth } from "../auth/auth";
 import { buildDigest } from "../engine/digest";
 import { appealDraft } from "../engine/eobAppeal";
 import { decideInbound, forwardingAddress } from "../engine/inbox";
+import { runLocalAgent } from "../engine/localAgent";
+import { digestEmail, monthlyEmail } from "../engine/localEmails";
+import { monthlyOverview } from "../engine/overview";
+import { redactPhi } from "../engine/phi";
 import { heuristicMatch } from "../engine/reconcile";
 import { localIntent } from "../engine/answer";
 import { optimize } from "../engine/schedule";
-import type { PlanRules } from "../engine/types";
+import type { PlanRules, Profile } from "../engine/types";
+import dentists from "../fixtures/dentists.json";
+import { useAppStore } from "../store";
 import { localExplainer } from "../engine/explain";
 import { classifyDocument } from "../intake/classify";
 import { parseDescription } from "../intake/describe";
@@ -25,14 +31,18 @@ import { localOcr } from "../services/ocr";
 import { pdfText } from "../services/pdf";
 import { apiContext as mock } from "./context";
 import type {
+  CarrierRecord,
   Contact,
   NotificationPrefs,
+  ReadDocument,
+  ReceivedDoc,
   ScheduledReminder,
+  SentEmail,
   ShareSnapshot,
   TingApi,
 } from "./index";
-import { readDraft, saveDraft } from "../lib/drafts";
-import { mockClaimEvent } from "./mockClaim";
+import { clearDraft, readDraft, saveDraft } from "../lib/drafts";
+import { mockClaimEvent, recordPastClaim } from "./mockClaim";
 
 const latency = () =>
   new Promise<void>((r) => setTimeout(r, 300 + Math.random() * 500));
@@ -101,6 +111,75 @@ function signedInMember(): string {
   return id;
 }
 
+// --- the in-browser email agent: what it read and what it sent, per member, kept across reloads ----------------
+
+const AGENT_ADDRESS = "ting-dental@agentmail.to";
+const MAX_KEPT = 50;
+const receivedDocs = () => readDraft<ReceivedDoc[]>("received", mock.personaId) ?? [];
+const sentEmails = () => readDraft<SentEmail[]>("outbox", mock.personaId) ?? [];
+const savedContact = () => readDraft<Contact>("contact", mock.personaId) ?? null;
+const origin = () => (typeof window !== "undefined" ? window.location.origin : "");
+
+/** Who the agent is working for: name and ids from the member, the address from their email settings or account. */
+function agentMember() {
+  const m = memberFor(mock.personaId);
+  const email = savedContact()?.email || useAuth.getState().claims?.email || undefined;
+  return { name: m.name, memberId: m.memberId, email, currentDentistId: m.currentDentistId };
+}
+
+const saveSent = (emails: SentEmail[]) => saveDraft("outbox", mock.personaId, [...emails, ...sentEmails()].sort((a, b) => (a.at < b.at ? 1 : -1)).slice(0, MAX_KEPT));
+
+/** Tells the Email page (and anything else listening) that the record changed, like the live WebSocket's signal. */
+const signal = () => typeof window !== "undefined" && window.dispatchEvent(new CustomEvent("ting:signal", { detail: { type: "corpus.updated" } }));
+
+/** Lincoln's side of the record, derived from the member's ledger so /record isn't empty offline. */
+function carrierRecordFor(profile: Profile): CarrierRecord {
+  const m = memberFor(mock.personaId);
+  const dentist = dentists.dentists.find((d) => d.id === m.currentDentistId);
+  const { ledger } = profile;
+  const byClaim = new Map<string, CarrierRecord["claims"][number]>();
+  ledger.history
+    .filter((h) => h.source !== "user")
+    .forEach((h, n) => {
+      const id = h.claimId ?? `LEDGER-${h.date}-${n}`;
+      const owes = h.memberOwes ?? 0;
+      // The ledger keeps what the plan paid and the member owes; the insurer's allowed amount is their sum.
+      const allowed = Math.round((h.planPaid + owes) * 100) / 100;
+      const c = byClaim.get(id) ?? {
+        claimId: id,
+        serviceDate: h.date,
+        status: "paid",
+        providerNpi: dentist ? "demo-0042" : "unknown",
+        inNetwork: h.inNetwork !== false,
+        origin: h.source,
+        totals: { billed: 0, allowed: 0, planPaid: 0, memberOwes: 0 },
+        lines: [],
+      };
+      c.lines.push({ lineNo: c.lines.length + 1, cdt: h.cdt, tooth: h.tooth, billed: allowed, allowed, planPaid: h.planPaid, memberOwes: owes, adjustments: [] });
+      c.totals = {
+        billed: c.totals.billed + allowed,
+        allowed: c.totals.allowed + allowed,
+        planPaid: Math.round((c.totals.planPaid + h.planPaid) * 100) / 100,
+        memberOwes: Math.round((c.totals.memberOwes + owes) * 100) / 100,
+      };
+      byClaim.set(id, c);
+    });
+  return {
+    member: {
+      memberId: m.memberId,
+      planId: profile.currentPlan.id,
+      groupNumber: "00412345",
+      employer: m.employer,
+      coverageTier: m.coverage,
+      effectiveDate: ledger.coverageStart,
+    },
+    plan: profile.currentPlan,
+    accumulators: [{ planYear: ledger.planYear, deductibleMet: ledger.deductibleMet, annualMaxUsed: ledger.maxUsed, orthoUsed: ledger.orthoUsed, rolloverBalance: ledger.rolloverBalance }],
+    claims: [...byClaim.values()].sort((a, b) => (a.serviceDate < b.serviceDate ? -1 : 1)),
+    providers: dentist ? [{ npi: "demo-0042", name: dentist.name, inNetwork: dentist.inNetwork, dentistId: dentist.id }] : [],
+  };
+}
+
 export const mockApi: TingApi = {
   async getMember() {
     const id = currentMemberId();
@@ -158,11 +237,14 @@ export const mockApi: TingApi = {
 
   async readDocument(file) {
     const text = await fileText(file);
+    const m = memberFor(mock.personaId);
+    const red = redactPhi(text, { names: m.name === "Member" ? [] : [m.name], ids: [m.memberId] });
     return {
       docId: `doc-${uid()}`,
       text,
       ...classifyDocument(text, file.type.startsWith("image/")),
-    };
+      deidentified: { removed: red.removed, preview: red.text.slice(0, 600) },
+    } as ReadDocument;
   },
 
   async compilePlan(text) {
@@ -225,6 +307,8 @@ export const mockApi: TingApi = {
 
   async resetDemo() {
     firedClaims.delete(mock.personaId);
+    clearDraft("received", mock.personaId);
+    clearDraft("outbox", mock.personaId);
   },
 
   async submitRules(rules, evidence, source) {
@@ -271,8 +355,8 @@ export const mockApi: TingApi = {
     return null; // the store already holds the persona's profile
   },
   async getContact() {
-    contact = readDraft<Contact>("contact", mock.personaId) ?? null;
-    return { contact, agent: "ting-dental@agentmail.to", live: false };
+    contact = savedContact();
+    return { contact, agent: AGENT_ADDRESS, live: false };
   },
   async setContact(next) {
     contact = next;
@@ -280,21 +364,52 @@ export const mockApi: TingApi = {
     return next;
   },
   async getOutbox() {
-    return [];
+    return sentEmails();
   },
   async getReceived() {
-    return [];
+    return receivedDocs();
   },
-  async emailAgent() {
-    throw new Error("The email agent needs the live backend");
+  async emailAgent(mail) {
+    await latency();
+    const store = useAppStore.getState();
+    const member = agentMember();
+    const from = mail.fromDentist ? "frontdesk@collegehilldental.example" : (member.email ?? "you@example.com");
+    const out = runLocalAgent({
+      mail: { from, ...mail },
+      member,
+      profile: store.profile,
+      today: store.profile.asOf,
+      at: new Date().toISOString(),
+      contact: savedContact(),
+      web: origin(),
+    });
+    // Apply what the agent decided to the member's record the way the live path does after it refetches the profile.
+    if (out.claim) recordPastClaim(out.claim, out.deductible);
+    if (out.procedures.length) {
+      const err = useAppStore.getState().addProcedures(out.procedures);
+      if (err) out.doc.flags = [...(out.doc.flags ?? []), `Ting couldn't add the new work: ${err}`];
+    }
+    saveDraft("received", mock.personaId, [out.doc, ...receivedDocs().filter((d) => d.docId !== out.doc.docId)].slice(0, MAX_KEPT));
+    saveSent(out.emails);
+    signal();
+    return { accepted: true, from };
   },
   async sendMonthlyNow() {
-    return { sent: false, reason: "needs the live backend" };
+    await latency();
+    const p = useAppStore.getState().profile;
+    const o = monthlyOverview(p, optimize(p, { horizon: 2 }).cheapest);
+    const { name, email } = agentMember();
+    const r = monthlyEmail(name.split(/\s+/)[0] || "there", o, savedContact()?.detail !== "private", origin());
+    saveSent([{ at: new Date().toISOString(), kind: "monthly", to: email ?? "you", subject: r.subject, text: r.text, html: r.html, delivered: "outbox" }]);
+    signal();
+    return { sent: true };
   },
   async getCarrierRecord() {
-    return null;
+    return carrierRecordFor(useAppStore.getState().profile);
   },
-  async changePlan() {},
+  async changePlan(planId) {
+    useAppStore.getState().setCurrentPlan(planId);
+  },
 
   async getInbox() {
     await latency();
@@ -383,11 +498,14 @@ export const mockApi: TingApi = {
   },
   async sendTestDigest() {
     await latency();
-    return {
-      emailed: false,
-      pushedTo: 0,
-      private: prefs.detail !== "detailed",
-    };
+    const p = useAppStore.getState().profile;
+    const d = buildDigest(p, optimize(p, { horizon: 2 }).cheapest);
+    const { name, email } = agentMember();
+    const isPrivate = prefs.detail !== "detailed";
+    const r = digestEmail(name.split(/\s+/)[0] || "there", d.title, d.body, !isPrivate, origin());
+    saveSent([{ at: new Date().toISOString(), kind: "reminder", to: email ?? "you", subject: r.subject, text: r.text, html: r.html, delivered: "outbox" }]);
+    signal();
+    return { emailed: false, pushedTo: 0, private: isPrivate };
   },
   async deleteMyData() {},
 

@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 import { resetDemo, failOnPageErrors } from "./helpers";
 
 test("release uses live API and member routes fit the viewport", async ({ page }) => {

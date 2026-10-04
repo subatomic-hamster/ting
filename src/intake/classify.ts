@@ -1,15 +1,18 @@
 import { isInvoiceText, parseInvoice, type Invoice } from '../engine/reconcile';
+import { isEobText, parseEob, type ParsedEob } from './eob';
 import { parseInsuranceCard } from './insuranceCard';
 import { parseTreatmentPlanText } from './treatmentPlan';
 import type { IntakeItem } from './types';
 
-export type DocumentKind = 'treatment_plan' | 'invoice' | 'plan_summary' | 'insurance_card' | 'unknown';
+export type DocumentKind = 'treatment_plan' | 'invoice' | 'eob' | 'plan_summary' | 'insurance_card' | 'unknown';
 
 /** Text read from a document (OCR, Textract or a PDF text layer) → what it is and, for a treatment plan, its procedures. */
 export function classifyDocument(
   text: string,
   isImage: boolean,
-): { kind: DocumentKind; items: IntakeItem[]; unrecognized: string[]; invoice?: Invoice } {
+): { kind: DocumentKind; items: IntakeItem[]; unrecognized: string[]; invoice?: Invoice; eob?: ParsedEob } {
+  // An insurer's EOB for a visit that already happened: its coded lines are claims, not planned work.
+  if (isEobText(text)) return { kind: 'eob', items: [], unrecognized: [], eob: parseEob(text) };
   // A dentist's bill lists codes too, but it's a record of a visit, not planned work.
   if (isInvoiceText(text)) return { kind: 'invoice', items: [], unrecognized: [], invoice: parseInvoice(text) };
   const plan = parseTreatmentPlanText(text, isImage ? 'photo' : 'upload');

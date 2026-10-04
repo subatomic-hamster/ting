@@ -6,6 +6,7 @@ import { HabitEstimateCard } from "../components/habits/HabitEstimateCard";
 import { HomeCareSummary } from "../components/habits/HomeCareSummary";
 import { LiveBrushPanel } from "../components/habits/LiveBrushPanel";
 import { NextYearCard } from "../components/habits/NextYearCard";
+import { ProfileSyncCard } from "../components/habits/ProfileSyncCard";
 import { PrivacyControls } from "../components/habits/PrivacyControls";
 import { RewardsCard } from "../components/habits/RewardsCard";
 import { StreakCalendar } from "../components/habits/StreakCalendar";
@@ -20,7 +21,7 @@ import { useAppStore } from "../store";
 export default function Habits() {
   const persona = useAppStore((s) => memberFor(s.personaId));
   const consent = useHabitStore((s) => s.consent);
-  const { program, rewards, adherence, streak, calendar, dentist } =
+  const { program, rewards, adherence, signal, streak, calendar, dentist } =
     useSmileStreak();
   const credit = consent.optedIn ? rewards.earned : rewards.wouldEarn;
 
@@ -34,6 +35,8 @@ export default function Habits() {
       </PageHeader>
 
       {!consent.optedIn && <ConsentCard rewards={rewards} />}
+
+      <ProfileSyncCard signal={signal} />
 
       <div className="grid gap-5 lg:grid-cols-5">
         <Section className="min-w-0 lg:col-span-3" title="Brush" id="live">

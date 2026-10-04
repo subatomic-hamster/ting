@@ -7,6 +7,7 @@ import { rankAlerts } from '../ai/winnowUses';
 import type { Decide } from '../ai/winnow';
 import { z } from 'zod';
 import { db } from './db';
+import { logWarn } from './log';
 import { pushToMember } from './push';
 
 const TABLE = process.env.TABLE_NAME ?? '';
@@ -128,7 +129,7 @@ export async function deliverDue(asOf: string, decide?: Decide) {
         ranked = r.answers[reminder.id];
         push = shouldPush(ranked ?? {}, await pushesThisWeek(member, asOf));
       } catch (err) {
-        console.warn('notification ranker skipped', err);
+        logWarn('reminders.ranker_skipped', err);
       }
     }
     const pushedTo =
@@ -140,7 +141,7 @@ export async function deliverDue(asOf: string, decide?: Decide) {
     try {
       email = await sendEmail();
     } catch (err) {
-      console.warn('reminder email failed', reminder.id, err);
+      logWarn('reminders.email_failed', err);
     }
     await db.send(
       new UpdateCommand({
