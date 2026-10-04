@@ -134,6 +134,12 @@ const PREMOLARS = new Set([4, 5, 12, 13, 20, 21, 28, 29]);
 export const isMolar = (tooth?: number) => tooth !== undefined && MOLARS.has(tooth);
 export const isPosterior = (tooth?: number) => tooth !== undefined && (MOLARS.has(tooth) || PREMOLARS.has(tooth));
 
+/** A procedure's name for people: its own label if it has one, and its tooth only when someone said which tooth. */
+export function nameOf(x: { cdt: string; tooth?: number; toothGuessed?: boolean; label?: string }): string {
+  const tooth = x.toothGuessed ? undefined : x.tooth;
+  return x.label ? `${x.label}${tooth ? ` on #${tooth}` : ''}` : cdtLabel(x.cdt, tooth);
+}
+
 export function cdtLabel(cdt: string, tooth?: number): string {
   const name = CDT[cdt]?.short ?? cdt;
   return tooth ? `${name} on #${tooth}` : name;

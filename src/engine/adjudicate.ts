@@ -203,6 +203,8 @@ function adjudicateLine(
     id: proc.id,
     cdt: proc.cdt,
     tooth: proc.tooth,
+    ...(proc.toothGuessed && { toothGuessed: true }),
+    ...(proc.label && { label: proc.label }),
     date,
     year: st.py.year,
     serviceClass: cls,

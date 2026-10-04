@@ -1,7 +1,7 @@
 // What Ting's agent does with newly learned work (from an emailed dentist note or treatment plan): schedule it with
 // the optimizer, suggest who should do it, spread the cost by month, and check the year's maximum.
 import dentistsJson from '../fixtures/dentists.json';
-import { cdtLabel } from './cdt';
+import { nameOf } from './cdt';
 import { yearOf } from './dates';
 import { priceDentists } from './helpers';
 import { optimize } from './schedule';
@@ -51,7 +51,7 @@ export function planNewWork(profile: Profile, newIds: string[], currentDentistId
       const p = profile.procedures.find((x) => x.id === l.id);
       return {
         id: l.id,
-        label: cdtLabel(l.cdt, l.tooth),
+        label: nameOf(l),
         date: l.date,
         memberOwes: l.memberOwes,
         planPaid: l.planPaid,

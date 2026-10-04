@@ -4,7 +4,15 @@ import { addMonths } from '../engine/dates';
 import { usd } from '../engine/format';
 import { evaluateSchedule } from '../engine/schedule';
 import type { PlannedProcedure, Profile, ServiceRecord } from '../engine/types';
+import { EXPLICIT_TOOTH_P } from './describe';
 import type { IntakeItem, IntakeQuestion } from './types';
+
+/** A code nobody stated the size of (surfaces) is shown by its family name, so no number appears that wasn't said. */
+const FAMILY: [RegExp, string][] = [
+  [/^D239[1-4]$/, 'Tooth-colored filling'],
+  [/^D21[4-6]\d$/, 'Silver filling'],
+];
+const STATED_P = 0.85;
 
 /** Ask only when guessing wrong costs more than this in expectation; below it the answer is accepted as "inferred". */
 export const ASK_THRESHOLD = 25;
@@ -26,7 +34,22 @@ export function toProcedures(items: IntakeItem[], profile: Profile): PlannedProc
     const table = profile.fees[cdt];
     const fee = item.fee ?? table?.billed;
     if (fee === undefined) return [];
-    return [{ id: item.id, cdt, tooth: item.teeth[0]?.tooth, fee, allowedFee: table?.inNetwork, inNetwork: true, ...(item.visit && { visit: item.visit }) }];
+    const tooth = item.teeth[0];
+    const family = (item.candidates[0]?.p ?? 0) < STATED_P ? FAMILY.find(([re]) => re.test(cdt))?.[1] : undefined;
+    return [
+      {
+        id: item.id,
+        cdt,
+        tooth: tooth?.tooth,
+        fee,
+        allowedFee: table?.inNetwork,
+        inNetwork: true,
+        ...(item.visit && { visit: item.visit }),
+        // Priced on Ting's best guess, but only a tooth someone named is ever shown as a number.
+        ...(tooth && tooth.p < EXPLICIT_TOOTH_P && { toothGuessed: true }),
+        ...(family && { label: family }),
+      },
+    ];
   });
   // Each step on a tooth depends on the latest earlier step on that tooth.
   return procs.map((p) => {
@@ -71,7 +94,11 @@ export function intakeQuestions(items: IntakeItem[], profile: Profile): IntakeQu
   const out: IntakeQuestion[] = [];
 
   for (const item of items) {
+    // One appointment, one set of questions: asked on its first item, and a code answer covers the whole visit.
+    if (item.visit && items.find((i) => i.visit === item.visit) !== item) continue;
     const swap = (v: IntakeItem) => items.map((i) => (i.id === item.id ? v : i));
+    const swapCode = (cdt: string) =>
+      items.map((i) => (i.id === item.id || (item.visit && i.visit === item.visit) ? { ...i, candidates: [{ cdt, p: 1 }], fee: i.id === item.id ? i.fee : undefined } : i));
     const share = (ps: number[]) => ps.map((p) => p / (ps.reduce((s, q) => s + q, 0) || 1));
     const fields: { field: IntakeQuestion['field']; prompt: string; answers: Answer[] }[] = [];
 
@@ -86,7 +113,7 @@ export function intakeQuestions(items: IntakeItem[], profile: Profile): IntakeQu
           phrase: `it's ${cdtLabel(c.cdt)}`,
           p: ps[i],
           // The stated fee belongs to the top code only.
-          items: swap({ ...item, candidates: [{ cdt: c.cdt, p: 1 }], fee: i === 0 ? item.fee : undefined }),
+          items: i === 0 ? swapCode(c.cdt) : swapCode(c.cdt).map((x) => (x.id === item.id ? { ...x, fee: undefined } : x)),
           replacing: replacingNow,
         })),
       });

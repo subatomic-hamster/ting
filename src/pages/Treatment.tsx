@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { DemoDataPill } from '../components/DemoDataPill';
-import { DentistQuestions, ShareWithDentist } from '../components/DentistQuestions';
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { api } from '../api';
+import { ShareWithDentist } from '../components/DentistQuestions';
 import { GlossaryTerm } from '../components/GlossaryTerm';
 import { IntakeBox } from '../components/IntakeBox';
 import { ProcedureList } from '../components/ProcedureList';
@@ -9,7 +10,7 @@ import { ScheduleTabs } from '../components/ScheduleTabs';
 import { PageHeader, Section } from '../components/Section';
 import { Timeline } from '../components/Timeline';
 import { Waterfall } from '../components/Waterfall';
-import { FEE_ZIP } from '../hooks/useDentistQuotes';
+import { explainQuery } from '../lib/explainQuery';
 import { procedureName } from '../lib/format';
 import { useActive, useAppStore, useProfile } from '../store';
 
@@ -22,6 +23,12 @@ export default function Treatment() {
   const line = selected && active.lines.find((l) => l.id === selected.id);
   // A line is priced under the plan of its year; next year it's the same plan unless you switch at enrollment.
   const rules = profile.currentPlan;
+  const visitSize = selected?.visit ? profile.procedures.filter((p) => p.visit === selected.visit).length : 1;
+  // Explanations for every item load in the background, so picking one shows its words at once.
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    for (const l of active.lines) void queryClient.prefetchQuery(explainQuery(l, rules, api));
+  }, [active.lines, rules, queryClient]);
 
   return (
     <div className="space-y-5">
@@ -41,13 +48,13 @@ export default function Treatment() {
       </Section>
 
       <div className="grid gap-5 lg:grid-cols-5">
-        <Section className="lg:col-span-2" title="2. Your items" id="items" actions={<DemoDataPill label={`Demo fees · ZIP ${FEE_ZIP}`} />}>
+        <Section className="lg:col-span-2" title="2. Your items" id="items">
           <ProcedureList selectedId={selected?.id} onSelect={setPicked} />
         </Section>
 
         <Section
           className="lg:col-span-3"
-          title={selected ? `3. What you'll pay: ${procedureName(selected)}` : "3. What you'll pay"}
+          title={selected ? `3. What you'll pay: ${procedureName(selected)}${visitSize > 1 ? ` (each of ${visitSize})` : ''}` : "3. What you'll pay"}
           id="waterfall"
           eyebrow={<>From the engine · rules {line?.rulesVersion ?? rules.version}</>}
         >
@@ -67,15 +74,11 @@ export default function Treatment() {
         </Section>
       </div>
 
-      <Section title="4. When to do it" id="schedule">
+      <Section title="4. When to do it" id="schedule" actions={<ShareWithDentist />}>
         <ScheduleTabs panelId="timeline-panel" />
         <div id="timeline-panel" role="tabpanel" aria-label="Treatment timeline" className="mt-4">
           <Timeline />
         </div>
-      </Section>
-
-      <Section title="5. Questions for your dentist" id="questions" actions={<ShareWithDentist />}>
-        <DentistQuestions />
       </Section>
     </div>
   );

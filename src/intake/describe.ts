@@ -191,6 +191,9 @@ export function countIn(clause: string): number {
   return n >= 2 && n <= 8 ? n : 1;
 }
 
+/** The phrase without its count ("3 fillings" → "fillings"), so a count is never read as a size or a tooth. */
+export const withoutCount = (phrase: string) => phrase.replace(new RegExp(COUNT.source, 'gi'), (_m, _n, mid: string, noun: string) => `${mid}${noun}`).replace(/\s+/g, ' ').trim();
+
 /** n copies of one set of possible teeth, each led by a different tooth so "3 wisdom teeth" doesn't mean one tooth thrice. */
 const spread = (teeth: Teeth, n: number): Teeth[] => Array.from({ length: n }, (_, k) => [...teeth.slice(k % (teeth.length || 1)), ...teeth.slice(0, k % (teeth.length || 1))]);
 

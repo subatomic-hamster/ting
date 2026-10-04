@@ -1,12 +1,28 @@
 // The only money code in the UI: turning engine numbers into text.
 // Never compute amounts here — only format them.
 
-import { cdtLabel } from '../engine/cdt';
+import { nameOf } from '../engine/cdt';
 import type { PlannedProcedure } from '../engine/types';
 
 /** "Crown (porcelain) on #19", or the dentist's own label ("Braces (Arjun)"). */
-export function procedureName(p: Pick<PlannedProcedure, 'cdt' | 'tooth' | 'label'>): string {
-  return p.label ? `${p.label}${p.tooth ? ` on #${p.tooth}` : ''}` : cdtLabel(p.cdt, p.tooth);
+export function procedureName(p: Pick<PlannedProcedure, 'cdt' | 'tooth' | 'label' | 'toothGuessed'>): string {
+  return nameOf(p);
+}
+
+/** One appointment's name: "3 × Tooth-colored filling", "2 × Crown (porcelain) on #3, #14", or the names joined. */
+export function visitName(procs: Pick<PlannedProcedure, 'cdt' | 'tooth' | 'label' | 'toothGuessed'>[]): string {
+  if (procs.length === 1) return procedureName(procs[0]);
+  const bare = procs.map((p) => procedureName({ ...p, tooth: undefined }));
+  if (bare.some((n) => n !== bare[0])) return procs.map(procedureName).join(' + ');
+  const teeth = procs.flatMap((p) => (p.tooth && !p.toothGuessed ? [`#${p.tooth}`] : []));
+  return `${procs.length} × ${bare[0]}${teeth.length === procs.length ? ` on ${teeth.join(', ')}` : ''}`;
+}
+
+/** Procedures grouped into appointments (shared visit id), in plan order. */
+export function groupVisits<T extends Pick<PlannedProcedure, 'id' | 'visit'>>(procs: T[]): T[][] {
+  const groups = new Map<string, T[]>();
+  for (const p of procs) groups.set(p.visit ?? p.id, [...(groups.get(p.visit ?? p.id) ?? []), p]);
+  return [...groups.values()];
 }
 
 const whole = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0, minimumFractionDigits: 0 });

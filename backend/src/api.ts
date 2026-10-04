@@ -1,5 +1,5 @@
 // HTTP API Lambda: the TingApi routes. Engine, intake and compiler are the same src/ code the browser runs.
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
@@ -367,6 +367,11 @@ const routes: Record<string, Route> = {
     const body = bodyOf(e);
     const line = body.line as AdjudicatedLine | undefined;
     if (!isRec(line) || !Array.isArray(line.waterfall)) throw new HttpError(400, 'line is required');
+    // Same line, same words: the model, Winnow and Automated Reasoning run once per distinct line, then it's a lookup.
+    const { id: _id, ...content } = line;
+    const cacheKey = { pk: 'EXPLAIN', sk: createHash('sha256').update(`v1|${JSON.stringify(content)}`).digest('hex') };
+    const hit = await db.send(new GetCommand({ TableName: TABLE, Key: cacheKey })).catch(() => undefined);
+    if (hit?.Item?.steps) return json(200, hit.Item.steps);
     const [steps, reasoning] = await Promise.all([
       explainWithModel(line, callBedrock),
       checkLine(line).catch((err: unknown) => {
@@ -380,7 +385,13 @@ const routes: Record<string, Route> = {
       return undefined;
     });
     const out = steps.map((s, i) => ({ ...s, text: plain?.[i]?.text ?? s.text, clarity: plain?.[i]?.clarity }));
-    return json(200, reasoning ? out.map((s) => (s.key === 'coinsurance' ? { ...s, reasoning } : s)) : out);
+    const result = reasoning ? out.map((s) => (s.key === 'coinsurance' ? { ...s, reasoning } : s)) : out;
+    // Only fully worked answers are kept: a step that fell back to the template is tried again next time.
+    if (steps.every((x) => x.source === 'model') && reasoning)
+      await db
+        .send(new PutCommand({ TableName: TABLE, Item: { ...cacheKey, steps: result, ttl: Math.floor(Date.now() / 1000) + 30 * 86_400 } }))
+        .catch((err: unknown) => console.warn('explain cache write failed', err));
+    return json(200, result);
   },
 
   // Demo control standing in for Lincoln's claims platform: validate, then publish to the claims bus.

@@ -1,4 +1,4 @@
-import { CDT, cdtLabel } from './cdt';
+import { CDT, nameOf } from './cdt';
 import { formatDate } from './dates';
 import { pct, usd } from './format';
 import type { AdjudicatedLine, PlanRules, WaterfallKey } from './types';
@@ -23,7 +23,7 @@ export interface Explainer {
 const CLASS_NAME = { preventive: 'Preventive', basic: 'Basic', major: 'Major', ortho: 'Orthodontic', excluded: 'Excluded' } as const;
 
 export function explainLine(line: AdjudicatedLine): ExplainedStep[] {
-  const name = cdtLabel(line.cdt, line.tooth).replace(/^./, (c) => c.toLowerCase());
+  const name = nameOf(line).replace(/^./, (c) => c.toLowerCase());
   const category = CDT[line.cdt]?.category;
   return line.waterfall.map((step) => {
     const amount = usd(Math.abs(step.delta));

@@ -1,6 +1,6 @@
 import { adjudicate, frequencyEligibleFrom, planYearsFor, round2, serviceClassOf, waitingPeriodEnds } from './adjudicate';
 import type { Adjudication, PlanYear } from './adjudicate';
-import { cdtLabel } from './cdt';
+import { nameOf } from './cdt';
 import { addDays, dateOfDay, dayOfYear, firstBusinessDay, formatDate, toDay, yearOf } from './dates';
 import { fsaLimits } from './fsa';
 import type { ISODate, Placement, PlannedProcedure, PlanRules, Profile, ScheduleEvaluation, YearCost } from './types';
@@ -182,17 +182,17 @@ export function validatePlacements(profile: Profile, placements: Placement[]): V
   for (const p of profile.procedures) {
     const date = at.get(p.id);
     if (!date) continue;
-    const name = cdtLabel(p.cdt, p.tooth);
+    const name = nameOf(p);
     if (date < profile.asOf) out.push({ id: p.id, message: `${name} can't be scheduled in the past.` });
     if (p.deadline && date > p.deadline)
       out.push({ id: p.id, message: `${name} is past your dentist's deadline of ${formatDate(p.deadline)}.` });
     for (const d of p.dependsOn ?? []) {
       const depDate = at.get(d);
       const dep = profile.procedures.find((q) => q.id === d);
-      if (dep && depDate && date < depDate) out.push({ id: p.id, message: `${name} must come after ${cdtLabel(dep.cdt, dep.tooth)}.` });
+      if (dep && depDate && date < depDate) out.push({ id: p.id, message: `${name} must come after ${nameOf(dep)}.` });
     }
     const mate = p.visit ? profile.procedures.find((q) => q.id !== p.id && q.visit === p.visit && at.has(q.id) && at.get(q.id) !== date) : undefined;
-    if (mate) out.push({ id: p.id, message: `${name} is done in the same visit as ${cdtLabel(mate.cdt, mate.tooth)}.` });
+    if (mate) out.push({ id: p.id, message: `${name} is done in the same visit as ${nameOf(mate)}.` });
   }
   return out;
 }
@@ -360,7 +360,7 @@ export function dentistQuestions(profile: Profile, plan: Placement[], soonest: P
   const questions = plan.flatMap((p) => {
     const proc = byId.get(p.id);
     if (!proc || toDay(p.date) - toDay(asap.get(p.id) ?? p.date) <= DEFAULT_GAP_DAYS) return [];
-    return [`Can the ${cdtLabel(proc.cdt, proc.tooth).replace(/^./, (c) => c.toLowerCase())} safely wait until ${formatDate(p.date)}?`];
+    return [`Can the ${nameOf(proc).replace(/^./, (c) => c.toLowerCase())} safely wait until ${formatDate(p.date)}?`];
   });
   return [...new Set(questions)];
 }

@@ -1,7 +1,7 @@
 // Answers to typed questions that tested code can give: plan lookups from the rules, costs and dates from the
 // engine's schedule. Used when Winnow's router (or the in-browser fallback) says it's that kind of question.
 import { parseDescription } from '../intake/describe';
-import { cdtLabel } from './cdt';
+import { nameOf } from './cdt';
 import { pct, usd } from './format';
 import type { PlannedSchedule } from './schedule';
 import type { PlanRules } from './types';
@@ -30,11 +30,11 @@ export function costAnswer(question: string, schedule: PlannedSchedule): string 
   const codes = new Set(parseDescription(question).flatMap((i) => i.candidates.slice(0, 2).map((c) => c.cdt)));
   const lines = codes.size ? schedule.lines.filter((l) => codes.has(l.cdt)) : [];
   if (lines.length)
-    return lines.map((l) => `${cdtLabel(l.cdt, l.tooth)}: ${date(l.date)}, you pay ${usd(l.memberOwes)}.`).join(' ');
+    return lines.map((l) => `${nameOf(l)}: ${date(l.date)}, you pay ${usd(l.memberOwes)}.`).join(' ');
   if (/total|altogether|in all|how much will i pay|how much do i owe/i.test(question))
     return `For everything planned, you pay ${usd(schedule.expectedOwes)} in total.`;
   if (/when|schedule|date/i.test(question) && schedule.lines.length)
-    return schedule.lines.map((l) => `${cdtLabel(l.cdt, l.tooth)} on ${date(l.date)}`).join('; ') + '.';
+    return schedule.lines.map((l) => `${nameOf(l)} on ${date(l.date)}`).join('; ') + '.';
   return undefined;
 }
 

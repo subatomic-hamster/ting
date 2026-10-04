@@ -7,7 +7,7 @@ import { addMonths } from '../engine/dates';
 import type { ServiceRecord } from '../engine/types';
 import { intakeQuestions, toProcedures } from '../intake/questions';
 import type { IntakeItem, IntakeQuestion } from '../intake/types';
-import { formatMoney, formatPercent, procedureName } from '../lib/format';
+import { formatMoney, formatPercent, groupVisits, visitName } from '../lib/format';
 import { isSpeechSupported, listen } from '../lib/speech';
 import { useAppStore, useProfile } from '../store';
 import { CameraIcon, MicIcon } from './Icons';
@@ -99,7 +99,8 @@ export function IntakeBox() {
   const answer = (q: IntakeQuestion, value: string) =>
     setItems((xs) =>
       xs.map((i) =>
-        i.id !== q.itemId
+        // A code answer covers the whole appointment ("3 fillings" are the same kind of filling).
+        i.id !== q.itemId && !(q.field === 'cdt' && i.visit && i.visit === xs.find((x) => x.id === q.itemId)?.visit)
           ? i
           : q.field === 'cdt'
             ? { ...i, candidates: [{ cdt: value, p: 1 }] }
@@ -243,15 +244,18 @@ export function IntakeBox() {
           ))}
 
           <ul className="space-y-2">
-            {items.map((i) => {
-              const p = priced.find((x) => x.id === i.id);
+            {groupVisits(items).map((group) => {
+              // One row per appointment: "3 fillings" is one visit, so its deadline and "maybe" apply to all of it.
+              const i = group[0];
+              const ps = group.flatMap((g) => priced.filter((x) => x.id === g.id));
+              const p = ps[0];
               const e = extra[i.id];
-              const set = (patch: Partial<Extra>) => setExtra((x) => ({ ...x, [i.id]: { ...x[i.id], ...patch } }));
+              const set = (patch: Partial<Extra>) => setExtra((x) => ({ ...x, ...Object.fromEntries(group.map((g) => [g.id, { ...x[g.id], ...patch }])) }));
               const inferred = (i.candidates.length > 1 || i.teeth.length > 1) && !questions.some((q) => q.itemId === i.id);
               return (
                 <li key={i.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-xl border border-line bg-white px-3 py-2 text-sm">
                   <div className="min-w-0 flex-1">
-                    <span className="font-medium">{p ? procedureName(p) : i.phrase}</span>{' '}
+                    <span className="font-medium">{ps.length ? visitName(ps) : i.phrase}</span>{' '}
                     {p && <span className="font-mono text-xs text-muted">{p.cdt}</span>}
                     {inferred && (
                       <span
@@ -262,7 +266,7 @@ export function IntakeBox() {
                       </span>
                     )}
                     <div className="text-xs text-muted">
-                      from "{i.phrase}" · {p ? `fee ${formatMoney(p.fee)}` : 'no fee on file, left out'}
+                      from "{i.phrase}" · {p ? `fee ${formatMoney(p.fee)}${ps.length > 1 ? ' each · one visit' : ''}` : 'no fee on file, left out'}
                     </div>
                   </div>
                   <label className="flex items-center gap-1 text-xs text-muted">

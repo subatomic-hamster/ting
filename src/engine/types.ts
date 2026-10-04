@@ -129,6 +129,8 @@ export interface PlannedProcedure {
   gapDays?: number;
   /** Procedures sharing a visit id are done in one appointment ("2 fillings"), so they're always on the same date. */
   visit?: string;
+  /** Ting picked the tooth to price it (nobody said which): it's priced, never shown as a tooth number. */
+  toothGuessed?: boolean;
   /** 0..1, for the dentist's "maybe" items. Absent = certain. */
   likelihood?: number;
 }
@@ -193,6 +195,10 @@ export interface AdjudicatedLine {
   id: string;
   cdt: string;
   tooth?: number;
+  /** Display only: see PlannedProcedure.toothGuessed. */
+  toothGuessed?: boolean;
+  /** Display only: the procedure's own name, when it has one. */
+  label?: string;
   date: ISODate;
   year: number;
   serviceClass: ServiceClass | 'excluded';

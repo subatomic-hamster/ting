@@ -38,13 +38,15 @@ test('an insurer claim arrives live, survives a reload, and an underpaid one dra
   await expect(page.getByText(/Hello Member Services/)).toBeVisible();
 });
 
-test('typed intake in Spanish finds the crown on #19', async ({ page }) => {
+test('typed intake in Spanish finds the crown, without showing a tooth number nobody said', async ({ page }) => {
   await page.goto('/treatment');
   await page.getByPlaceholder(/Root canal on #19/).fill('me van a poner una corona en la muela de abajo izquierda, reemplazando la vieja');
   await page.getByRole('button', { name: 'Find procedures' }).click();
   await expect(page.getByText(/Found 1 item/)).toBeVisible();
   // Winnow reads "reemplazando la vieja" with high confidence, so the engine may not need to ask.
-  await expect(page.getByText(/Crown \(porcelain\) on #19/).first()).toBeVisible();
+  await expect(page.locator('#intake').getByText(/^Crown \(porcelain\)/).first()).toBeVisible();
+  // "Lower left molar" is priced as #19, but no tooth number is shown because nobody said one.
+  await expect(page.locator('#intake').getByText(/Crown \(porcelain\) on #\d/)).toHaveCount(0);
 });
 
 test('treatment-plan photo is read by Textract into five items', async ({ page }) => {
@@ -60,16 +62,18 @@ test("a dentist's bill above the EOB is flagged", async ({ page }) => {
   await page.getByLabel('Upload a photo of your treatment plan').setInputFiles('public/samples/invoice.png');
   const confirm = page.getByRole('button', { name: 'Yes, same visit' });
   const flag = page.getByText(/Your bill asks for \$412, but your insurer's EOB says you owe \$200/);
-  await expect(confirm.or(flag)).toBeVisible({ timeout: 30_000 });
+  await expect(confirm.or(flag)).toBeVisible({ timeout: 60_000 }); // Textract + Winnow can take ~30 s
   if (await confirm.isVisible()) await confirm.click();
   await expect(flag).toBeVisible();
 });
 
-test('explanations are verified and proved by Automated Reasoning', async ({ page }) => {
+test('explanations show at once and are proved by Automated Reasoning', async ({ page }) => {
   await page.goto('/treatment');
   await page.getByRole('button', { name: /Root canal \(molar\) on #19/ }).first().click();
+  // The engine's sentence is there immediately; no loading state.
+  await expect(page.locator('#waterfall').getByText(/\$1,180/).first()).toBeVisible({ timeout: 2_000 });
   await expect(page.getByText('Proved').first()).toBeVisible({ timeout: 30_000 });
-  await expect(page.getByText('Verified').first()).toBeVisible();
+  await expect(page.getByText(/Checking|Verified/)).toHaveCount(0);
 });
 
 test('dentist map shows every practice on OpenStreetMap', async ({ page }) => {

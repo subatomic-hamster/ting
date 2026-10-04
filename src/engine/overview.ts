@@ -1,6 +1,6 @@
 // Monthly overview: the month's activity, what's coming, whether the member is on track to use their plan, and what
 // to do differently. Every amount comes from the engine; the email only formats it.
-import { cdtLabel } from './cdt';
+import { cdtLabel, nameOf } from './cdt';
 import { addDays, yearOf } from './dates';
 import { usd } from './format';
 import { leftOnTable } from './helpers';
@@ -59,7 +59,7 @@ export function monthlyOverview(profile: Profile, ev: ScheduleEvaluation): Month
     .filter((l) => l.date >= profile.asOf && l.date <= soon)
     .sort((a, b) => (a.date < b.date ? -1 : 1))
     .map((l) => ({
-      label: cdtLabel(l.cdt, l.tooth),
+      label: nameOf(l),
       date: l.date,
       memberOwes: l.memberOwes,
       inNetwork: l.balanceBill === 0,

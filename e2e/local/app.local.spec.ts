@@ -49,22 +49,38 @@ test('typed intake finds the crown on #19', async ({ page }) => {
   await expect(page.getByText(/Crown \(porcelain\) on #19/).first()).toBeVisible();
 });
 
-test('"I need 2 fillings" is one appointment: same date on the timeline, and they move together', async ({ page }) => {
+test('"3 fillings" is one appointment: one row, one card, one timeline chip that moves as one; no invented numbers', async ({ page }) => {
   await page.goto('/treatment');
-  await page.getByRole('textbox', { name: /Describe the dental work/ }).fill('I need 2 fillings');
+  await page.getByRole('textbox', { name: /Describe the dental work/ }).fill('3 fillings');
   await page.getByRole('button', { name: 'Find procedures' }).click();
+  const intake = page.locator('#intake');
+  await expect(intake.getByText('3 × Tooth-colored filling', { exact: true })).toBeVisible();
+  await expect(intake.getByText(/surfaces/)).toHaveCount(0); // nobody said how many surfaces
   await page.getByRole('button', { name: 'Add to plan' }).click();
-  const fillings = page.getByRole('button', { name: /^Tooth-colored filling \(2 surfaces\), .*Use left and right arrows/ });
-  await expect(fillings).toHaveCount(2);
-  const dates = async () => {
-    const names = await fillings.evaluateAll((els) => els.map((e) => e.getAttribute('aria-label') ?? e.textContent ?? ''));
-    return names.map((n) => /, (\w{3} \d{1,2}, \d{4}), you pay/.exec(n)?.[1]);
-  };
-  const [a, b] = await dates();
-  expect(a).toBeTruthy();
-  expect(b).toBe(a);
-  await fillings.first().focus();
-  await fillings.first().press('Shift+ArrowRight');
-  await expect.poll(async () => new Set(await dates()).size).toBe(1);
-  await expect.poll(async () => (await dates())[0]).not.toBe(a);
+  await expect(page.locator('#items').getByText('3 × Tooth-colored filling', { exact: true })).toBeVisible();
+  const chip = page.getByRole('button', { name: /^3 × Tooth-colored filling, .*Use left and right arrows/ });
+  await expect(chip).toHaveCount(1);
+  const dateOf = async () => /, (\w{3} \d{1,2}, \d{4}), you pay/.exec((await chip.getAttribute('aria-label')) ?? '')?.[1];
+  const before = await dateOf();
+  await chip.focus();
+  await chip.press('Shift+ArrowRight');
+  await expect.poll(dateOf).not.toBe(before);
+});
+
+test('wisdom teeth: one appointment, and no tooth numbers nobody said', async ({ page }) => {
+  await page.goto('/treatment');
+  await page.getByRole('textbox', { name: /Describe the dental work/ }).fill('Two wisdom teeth out');
+  await page.getByRole('button', { name: 'Find procedures' }).click();
+  const intake = page.locator('#intake');
+  await expect(intake.getByText(/^2 × Wisdom tooth removal/)).toBeVisible();
+  await expect(intake.locator('ul li').getByText(/#\d/)).toHaveCount(0);
+});
+
+test('the cost breakdown shows its words at once, without a loading state', async ({ page }) => {
+  await page.goto('/treatment');
+  const fig = page.locator('#waterfall figure');
+  await expect(fig.getByText(/^Your dentist's fee for the /)).toBeVisible({ timeout: 2_000 });
+  await expect(page.getByText(/Checking|Verified/)).toHaveCount(0);
+  await expect(page.getByText('Demo fees')).toHaveCount(0);
+  await expect(page.getByText('Questions for your dentist')).toHaveCount(0);
 });

@@ -13,7 +13,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { maxGauges } from '../engine/helpers';
 import type { PlannedProcedure } from '../engine/types';
 import { addDays, addMonths, clampDate, diffDays, endOfYear, startOfYear, yearOf } from '../lib/dates';
-import { formatDate, formatMoney, formatPercent, procedureName } from '../lib/format';
+import { formatDate, formatMoney, formatPercent, groupVisits, visitName } from '../lib/format';
 import { datePct } from '../lib/geometry';
 import { HORIZON, selectActive, useActive, useAppStore } from '../store';
 import { LockIcon } from './Icons';
@@ -24,7 +24,11 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 const horizontalOnly: Modifier = ({ transform }) => ({ ...transform, y: 0 });
 
 interface Visit {
+  /** The appointment's first procedure: it carries the date, and moving it moves the whole visit. */
   procedure: PlannedProcedure;
+  /** Everything done in this appointment ("3 fillings" is one visit, one chip). */
+  procedures: PlannedProcedure[];
+  name: string;
   date: string;
   /** What the member owes if it happens. */
   owes: number;
@@ -51,9 +55,11 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
 
   const dates = new Map(active.placements.map((p) => [p.id, p.date]));
   const owes = new Map(active.lines.map((l) => [l.id, l.memberOwes]));
-  const visits: Visit[] = profile.procedures.flatMap((procedure) => {
+  const visits: Visit[] = groupVisits(profile.procedures).flatMap((procedures) => {
+    const procedure = procedures[0];
     const date = dates.get(procedure.id);
-    return date ? [{ procedure, date, owes: owes.get(procedure.id) ?? 0 }] : [];
+    const total = procedures.reduce((s, p) => s + (owes.get(p.id) ?? 0), 0);
+    return date ? [{ procedure, procedures, name: visitName(procedures), date, owes: total }] : [];
   });
   const visitById = new Map(visits.map((v) => [v.procedure.id, v]));
 
@@ -72,7 +78,7 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
     const after = selectActive(useAppStore.getState());
     const moved = after.placements.find((p) => p.id === v.procedure.id);
     setMessage(
-      `${procedureName(v.procedure)} moved to ${formatDate(moved?.date ?? date, { year: true })}. ` +
+      `${v.name} moved to ${formatDate(moved?.date ?? date, { year: true })}. ` +
         `You pay ${formatMoney(after.expectedOwes)} in total (${formatMoney(res.delta, { signed: true })}).`,
     );
   };
@@ -92,9 +98,9 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
   const onKey = (v: Visit) => (e: KeyboardEvent) => {
     if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
     e.preventDefault();
-    if (v.procedure.locked) {
+    if (v.procedures.some((p) => p.locked)) {
       setShake({ id: v.procedure.id, n: Date.now() });
-      setMessage(`${procedureName(v.procedure)} is locked: your dentist set this date.`);
+      setMessage(`${v.name} is locked: your dentist set this date.`);
       return;
     }
     const dir = e.key === 'ArrowRight' ? 1 : -1;
@@ -211,14 +217,14 @@ function Chip({
   onKeyDown: (e: KeyboardEvent) => void;
 }) {
   const { procedure, date, owes } = visit;
-  const locked = Boolean(procedure.locked);
+  const locked = visit.procedures.some((p) => p.locked);
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: procedure.id, disabled: locked });
   const controls = useAnimationControls();
   useEffect(() => {
     if (shakeN) void controls.start({ x: [0, -8, 8, -6, 6, 0], transition: { duration: 0.4 } });
   }, [shakeN, controls]);
 
-  const name = procedureName(procedure);
+  const name = visit.name;
   const maybe = procedure.likelihood !== undefined && procedure.likelihood < 1 ? ` (maybe, ${formatPercent(procedure.likelihood)})` : '';
   const label = locked
     ? `${name}, ${formatDate(date, { year: true })}, you pay ${formatMoney(owes)}. Locked: your dentist set this date.`

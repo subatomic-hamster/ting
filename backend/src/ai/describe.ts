@@ -1,7 +1,7 @@
 // Intake: the model only translates the member's words into phrases the tested parser knows.
 // Codes, teeth and probabilities still come from parseDescription.
 import { CDT } from '../../../src/engine/cdt';
-import { makeItem, parseDescription } from '../../../src/intake/describe';
+import { makeItem, parseDescription, withoutCount } from '../../../src/intake/describe';
 import type { IntakeItem, IntakeSource } from '../../../src/intake/types';
 import { isRec, type CallModel } from './model';
 import type { Decide, WinnowQuestion } from './winnow';
@@ -59,21 +59,24 @@ export function blend(prior: IntakeItem['candidates'], winnow: Record<string, nu
  */
 export async function withWinnow(text: string, items: IntakeItem[], decide: Decide): Promise<IntakeItem[]> {
   const questions: Record<string, WinnowQuestion> = {};
+  // One appointment ("3 fillings") is one question, asked without the count so "3" is never read as 3 surfaces.
+  const lead = items.map((item, i) => (item.visit ? items.findIndex((x) => x.visit === item.visit) : i));
   items.forEach((item, i) => {
+    if (lead[i] !== i) return;
     if (item.candidates.length > 1)
       questions[`code_${i}`] = {
         type: 'choice',
-        instructions: `Which procedure does "${item.phrase}" describe?`,
+        instructions: `Which procedure does "${withoutCount(item.phrase)}" describe?`,
         criteria: Object.fromEntries(item.candidates.map((c) => [c.cdt, CDT[c.cdt] ? `${CDT[c.cdt].short} (${CDT[c.cdt].description})` : c.cdt])),
       };
     if (CROWNS.has(item.candidates[0]?.cdt ?? '') && item.replacement !== undefined)
       questions[`replacement_${i}`] = { type: 'noul', instructions: 'Does this crown replace an existing crown on the same tooth?' };
   });
   if (!Object.keys(questions).length) return items;
-  const { answers, source } = await decide({ description: text.slice(0, 2000) }, questions);
+  const { answers, source } = await decide({ description: withoutCount(text).slice(0, 2000) }, questions);
   return items.map((item, i) => {
-    const code = answers[`code_${i}`];
-    const repl = answers[`replacement_${i}`];
+    const code = answers[`code_${lead[i]}`];
+    const repl = answers[`replacement_${lead[i]}`];
     if (!code && !repl) return item;
     // The parser's dental priors and Winnow's reading of these exact words, combined (geometric mean): Winnow can
     // overturn a prior with clear evidence, but a literal reading alone doesn't erase what's usual in dentistry.
