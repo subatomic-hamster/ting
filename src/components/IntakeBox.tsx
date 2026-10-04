@@ -62,7 +62,8 @@ export function IntakeBox() {
     mutationFn: (f: File) => api.readDocument(f),
     onSuccess: (r) => {
       setDoc(r);
-      if (r.triage?.quarantined)
+      if (r.duplicate) setNote("You've uploaded this file before. Ting won't count anything on it twice.");
+      else if (r.triage?.quarantined)
         setNote('This file seems to contain instructions aimed at an AI, so Ting read it with its own parser only. Check every item.');
       if (r.kind === 'treatment_plan' && r.triage?.quarantined) review(r.items, `Found ${r.items.length} item(s) with Ting's own parser. Check them below.`);
       else if (r.kind === 'treatment_plan') review(r.items, `Read your treatment plan: found ${r.items.length} item${r.items.length === 1 ? '' : 's'}. Check them below.`);

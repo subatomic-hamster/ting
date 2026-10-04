@@ -4,6 +4,7 @@ import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { DetectDocumentTextCommand, TextractClient } from '@aws-sdk/client-textract';
+import { SFNClient, StartSyncExecutionCommand } from '@aws-sdk/client-sfn';
 import { DeleteCommand, GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
 import { DEMO_PLAN_OPTIONS } from '../../src/data/demo';
@@ -27,6 +28,8 @@ import { db, deleteClaims, getShare, putShare } from './lib/db';
 import admin from '../../src/fixtures/admin.json';
 import { rowsToText } from './lib/layout';
 import { checkLine } from './lib/reasoning';
+import { addSender, heldFor, holdMail, sendersFor, takeHeld } from './lib/inbox';
+import { decideInbound, forwardingAddress, type InboundEmail } from '../../src/engine/inbox';
 import { digestFor, getPrefs, prefsSchema, putPrefs, sendDigest } from './lib/digest';
 import { cancelReminder, deliverDue, reminderSchema, scheduleReminder } from './lib/reminders';
 
@@ -37,6 +40,8 @@ const BUCKET = process.env.DOCS_BUCKET ?? '';
 const BUS = process.env.EVENT_BUS ?? '';
 const WEB_ORIGIN = process.env.WEB_ORIGIN ?? '';
 const WINNOW_URL = process.env.WINNOW_URL ?? '';
+const INGEST_ARN = process.env.INGEST_ARN ?? '';
+const sfnClient = new SFNClient({});
 const TABLE = process.env.TABLE_NAME ?? '';
 
 // Winnow when its server is up; otherwise the labelled Claude simulation (the spec's fallback path).
@@ -110,6 +115,12 @@ function context(event: APIGatewayProxyEventV2): { personaId: PersonaId; asOf: s
 function trustedOrigin(origin: unknown): string {
   if (typeof origin === 'string' && (origin === WEB_ORIGIN || /^http:\/\/localhost(:\d+)?$/.test(origin))) return origin;
   return WEB_ORIGIN;
+}
+
+/** Accepted mail: only the text is kept long enough to classify and screen it. */
+async function readMailText(mail: InboundEmail) {
+  const text = `${mail.subject}\n${mail.text}`.slice(0, 60_000);
+  return { docId: `mail-${randomUUID().slice(0, 8)}`, text, ...classifyDocument(text, false), triage: await safeTriage(text) };
 }
 
 async function readUpload(key: string, contentType: string) {
@@ -188,8 +199,50 @@ const routes: Record<string, Route> = {
     }
   },
 
+  // F2 channel 2: the member's forwarding address. Production receives mail with SES inbound; the demo posts it.
+  'GET /inbox': async (e) => {
+    const member = PERSONAS[context(e).personaId].memberId;
+    return json(200, { address: forwardingAddress(member), senders: await sendersFor(member), held: await heldFor(member) });
+  },
+  'POST /mock/inbound-email': async (e) => {
+    const body = bodyOf(e);
+    const auth = isRec(body.auth) ? body.auth : {};
+    const mail: InboundEmail = {
+      from: str(body.from, 'from', 200),
+      subject: String(body.subject ?? '').slice(0, 200),
+      text: str(body.text, 'text', 60_000),
+      auth: { spf: auth.spf !== false, dkim: auth.dkim !== false, dmarc: auth.dmarc !== false },
+    };
+    const member = PERSONAS[context(e).personaId].memberId;
+    const decision = decideInbound(mail, callers.get(e)?.email, await sendersFor(member));
+    if (decision.action === 'reject') return json(200, { status: 'rejected', reason: decision.reason });
+    if (decision.action === 'hold') return json(200, { status: 'held', reason: decision.reason, heldId: await holdMail(member, mail) });
+    return json(200, { status: 'accepted', doc: await readMailText(mail) });
+  },
+  'POST /inbox/senders': async (e) => {
+    const body = bodyOf(e);
+    const member = PERSONAS[context(e).personaId].memberId;
+    const senders = await addSender(member, str(body.address, 'address', 200));
+    const held = typeof body.heldId === 'string' ? await takeHeld(member, body.heldId) : undefined;
+    return json(200, { senders, doc: held ? await readMailText(held) : undefined });
+  },
+
   'POST /documents': async (e) => {
     const body = bodyOf(e);
+    // The ingestion workflow (Step Functions) when deployed: read → screen → record, with duplicate detection.
+    if (INGEST_ARN) {
+      const key = str(body.key, 'key', 300);
+      if (!/^uploads\/[\w-]+\/[\w.-]+$/.test(key)) throw new HttpError(400, 'Unknown upload');
+      const run = await sfnClient.send(
+        new StartSyncExecutionCommand({
+          stateMachineArn: INGEST_ARN,
+          input: JSON.stringify({ bucket: BUCKET, key, contentType: str(body.contentType, 'contentType', 100), member: PERSONAS[context(e).personaId].memberId }),
+        }),
+      );
+      const out = run.output ? (JSON.parse(run.output) as { doc?: Record<string, unknown>; duplicate?: boolean; error?: string }) : {};
+      if (run.status !== 'SUCCEEDED' || out.error || !out.doc) throw new HttpError(422, 'Ting could not read this file');
+      return json(200, { ...out.doc, duplicate: out.duplicate === true, pipeline: run.executionArn?.split(':').slice(-2).join(':') });
+    }
     try {
       return json(200, await readUpload(str(body.key, 'key', 300), str(body.contentType, 'contentType', 100)));
     } catch (err) {

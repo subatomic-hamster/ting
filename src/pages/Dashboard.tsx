@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ActivityFeed } from '../components/ActivityFeed';
+import { ForwardingCard } from '../components/ForwardingCard';
 import { DeductibleBar } from '../components/DeductibleBar';
 import { DemoDataPill } from '../components/DemoDataPill';
 import { EnrollmentCard } from '../components/EnrollmentCard';
@@ -83,6 +84,7 @@ export default function Dashboard() {
       <Section title="Activity" id="activity" actions={<DemoDataPill label="Demo claims feed" />}>
         <ActivityFeed />
       </Section>
+      <ForwardingCard />
     </div>
   );
 }

@@ -38,6 +38,8 @@ export interface ReadDocument {
   unrecognized: string[];
   /** A dentist's bill, parsed. */
   invoice?: Invoice;
+  /** The same file was uploaded before (content hash); it's never counted twice. */
+  duplicate?: boolean;
   /** Winnow's read of the file (AWS only): document type and whether it tries to instruct an AI. */
   triage?: DocumentTriage;
 }
@@ -111,6 +113,11 @@ export interface TingApi {
   fireMockClaim(profile: Profile, opts?: { underpay?: number }): Promise<void>;
   /** Which of the member's claims (EOBs) this invoice is for: a probability per claim id plus "none" (Winnow use 3 in AWS). */
   matchInvoice(invoice: Invoice, claims: ClaimRecord[]): Promise<{ probs: Record<string, number>; source: 'winnow' | 'simulated' | 'heuristic' }>;
+  /** F2 forwarding address: approved senders and mail waiting for approval. */
+  getInbox(): Promise<{ address: string; senders: string[]; held: { id: string; from: string; subject: string; receivedAt: string }[] }>;
+  /** Demo control standing in for SES inbound: an email arrives at the member's forwarding address. */
+  simulateForward(mail: { from: string; subject: string; text: string }): Promise<{ status: 'accepted' | 'held' | 'rejected'; reason?: string; doc?: ReadDocument }>;
+  approveSender(address: string, heldId?: string): Promise<{ senders: string[]; doc?: ReadDocument }>;
   /** F7: a factual message to Lincoln about an EOB that differs from the estimate. */
   draftAppeal(discrepancy: EobDiscrepancy, plan: Pick<PlanRules, 'name' | 'sections'>): Promise<{ text: string; source: 'model' | 'template' }>;
   /** A signed, expiring link for the dentist. The snapshot is what the link shows on any device. */

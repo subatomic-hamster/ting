@@ -11,6 +11,7 @@ import PlanRules from './pages/PlanRules';
 import Program from './pages/Program';
 import Share from './pages/Share';
 import Treatment from './pages/Treatment';
+import TryIt from './pages/TryIt';
 
 export default function App() {
   return (
@@ -18,6 +19,8 @@ export default function App() {
       {/* Public dentist handoff: no app chrome. */}
       <Route path="/share/:token" element={<Share />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
+      {/* Title-slide QR code for judges. */}
+      <Route path="/try" element={<TryIt />} />
       <Route element={<AppShell />}>
         <Route index element={<Dashboard />} />
         <Route path="treatment" element={<Treatment />} />

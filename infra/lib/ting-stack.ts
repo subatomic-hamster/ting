@@ -26,6 +26,8 @@ import {
 } from 'aws-cdk-lib/aws-cognito';
 import { BlockPublicAccess, Bucket, BucketEncryption, HttpMethods } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
+import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
+import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import type { Construct } from 'constructs';
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -285,6 +287,63 @@ export class TingStack extends Stack {
     );
     // Anthropic models on Bedrock check the caller's Marketplace subscription on each call.
     apiFn.addToRolePolicy(new PolicyStatement({ actions: ['aws-marketplace:ViewSubscriptions', 'aws-marketplace:Subscribe'], resources: ['*'] }));
+
+    // --- Document ingestion: one Express workflow for every document (read → screen → record) ----------------
+    const ingestFn = fn('IngestFn', 'ingest.ts', {
+      memorySize: 1024,
+      timeout: Duration.seconds(25),
+      environment: { TABLE_NAME: table.tableName, MODEL_FAST, WINNOW_URL: this.node.tryGetContext('winnowUrl') ?? '', NODE_OPTIONS: '--enable-source-maps' },
+    });
+    docs.grantRead(ingestFn);
+    ingestFn.addToRolePolicy(new PolicyStatement({ actions: ['textract:DetectDocumentText'], resources: ['*'] }));
+    ingestFn.addToRolePolicy(
+      new PolicyStatement({
+        actions: ['bedrock:InvokeModel', 'aws-marketplace:ViewSubscriptions', 'aws-marketplace:Subscribe'],
+        resources: [`arn:aws:bedrock:${this.region}:${this.account}:inference-profile/${MODEL_FAST}`, 'arn:aws:bedrock:*::foundation-model/anthropic.*', '*'],
+      }),
+    );
+    const read = new tasks.LambdaInvoke(this, 'Read', {
+      lambdaFunction: ingestFn,
+      payload: sfn.TaskInput.fromObject({ step: 'read', 'bucket.$': '$.bucket', 'key.$': '$.key', 'contentType.$': '$.contentType' }),
+      payloadResponseOnly: true,
+      resultPath: '$.read',
+    });
+    const screen = new tasks.LambdaInvoke(this, 'Screen', {
+      lambdaFunction: ingestFn,
+      payload: sfn.TaskInput.fromObject({
+        step: 'screen',
+        'key.$': '$.key',
+        'contentType.$': '$.contentType',
+        'text.$': '$.read.text',
+        'hash.$': '$.read.hash',
+      }),
+      payloadResponseOnly: true,
+      resultPath: '$.doc',
+    });
+    const record = new tasks.DynamoPutItem(this, 'Record', {
+      table,
+      item: {
+        pk: tasks.DynamoAttributeValue.fromString(sfn.JsonPath.format('MEMBER#{}', sfn.JsonPath.stringAt('$.member'))),
+        sk: tasks.DynamoAttributeValue.fromString(sfn.JsonPath.format('DOC#{}', sfn.JsonPath.stringAt('$.read.hash'))),
+        kind: tasks.DynamoAttributeValue.fromString(sfn.JsonPath.stringAt('$.doc.kind')),
+        key: tasks.DynamoAttributeValue.fromString(sfn.JsonPath.stringAt('$.key')),
+      },
+      conditionExpression: 'attribute_not_exists(pk)',
+      resultPath: sfn.JsonPath.DISCARD,
+    });
+    const fresh = new sfn.Pass(this, 'New', { parameters: { 'doc.$': '$.doc', duplicate: false }, outputPath: '$' });
+    const seen = new sfn.Pass(this, 'Duplicate', { parameters: { 'doc.$': '$.doc', duplicate: true } });
+    record.addCatch(seen, { errors: ['DynamoDB.ConditionalCheckFailedException'], resultPath: '$.error' });
+    const unreadable = new sfn.Pass(this, 'Unreadable', { parameters: { error: 'unreadable', 'cause.$': '$.error.Cause' } });
+    read.addCatch(unreadable, { resultPath: '$.error' });
+    const ingest = new sfn.StateMachine(this, 'Ingest', {
+      stateMachineType: sfn.StateMachineType.EXPRESS,
+      definitionBody: sfn.DefinitionBody.fromChainable(read.next(screen).next(record).next(fresh)),
+      timeout: Duration.seconds(30),
+      tracingEnabled: true,
+    });
+    ingest.grantStartSyncExecution(apiFn);
+    apiFn.addEnvironment('INGEST_ARN', ingest.stateMachineArn);
 
     const httpApi = new HttpApi(this, 'Api', {
       defaultIntegration: new HttpLambdaIntegration('ApiIntegration', apiFn),

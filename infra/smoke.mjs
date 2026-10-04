@@ -110,7 +110,12 @@ await check('POST /documents (S3 presign + Textract)', async () => {
   assert(doc.kind === 'treatment_plan', `kind ${doc.kind}`);
   assert(doc.items.length === 5, `expected the 5 rows, got ${doc.items.length}`);
   assert(doc.triage && !doc.triage.quarantined && doc.triage.docType === 'treatment_plan', `triage ${JSON.stringify(doc.triage)}`);
-  return `${doc.items.length} items: ${doc.items.map((i) => i.candidates[0].cdt).join(',')}`;
+  // Same bytes again: the ingestion workflow's content hash marks it as a duplicate.
+  const again = await call('/documents/upload', { name: 'treatment-plan.png', contentType: 'image/png' });
+  await fetch(again.uploadUrl, { method: 'PUT', body: png, headers: { 'Content-Type': 'image/png' } });
+  const second = await call('/documents', { key: again.key, contentType: 'image/png' });
+  assert(second.duplicate === true, `second upload duplicate=${second.duplicate}`);
+  return `${doc.items.length} items: ${doc.items.map((i) => i.candidates[0].cdt).join(',')}; via ${doc.pipeline ?? 'direct'}; re-upload flagged duplicate`;
 });
 
 await check('Winnow triage quarantines a document that instructs the AI', async () => {
@@ -267,6 +272,25 @@ await check('invoice: Textract → classify → Winnow match → overbilling fla
   const m = await call('/invoices/match', { invoice: doc.invoice, claims });
   assert((m.probs['CLM-RC19'] ?? 0) >= 0.9, `match ${JSON.stringify(m)}`);
   return `amount due $412 → CLM-RC19 p=${m.probs['CLM-RC19']} (${m.source}); EOB says $200, so the bill is flagged`;
+});
+
+await check('forwarding: auth check, unknown sender held, approve → read and dropped', async () => {
+  const persona = 'priya'; // a member the other checks don't touch
+  const q = `?persona=${persona}`;
+  const post = async (path, body) => (await fetch(`${API}${path}${q}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json();
+  const inbox = await (await fetch(`${API}/inbox${q}`)).json();
+  assert(/^u-[a-z0-9]+@in\.ting\.app$/.test(inbox.address), inbox.address);
+  const sender = `billing-${Date.now()}@smile.example`;
+  const bill = { from: sender, subject: 'Statement', text: 'Statement / Invoice\nDate of service: 10/03/2026\nD1110 Cleaning $120.00\nAmount due $35.00' };
+  const spoofed = await post('/mock/inbound-email', { ...bill, auth: { dkim: false } });
+  assert(spoofed.status === 'rejected', JSON.stringify(spoofed));
+  const held = await post('/mock/inbound-email', bill);
+  assert(held.status === 'held' && held.heldId, JSON.stringify(held));
+  const approved = await post('/inbox/senders', { address: sender, heldId: held.heldId });
+  assert(approved.doc?.kind === 'invoice' && approved.doc.invoice.amountDue === 35, JSON.stringify(approved.doc));
+  const after = await (await fetch(`${API}/inbox${q}`)).json();
+  assert(!after.held.some((h) => h.id === held.heldId), 'held mail should be gone after processing');
+  return `${inbox.address}: spoofed rejected, unknown held, approved → invoice $35`;
 });
 
 await check('rejects a malformed claim', async () => {

@@ -7,6 +7,7 @@ import admin from '../fixtures/admin.json';
 import { PERSONAS } from '../data/personas';
 import { buildDigest } from '../engine/digest';
 import { appealDraft } from '../engine/eobAppeal';
+import { decideInbound, forwardingAddress } from '../engine/inbox';
 import { heuristicMatch } from '../engine/reconcile';
 import { optimize } from '../engine/schedule';
 import { localExplainer } from '../engine/explain';
@@ -35,6 +36,7 @@ const ledgerListeners = new Set<(e: unknown) => void>();
 /** Shared snapshots, this browser only (the AWS backend keeps them in DynamoDB). */
 const shares = new Map<string, ShareSnapshot>();
 let prefs: NotificationPrefs = { cadence: 'monthly', detail: 'private' };
+const inbox: { senders: string[]; held: { id: string; from: string; subject: string; text: string; receivedAt: string }[] } = { senders: [], held: [] };
 
 /** Scheduled reminders, by member. In mock mode the app itself shows them when they come due. */
 const reminders = new Map<string, Map<string, ScheduledReminder>>();
@@ -106,6 +108,32 @@ export const mockApi: TingApi = {
   },
 
   async resetDemo() {},
+
+  async getInbox() {
+    await latency();
+    return { address: forwardingAddress(PERSONAS[mock.personaId].memberId), senders: [...inbox.senders], held: inbox.held.map(({ id, from, subject, receivedAt }) => ({ id, from, subject, receivedAt })) };
+  },
+  async simulateForward(mail) {
+    await latency();
+    const d = decideInbound({ ...mail, auth: { spf: true, dkim: true, dmarc: true } }, undefined, inbox.senders);
+    if (d.action === 'reject') return { status: 'rejected', reason: d.reason };
+    if (d.action === 'hold') {
+      const id = uid();
+      inbox.held.push({ id, ...mail, receivedAt: new Date().toISOString() });
+      return { status: 'held', reason: d.reason };
+    }
+    const text = `${mail.subject}\n${mail.text}`;
+    return { status: 'accepted', doc: { docId: `mail-${uid()}`, text, ...classifyDocument(text, false) } };
+  },
+  async approveSender(address, heldId) {
+    await latency();
+    inbox.senders = [...new Set([...inbox.senders, address.toLowerCase()])];
+    const held = inbox.held.find((h) => h.id === heldId);
+    inbox.held = inbox.held.filter((h) => h.id !== heldId);
+    if (!held) return { senders: inbox.senders };
+    const text = `${held.subject}\n${held.text}`;
+    return { senders: inbox.senders, doc: { docId: `mail-${uid()}`, text, ...classifyDocument(text, false) } };
+  },
 
   async matchInvoice(invoice, claims) {
     await latency();
