@@ -142,7 +142,8 @@ export class TingStack extends Stack {
     const spaRewrite = new cloudfront.Function(this, 'SpaRewrite', {
       runtime: cloudfront.FunctionRuntime.JS_2_0,
       code: cloudfront.FunctionCode.fromInline(
-        "function handler(event) { var r = event.request; if (r.uri.indexOf('.') === -1) { r.uri = '/index.html'; } return r; }",
+        // App routes (including /share/<persona>.<kind>.<token>, which contains dots) get index.html; real files pass.
+        "function handler(event) { var r = event.request; if (!/\\.(js|css|html|json|png|jpe?g|gif|svg|ico|txt|pdf|map|woff2?|webmanifest)$/i.test(r.uri)) { r.uri = '/index.html'; } return r; }",
       ),
     });
     const distribution = new cloudfront.Distribution(this, 'Web', {
@@ -228,6 +229,16 @@ export class TingStack extends Stack {
       preventUserExistenceErrors: true,
     });
     webClient.node.addDependency(acmeIdp);
+    // End-to-end tests only: admin-created test users in the member pool sign in through the AWS admin API
+    // (IAM credentials required), never through a web page. The pre-token trigger maps them like federated users.
+    const e2eClient = members.addClient('E2E', {
+      generateSecret: false,
+      authFlows: { adminUserPassword: true },
+      readAttributes: employeeRead,
+      idTokenValidity: Duration.hours(1),
+      accessTokenValidity: Duration.hours(1),
+      refreshTokenValidity: Duration.hours(1),
+    });
 
     // --- HTTP API: the TingApi routes ---------------------------------------------------------------------------
     const apiFn = fn('ApiFn', 'api.ts', {
@@ -248,6 +259,7 @@ export class TingStack extends Stack {
         AR_RULES_PREFIX: 'PLAN-ACME-LOW',
         USER_POOL_ID: members.userPoolId,
         USER_POOL_CLIENT_ID: webClient.userPoolClientId,
+        E2E_CLIENT_ID: e2eClient.userPoolClientId,
         MODEL_FAST,
         MODEL_SMART,
         NODE_OPTIONS: '--enable-source-maps',
@@ -407,5 +419,6 @@ export class TingStack extends Stack {
     new CfnOutput(this, 'MembersPoolId', { value: members.userPoolId });
     new CfnOutput(this, 'SignInDomain', { value: membersDomain.baseUrl() });
     new CfnOutput(this, 'WebClientId', { value: webClient.userPoolClientId });
+    new CfnOutput(this, 'E2EClientId', { value: e2eClient.userPoolClientId });
   }
 }

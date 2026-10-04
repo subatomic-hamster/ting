@@ -29,14 +29,17 @@ export function useBootstrap() {
     if (ledger.data) setLedger(ledger.data);
   }, [ledger.data, setLedger]);
 
+  // Subscribe once the starting ledger is in, so replayed claims land on top of it instead of being overwritten.
+  const ledgerReady = ledger.isSuccess || ledger.isError;
   useEffect(() => {
+    if (!ledgerReady) return undefined;
     try {
       return api.subscribeLedger(applyClaim);
     } catch (err) {
       console.warn(err);
       return undefined;
     }
-  }, [applyClaim, personaId]);
+  }, [applyClaim, personaId, ledgerReady]);
 
   return { session: session.data };
 }

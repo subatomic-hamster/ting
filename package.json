@@ -51,6 +51,7 @@
     "@aws-sdk/lib-dynamodb": "^3.1146.0",
     "@aws-sdk/s3-request-presigner": "^3.1146.0",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/aws-lambda": "^8.10.164",
     "@types/leaflet": "^1.9.22",

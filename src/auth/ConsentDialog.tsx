@@ -7,11 +7,13 @@ export const CONSENT_VERSION = '2026-10';
 /** First sign-in: what Ting reads, what it never shares with the employer, and how to delete everything. */
 export function ConsentDialog() {
   const claims = useAuth((s) => s.claims);
-  const consent = useQuery({ queryKey: ['consent', claims?.sub], queryFn: () => api.getConsent(), enabled: !!claims });
+  // About the member's own dental data; admins and analysts never have any.
+  const isMember = !!claims && !claims.groups.includes('employer_admin') && !claims.groups.includes('lincoln_analyst');
+  const consent = useQuery({ queryKey: ['consent', claims?.sub], queryFn: () => api.getConsent(), enabled: isMember });
   const accept = useMutation({ mutationFn: () => api.giveConsent(CONSENT_VERSION), onSuccess: () => consent.refetch() });
   const remove = useMutation({ mutationFn: () => api.deleteMyData() });
 
-  if (!claims || !consent.data || consent.data.version === CONSENT_VERSION) return null;
+  if (!isMember || !consent.data || consent.data.version === CONSENT_VERSION) return null;
 
   return (
     <div role="dialog" aria-modal="true" aria-labelledby="consent-title" className="fixed inset-0 z-40 grid place-items-center bg-ink/40 p-4">

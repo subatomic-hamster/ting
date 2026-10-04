@@ -210,7 +210,8 @@ function traced(impl: TingApi): TingApi {
 
 /** The engine runs in the browser, so when the network drops the live API falls back to the in-browser one. */
 const LOCAL_WHEN_OFFLINE = new Set<keyof TingApi>(['getSession', 'getPlans', 'getLedger', 'parseDescription', 'readDocument', 'compilePlan', 'explain', 'getDigest', 'matchInvoice', 'draftAppeal']);
-const offline = (err: unknown) => (typeof navigator !== 'undefined' && !navigator.onLine) || err instanceof TypeError;
+const offline = (err: unknown) =>
+  (typeof navigator !== 'undefined' && !navigator.onLine) || err instanceof TypeError || (err instanceof DOMException && err.name === 'TimeoutError');
 
 function withOfflineFallback(live: TingApi, local: TingApi): TingApi {
   const wrapped: Record<string, unknown> = {};
@@ -220,6 +221,11 @@ function withOfflineFallback(live: TingApi, local: TingApi): TingApi {
       continue;
     }
     wrapped[name] = async (...args: unknown[]) => {
+      // Known offline: don't wait on a connection that may never answer.
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        emit(`api.${name} (offline)`, 'no network; answered in the browser', 0);
+        return (local[name] as (...a: unknown[]) => unknown).apply(local, args);
+      }
       try {
         return await fn.apply(live, args);
       } catch (err) {

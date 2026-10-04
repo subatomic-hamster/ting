@@ -7,8 +7,10 @@ import type { Group } from './identity';
 
 const USER_POOL_ID = process.env.USER_POOL_ID ?? '';
 const CLIENT_ID = process.env.USER_POOL_CLIENT_ID ?? '';
+/** The end-to-end test client (admin API sign-in only); its tokens are verified the same way. */
+const E2E_CLIENT_ID = process.env.E2E_CLIENT_ID ?? '';
 
-const verifier = USER_POOL_ID && CLIENT_ID ? CognitoJwtVerifier.create({ userPoolId: USER_POOL_ID, tokenUse: 'id', clientId: CLIENT_ID }) : undefined;
+const verifier = USER_POOL_ID && CLIENT_ID ? CognitoJwtVerifier.create({ userPoolId: USER_POOL_ID, tokenUse: 'id', clientId: E2E_CLIENT_ID ? [CLIENT_ID, E2E_CLIENT_ID] : CLIENT_ID }) : undefined;
 
 export interface Caller {
   sub: string;

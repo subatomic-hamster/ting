@@ -6,7 +6,11 @@ import App from './App';
 import './index.css';
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1, staleTime: Infinity } },
+  // networkMode 'always': the API seam answers in the browser when offline, so React Query must not pause calls.
+  defaultOptions: {
+    queries: { refetchOnWindowFocus: false, retry: 1, staleTime: Infinity, networkMode: 'always' },
+    mutations: { networkMode: 'always' },
+  },
 });
 
 // Offline shell for the deployed app (not in dev, where Vite serves modules live).

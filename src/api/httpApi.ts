@@ -27,6 +27,8 @@ async function http<T>(path: string, init?: RequestInit): Promise<T> {
   if (!API_URL) notWired(`VITE_API_URL is not set (${path})`);
   const token = currentIdToken();
   const res = await fetch(`${API_URL}${withContext(path)}`, {
+    // A connection that silently died (Wi-Fi dropped mid-request) must not hang the app.
+    signal: AbortSignal.timeout(25_000),
     ...init,
     headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...init?.headers },
   });
