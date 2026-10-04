@@ -162,6 +162,7 @@ export interface Money {
   nextYearElection?: number;
   /** Combined marginal rate saved on pre-tax dollars (federal + state + FICA). */
   marginalTaxRate: number;
+  premiumDiscount?: PremiumDiscount;
 }
 
 export interface FeeSource {
@@ -195,6 +196,29 @@ export interface PlanPreferences {
   covered?: "self" | "partner" | "children" | "family";
   movesFrequently?: boolean;
   surveyCompleted?: boolean;
+  /** How much of last year's max the plan paid: drives the "hit the max" / "used under 20%" plan advice. */
+  lastYear?: "underused" | "some" | "hitMax" | "unknown";
+  /** Dental goals for the next two years. */
+  goals?: ("wisdomTeeth" | "braces" | "implant" | "crown" | "none")[];
+  /** Optional lifestyle questions (opt-in, health information). Completing them earns the wellness discount. */
+  lifestyle?: Lifestyle;
+}
+
+export interface Lifestyle {
+  brushing: "once" | "twice" | "more";
+  flossing: "daily" | "sometimes" | "rarely";
+  sugaryDrinks: "rarely" | "daily" | "several";
+  tobacco: boolean;
+  grinding: "no" | "yes" | "unsure";
+  bleedingGums: boolean;
+  dryMouth: boolean;
+}
+
+/** Premium discount for completing the wellness questions (sample terms), applied to insurance premiums until `until`. */
+export interface PremiumDiscount {
+  pct: number;
+  until: ISODate;
+  reason: string;
 }
 
 /** Everything the engine needs about one covered person. */

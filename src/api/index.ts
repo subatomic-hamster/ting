@@ -14,6 +14,9 @@ import type { AdjudicatedLine, Ledger, PlannedProcedure, PlanRules, Profile } fr
 import type { DocumentKind } from '../intake/classify';
 import type { DentistSummary } from '../habits/analytics';
 import type { IntakeItem } from '../intake/types';
+import type { MemberRecord } from '../data/members';
+import type { PhiKind } from '../engine/phi';
+import type { HabitSignal } from '../engine/risk';
 import type { ActiveSchedule } from '../store';
 import { httpApi } from './httpApi';
 import { mockApi } from './mockApi';
@@ -138,6 +141,8 @@ export interface ReceivedDoc {
   };
   recorded?: string[];
   flags?: string[];
+  /** HIPAA: what was removed before any AI read the document, and the de-identified text it actually saw. */
+  deidentified?: { removed: Partial<Record<PhiKind, number>>; preview: string };
   plan?: {
     items: { label: string; date: string; memberOwes: number }[];
     dentist?: { name: string; distanceMiles: number; isCurrent: boolean };
@@ -214,8 +219,17 @@ export interface ScheduledReminder {
   channels: ('in_app' | 'email')[];
 }
 
+/** What the sign-up survey sends; the server adds the member id, email, employer and dates. */
+export type NewMember = Pick<MemberRecord, 'name' | 'planId' | 'survey'> & { currentDentistId?: string };
+
 export interface TingApi {
   getSession(): Promise<Session>;
+  /** The signed-in member's sign-up record, or null when they haven't finished the onboarding survey. */
+  getMember(): Promise<MemberRecord | null>;
+  /** Finish sign-up: stores the survey; the insurer's record is seeded and the member's email is linked to the agent. */
+  saveMember(member: NewMember): Promise<MemberRecord>;
+  /** SmileStreak: brushing data the member chose to share, which updates their dental profile. */
+  shareHabits(habits: HabitSignal): Promise<MemberRecord>;
   /** Plan options at open enrollment, including waiving coverage and the dentist's membership plan. */
   getPlans(): Promise<PlanRules[]>;
   getLedger(): Promise<Ledger>;

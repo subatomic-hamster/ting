@@ -1,7 +1,7 @@
 // AWS backend client (infra/ deploys it). Same TingApi, same engine types; the Lambda runs the same src/ code.
 
-import { currentIdToken } from '../auth/auth';
-import { PERSONAS } from '../data/personas';
+import { freshIdToken } from '../auth/auth';
+import { memberFor, type MemberRecord } from '../data/members';
 import { classifyDocument } from '../intake/classify';
 import { notify } from '../lib/notify';
 import { pdfText } from '../services/pdf';
@@ -24,7 +24,7 @@ function withContext(path: string): string {
 
 async function http<T>(path: string, init?: RequestInit): Promise<T> {
   if (!API_URL) notWired(`VITE_API_URL is not set (${path})`);
-  const token = currentIdToken();
+  const token = await freshIdToken();
   const res = await fetch(`${API_URL}${withContext(path)}`, {
     // A connection that silently died (Wi-Fi dropped mid-request) must not hang the app.
     signal: AbortSignal.timeout(25_000),
@@ -59,6 +59,9 @@ async function readDocument(file: File): Promise<ReadDocument> {
 }
 
 export const httpApi: TingApi = {
+  getMember: async () => (await http<{ member: MemberRecord | null }>('/me')).member,
+  saveMember: async (member) => (await http<{ member: MemberRecord }>('/me', post(member))).member,
+  shareHabits: async (habits) => (await http<{ member: MemberRecord }>('/me/habits', post(habits))).member,
   getSession: () => http('/session'),
   getPlans: () => http('/plans'),
   getLedger: () => http('/ledger'),
@@ -70,7 +73,7 @@ export const httpApi: TingApi = {
   /** Live claims over WebSocket. On connect the backend replays this member's earlier claims; applying them is idempotent. */
   subscribeLedger: (onEvent) => {
     if (!WS_URL) notWired('VITE_WS_URL is not set (subscribeLedger)');
-    const member = PERSONAS[apiContext.personaId].memberId;
+    const member = memberFor(apiContext.personaId).memberId;
     let ws: WebSocket | undefined;
     let closed = false;
     let retry: ReturnType<typeof setTimeout> | undefined;

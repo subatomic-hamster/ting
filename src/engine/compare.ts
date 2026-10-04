@@ -15,6 +15,8 @@ export interface OptionResult {
   /** Cheapest schedule under this option. */
   schedule: PlannedSchedule;
   premiumsAnnual: number;
+  /** Wellness discount already taken off `premiumsAnnual`. */
+  premiumDiscount: number;
   /** Premiums after the tax saving when they're deducted pre-tax. */
   premiumCost: number;
   careCost: number;
@@ -26,14 +28,26 @@ export interface OptionResult {
   waiting: AdjudicatedLine[];
 }
 
+/** Months of the enrolled year (next plan year) that a premium discount still covers. */
+export function discountMonths(profile: Profile): number {
+  const d = profile.money.premiumDiscount;
+  if (!d) return 0;
+  const next = yearOf(profile.asOf) + 1;
+  const [y, m] = d.until.split('-').map(Number);
+  // Whole months before the discount's end month.
+  return Math.max(0, Math.min(12, (y - next) * 12 + m - 1));
+}
+
 export function priceOption(profile: Profile, plan: PlanRules): OptionResult {
   const schedule = optimize(profile, { nextPlan: plan, horizon: HORIZON }).cheapest;
-  const premiumsAnnual = round2(plan.premiumMonthly * 12);
+  const discount = plan.kind === 'insurance' && profile.money.premiumDiscount ? round2(plan.premiumMonthly * discountMonths(profile) * profile.money.premiumDiscount.pct) : 0;
+  const premiumsAnnual = round2(plan.premiumMonthly * 12 - discount);
   const premiumCost = round2(premiumsAnnual * (plan.premiumPreTax ? 1 - profile.money.marginalTaxRate : 1));
   return {
     plan,
     schedule,
     premiumsAnnual,
+    premiumDiscount: discount,
     premiumCost,
     careCost: schedule.expectedCost,
     total: round2(schedule.expectedCost + premiumCost),

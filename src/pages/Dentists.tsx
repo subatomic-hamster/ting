@@ -5,10 +5,10 @@ import { DentistMap } from "../components/DentistMap";
 import { DENTISTS, FEE_ZIP } from "../hooks/useDentistQuotes";
 import { NetworkCompare } from "../components/NetworkCompare";
 import { PageHeader, Section } from "../components/Section";
-import { PERSONAS } from "../data/personas";
+import { memberFor } from "../data/members";
 import { useAppStore } from "../store";
 export default function Dentists() {
-  const persona = useAppStore((s) => PERSONAS[s.personaId]);
+  const persona = useAppStore((s) => memberFor(s.personaId));
   const [keep, setKeep] = useState(false);
   const [view, setView] = useState<"list" | "map">("list");
   const mine = DENTISTS.find((d) => d.id === persona.currentDentistId);

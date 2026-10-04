@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { sampleMode, useAccount } from "../auth/useAccount";
 import { ConsentDialog } from "../auth/ConsentDialog";
 import { useBootstrap } from "../hooks/useBootstrap";
 import { AuditDrawer } from "./AuditDrawer";
@@ -14,9 +15,14 @@ export function AppShell() {
     window.addEventListener("ting:saveerror", show);
     return () => window.removeEventListener("ting:saveerror", show);
   }, []);
+  const account = useAccount();
   const { session, profileStatus, retryProfile } = useBootstrap();
   const [auditOpen, setAuditOpen] = useState(false);
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
+  // QR visitors land on sign-up; the sample members open only when asked for (demo link or "Explore a sample").
+  if (account.status === "guest" && !sampleMode())
+    return <Navigate to={pathname === "/" ? "/signup" : `/login?next=${encodeURIComponent(pathname + search)}`} replace />;
+  if (account.status === "needsSurvey") return <Navigate to="/welcome" replace />;
   return (
     <div className="flex min-h-screen flex-col">
       <a
@@ -42,7 +48,24 @@ export function AppShell() {
           </p>
         )}
         <ErrorBoundary resetKey={pathname}>
-          {profileStatus === "ready" ? (
+          {account.status === "loading" ? (
+            <div>
+              <h1>Your account</h1>
+              <p role="status" className="mt-5">
+                Loading your account…
+              </p>
+            </div>
+          ) : account.status === "error" ? (
+            <div>
+              <h1>Account unavailable</h1>
+              <p role="alert" className="mt-5">
+                Could not load your account. Check your connection and try again.
+              </p>
+              <button className="btn-primary mt-5" onClick={() => void account.retry()}>
+                Try again
+              </button>
+            </div>
+          ) : profileStatus === "ready" ? (
             <Outlet />
           ) : profileStatus === "loading" ? (
             <div>

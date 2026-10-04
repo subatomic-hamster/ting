@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { api, onApiTrace, USE_MOCKS } from "../api";
 import { useAuth } from "../auth/auth";
+import { isPersonaId } from "../data/personas";
 import { useAppStore } from "../store";
 import { loadLiveProfile } from "../lib/profileCache";
 
@@ -17,7 +18,8 @@ export function useBootstrap() {
     if (lastAuth.current !== authSub) {
       lastAuth.current = authSub;
       const s = useAppStore.getState();
-      s.loadPersona(s.personaId);
+      // Signing out of a member account goes back to the sample member; the account gate loads a new member.
+      s.loadPersona(isPersonaId(s.personaId) ? s.personaId : "dale");
     }
   }, [authSub]);
   const personaId = useAppStore((s) => s.personaId);

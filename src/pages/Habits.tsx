@@ -12,13 +12,13 @@ import { StreakCalendar } from "../components/habits/StreakCalendar";
 import { ValueMap } from "../components/habits/ValueMap";
 import { ChevronIcon } from "../components/Icons";
 import { PageHeader, Section } from "../components/Section";
-import { PERSONAS } from "../data/personas";
+import { memberFor } from "../data/members";
 import { useSmileStreak } from "../habits/hooks";
 import { useHabitStore } from "../habits/store";
 import { useAppStore } from "../store";
 
 export default function Habits() {
-  const persona = useAppStore((s) => PERSONAS[s.personaId]);
+  const persona = useAppStore((s) => memberFor(s.personaId));
   const consent = useHabitStore((s) => s.consent);
   const { program, rewards, adherence, streak, calendar, dentist } =
     useSmileStreak();

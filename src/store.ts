@@ -3,7 +3,8 @@ import { readDraft, saveDraft } from "./lib/drafts";
 import type { ScheduledReminder, TraceEvent } from "./api";
 import { configureApi } from "./api/context";
 import { DEMO_PLAN_OPTIONS } from "./data/demo";
-import { isPersonaId, PERSONAS, type PersonaId } from "./data/personas";
+import { memberFor } from "./data/members";
+import { isPersonaId } from "./data/personas";
 import { round2 } from "./engine/adjudicate";
 import { compare } from "./engine/compare";
 import {
@@ -56,7 +57,8 @@ export type MoveResult =
   { ok: true; delta: number; ms: number } | { ok: false; reason: string };
 
 export interface AppState {
-  personaId: PersonaId;
+  /** Member key: a demo persona id, or the signed-up member's id (`U-…`). */
+  personaId: string;
   removedProcedureIds: string[];
   patchedProcedureIds: string[];
   today: string;
@@ -78,7 +80,7 @@ export interface AppState {
   scheduledReminders: ScheduledReminder[] | null;
   dismissedReminders: string[];
 
-  loadPersona: (id: PersonaId) => void;
+  loadPersona: (id: string) => void;
   reset: () => void;
   setPlans: (plans: PlanRules[]) => void;
   setLedger: (ledger: Ledger) => void;
@@ -88,6 +90,8 @@ export interface AppState {
   addPlan: (rules: PlanRules, asCurrent: boolean) => void;
   setAsOf: (asOf: string) => void;
   simulateDec1: () => void;
+  /** A signed-up member's record changed (survey re-saved, brushing data shared): rebuild from it, keep added work. */
+  refreshMember: () => void;
   moveProcedure: (procedureId: string, date: string) => MoveResult;
   applySchedule: (kind: Exclude<ScheduleKind, "custom">) => void;
   /** Returns why the engine can't schedule them, or undefined when added. */
@@ -139,13 +143,13 @@ function withNetwork(
   );
 }
 
-function personaState(id: PersonaId, asOf: string) {
+function personaState(id: string, asOf: string) {
   return {
     personaId: id,
     removedProcedureIds: [] as string[],
     patchedProcedureIds: [] as string[],
     today: todayISO(),
-    profile: PERSONAS[id].profile(asOf),
+    profile: memberFor(id).profile(asOf),
     plans: DEMO_PLAN_OPTIONS,
     network: "in" as Network,
     scheduleKind: "cheapest" as ScheduleKind,
@@ -159,7 +163,8 @@ function personaState(id: PersonaId, asOf: string) {
   };
 }
 
-function initialPersona(): PersonaId {
+/** Signed-up members are loaded by the account gate once their record arrives; the app starts on a persona. */
+function initialPersona(): string {
   if (typeof window === "undefined") return "dale";
   const p = new URLSearchParams(window.location.search).get("persona");
   return p && isPersonaId(p) ? p : "dale";
@@ -180,7 +185,7 @@ type Draft = Pick<
   | "scheduledReminders"
   | "dismissedReminders"
 >;
-function restorePersona(id: PersonaId) {
+function restorePersona(id: string) {
   const fresh = personaState(id, todayISO());
   const saved = readDraft<Draft>("treatment", id);
   if (!saved) return fresh;
@@ -222,7 +227,7 @@ export const useAppStore = create<AppState>()((set, get) => {
       set(restorePersona(id));
       pushTrace({
         tool: "demo.persona",
-        summary: `Switched to ${PERSONAS[id].name}`,
+        summary: `Switched to ${memberFor(id).name}`,
         ms: 0,
       });
     },
@@ -295,17 +300,39 @@ export const useAppStore = create<AppState>()((set, get) => {
       });
     },
 
-    // Demo time travel rebuilds the persona at the new date so its dentist deadlines stay ahead of "today".
+    // Demo time travel rebuilds the member at the new date so the seeded deadlines stay ahead of "today". Work
+    // added since (intake, email) and claims already received carry over, so nothing shown so far disappears.
     setAsOf: (asOf) => {
       const s = get();
       configureApi({ asOf });
-      const fresh = PERSONAS[s.personaId].profile(asOf);
-      set({
-        profile: {
-          ...fresh,
-          currentPlan: s.profile.currentPlan,
-          procedures: withNetwork(fresh.procedures, s.network, fresh.fees),
+      const member = memberFor(s.personaId);
+      const fresh = member.profile(asOf);
+      const seeded = new Set(member.profile(s.profile.asOf).procedures.map((p) => p.id));
+      const freshIds = new Set(fresh.procedures.map((p) => p.id));
+      // Survey predictions ("risk-…") always come from the member record, never carried over.
+      const added = s.profile.procedures.filter((p) => !seeded.has(p.id) && !freshIds.has(p.id) && !p.id.startsWith("risk-"));
+      let profile: Profile = {
+        ...fresh,
+        currentPlan: s.profile.currentPlan,
+        preferences: s.profile.preferences ?? fresh.preferences,
+        procedures: withNetwork(
+          [...fresh.procedures.filter((p) => !s.removedProcedureIds.includes(p.id)), ...added],
+          s.network,
+          fresh.fees,
+        ),
+        ledger: {
+          ...fresh.ledger,
+          history: [
+            ...fresh.ledger.history,
+            ...s.profile.ledger.history.filter(
+              (h) => h.source === "user" && !fresh.ledger.history.some((x) => x.date === h.date && x.cdt === h.cdt && x.tooth === h.tooth),
+            ),
+          ],
         },
+      };
+      for (const raw of s.liveClaims) profile = applyClaimEvent(profile, claimEventSchema.parse(raw)).profile;
+      set({
+        profile,
         scheduleKind: "cheapest",
         custom: [],
       });
@@ -317,6 +344,13 @@ export const useAppStore = create<AppState>()((set, get) => {
     },
 
     simulateDec1: () => get().setAsOf(`${yearOf(get().today)}-12-01`),
+
+    refreshMember: () => {
+      const s = get();
+      s.setAsOf(s.profile.asOf);
+      const plan = memberFor(s.personaId).profile(s.profile.asOf).currentPlan;
+      set((st) => ({ profile: { ...st.profile, currentPlan: plan, preferences: memberFor(s.personaId).record?.survey ?? st.profile.preferences } }));
+    },
 
     moveProcedure: (procedureId, requested) => {
       const s = get();
@@ -534,7 +568,7 @@ export const useAppStore = create<AppState>()((set, get) => {
     mergeServerProfile: (server) => {
       const s = get();
       const seeded = new Set(
-        PERSONAS[s.personaId].profile(server.asOf).procedures.map((p) => p.id),
+        memberFor(s.personaId).profile(server.asOf).procedures.map((p) => p.id),
       );
       const serverIds = new Set(server.procedures.map((p) => p.id));
       // Keep only what this browser added itself; the server owns the seeded work and anything learned by email.

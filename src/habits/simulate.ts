@@ -52,6 +52,20 @@ export const HABIT_PROFILES: Record<PersonaId, HabitProfile> = {
   },
 };
 
+/** A signed-up member: not opted in yet; once they do, a twice-a-day brusher by default. */
+const NEW_MEMBER: HabitProfile = {
+  deviceName: 'Smart toothbrush (demo)',
+  morning: 0.95,
+  evening: 0.9,
+  meanSec: 120,
+  sdSec: 12,
+  weakSector: 2,
+  pressurePerSession: 0.1,
+  consent: () => ({ optedIn: false, shareWithDentist: false, shareAggregateWithLincoln: false }),
+};
+
+export const habitProfile = (key: string): HabitProfile => (Object.hasOwn(HABIT_PROFILES, key) ? HABIT_PROFILES[key as PersonaId] : NEW_MEMBER);
+
 /** Small seeded PRNG (mulberry32) so every demo run shows the same history. */
 function rng(seed: number) {
   let a = seed >>> 0;
@@ -83,9 +97,9 @@ function splitSectors(rand: () => number, duration: number, weak: number): numbe
 }
 
 /** Brushing history from consent until the day before `asOf` (no data exists before consent). */
-export function seedHistory(personaId: PersonaId, asOf: string, consentedAt: string | undefined): BrushSession[] {
+export function seedHistory(personaId: string, asOf: string, consentedAt: string | undefined): BrushSession[] {
   if (!consentedAt || consentedAt >= asOf) return [];
-  const p = HABIT_PROFILES[personaId];
+  const p = habitProfile(personaId);
   const rand = rng(hash(`${personaId}:${consentedAt}`));
   const out: BrushSession[] = [];
   const days = diffDays(asOf, consentedAt);

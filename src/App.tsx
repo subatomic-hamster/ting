@@ -16,6 +16,8 @@ import Program from './pages/Program';
 import Share from './pages/Share';
 import Treatment from './pages/Treatment';
 import TryIt from './pages/TryIt';
+import Login, { Signup } from './pages/Login';
+import Welcome from './pages/Welcome';
 
 export default function App() {
   return (
@@ -25,6 +27,9 @@ export default function App() {
       <Route path="/auth/callback" element={<AuthCallback />} />
       {/* Title-slide QR code for judges. */}
       <Route path="/try" element={<TryIt />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/welcome" element={<Welcome />} />
       <Route element={<AppShell />}>
         <Route index element={<Dashboard />} />
         <Route path="treatment" element={<Treatment />} />

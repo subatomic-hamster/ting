@@ -12,12 +12,12 @@ import { RemindersCard } from "../components/RemindersCard";
 import { Timeline } from "../components/Timeline";
 import { PageHeader, Section } from "../components/Section";
 import { maxGauges } from "../engine/helpers";
-import { PERSONAS } from "../data/personas";
+import { memberFor } from "../data/members";
 import { formatDate, formatMoney } from "../lib/format";
 import { isEnrollmentWindow, yearOf } from "../lib/dates";
 import { useActive, useAppStore, useProfile } from "../store";
 export default function Dashboard() {
-  const persona = useAppStore((s) => PERSONAS[s.personaId]);
+  const persona = useAppStore((s) => memberFor(s.personaId));
   const profile = useProfile();
   const active = useActive();
   const [gauge] = maxGauges(profile, active);

@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { readDraft, saveDraft } from "../lib/drafts";
-import type { PersonaId } from "../data/personas";
 import { formatDuration } from "../lib/format";
 import { yearOf } from "../lib/dates";
 import { useAppStore } from "../store";
@@ -11,7 +10,7 @@ import {
 } from "./bridge";
 import { verifySession } from "./rewards";
 import {
-  HABIT_PROFILES,
+  habitProfile,
   playSimulatedSession,
   seedHistory,
   type LivePlayer,
@@ -41,7 +40,7 @@ export interface LastSession {
 }
 
 export interface HabitState {
-  personaId: PersonaId;
+  personaId: string;
   asOf: string;
   consent: HabitConsent;
   device: DeviceState;
@@ -67,7 +66,7 @@ export interface HabitState {
   setDentistCheck: (value: boolean) => void;
   applyAdjustment: (procedureId: string, from: number, to: number) => void;
   undoAdjustment: (procedureId: string) => void;
-  sync: (personaId: PersonaId, asOf: string) => void;
+  sync: (personaId: string, asOf: string) => void;
 }
 
 let bridge: BridgeConnection | null = null;
@@ -88,8 +87,8 @@ function stopDevice() {
 
 const NO_DEVICE: DeviceState = { kind: null, status: "disconnected" };
 
-function personaHabits(personaId: PersonaId, asOf: string) {
-  const profile = HABIT_PROFILES[personaId];
+function personaHabits(personaId: string, asOf: string) {
+  const profile = habitProfile(personaId);
   const consent = profile.consent(yearOf(asOf));
   return {
     personaId,
@@ -117,7 +116,7 @@ function startedAtOn(asOf: string) {
   return `${asOf}T${new Date().toISOString().slice(11, 19)}Z`;
 }
 
-function restoredHabits(personaId: PersonaId, asOf: string) {
+function restoredHabits(personaId: string, asOf: string) {
   const fresh = personaHabits(personaId, asOf);
   const saved = readDraft<
     Pick<HabitState, "consent" | "sessions" | "dentistCheck">
@@ -182,7 +181,7 @@ export const useHabitStore = create<HabitState>()((set, get) => ({
         device: {
           kind,
           status: "connected",
-          name: HABIT_PROFILES[get().personaId].deviceName,
+          name: habitProfile(get().personaId).deviceName,
         },
         live: null,
       });
@@ -238,7 +237,7 @@ export const useHabitStore = create<HabitState>()((set, get) => ({
     player?.stop();
     player = playSimulatedSession({
       deviceId: `${personaId}-brush`,
-      deviceName: HABIT_PROFILES[personaId].deviceName,
+      deviceName: habitProfile(personaId).deviceName,
       startedAt: startedAtOn(asOf),
       onLive: (l) => get().ingestLive(l),
       onDone: (s) => {

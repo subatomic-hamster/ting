@@ -8,7 +8,8 @@ import {
 } from "../compiler/compile";
 import { DEMO_PLAN_OPTIONS } from "../data/demo";
 import admin from "../fixtures/admin.json";
-import { PERSONAS } from "../data/personas";
+import { EMPLOYER, memberFor, type MemberRecord } from "../data/members";
+import { currentMemberId, useAuth } from "../auth/auth";
 import { buildDigest } from "../engine/digest";
 import { appealDraft } from "../engine/eobAppeal";
 import { decideInbound, forwardingAddress } from "../engine/inbox";
@@ -76,15 +77,62 @@ const inbox: {
 /** Scheduled reminders, by member. In mock mode the app itself shows them when they come due. */
 const reminders = new Map<string, Map<string, ScheduledReminder>>();
 const remindersFor = () => {
-  const member = PERSONAS[mock.personaId].memberId;
+  const member = memberFor(mock.personaId).memberId;
   if (!reminders.has(member)) reminders.set(member, new Map());
   return reminders.get(member)!;
 };
 
+/** Signed-up members, this browser only (the AWS backend keeps them in DynamoDB). */
+const MEMBERS = "ting.members.v1";
+function readMembers(): Record<string, MemberRecord> {
+  try {
+    return JSON.parse(localStorage.getItem(MEMBERS) ?? "{}") as Record<string, MemberRecord>;
+  } catch {
+    return {};
+  }
+}
+function writeMember(record: MemberRecord): MemberRecord {
+  localStorage.setItem(MEMBERS, JSON.stringify({ ...readMembers(), [record.memberId]: record }));
+  return record;
+}
+function signedInMember(): string {
+  const id = currentMemberId();
+  if (!id) throw new Error("Sign in first.");
+  return id;
+}
+
 export const mockApi: TingApi = {
+  async getMember() {
+    const id = currentMemberId();
+    return id ? (readMembers()[id] ?? null) : null;
+  },
+
+  async saveMember(input) {
+    await latency();
+    const memberId = signedInMember();
+    const before = readMembers()[memberId];
+    return writeMember({
+      memberId,
+      name: input.name.trim(),
+      email: useAuth.getState().claims?.email ?? "",
+      employer: EMPLOYER,
+      createdAt: before?.createdAt ?? todayISO(),
+      currentDentistId: input.currentDentistId ?? before?.currentDentistId ?? "d01",
+      planId: input.planId,
+      survey: input.survey,
+      habits: before?.habits,
+    });
+  },
+
+  async shareHabits(habits) {
+    const record = readMembers()[signedInMember()];
+    if (!record) throw new Error("Finish the sign-up survey first.");
+    return writeMember({ ...record, habits });
+  },
+
   async getSession() {
     await latency();
-    const p = PERSONAS[mock.personaId];
+    const p = memberFor(mock.personaId);
     return {
       memberId: p.memberId,
       name: p.name,
@@ -100,7 +148,7 @@ export const mockApi: TingApi = {
 
   async getLedger() {
     await latency();
-    return PERSONAS[mock.personaId].profile(mock.asOf).ledger;
+    return memberFor(mock.personaId).profile(mock.asOf).ledger;
   },
 
   async parseDescription(text) {
@@ -138,7 +186,7 @@ export const mockApi: TingApi = {
     await latency();
     const event = mockClaimEvent(
       profile,
-      PERSONAS[mock.personaId].memberId,
+      memberFor(mock.personaId).memberId,
       opts?.underpay,
     );
     firedClaims.set(mock.personaId, [
@@ -251,7 +299,7 @@ export const mockApi: TingApi = {
   async getInbox() {
     await latency();
     return {
-      address: forwardingAddress(PERSONAS[mock.personaId].memberId),
+      address: forwardingAddress(memberFor(mock.personaId).memberId),
       senders: [...inbox.senders],
       held: inbox.held.map(({ id, from, subject, receivedAt }) => ({
         id,
@@ -327,7 +375,7 @@ export const mockApi: TingApi = {
   },
   async getDigest() {
     await latency();
-    const profile = PERSONAS[mock.personaId].profile(mock.asOf);
+    const profile = memberFor(mock.personaId).profile(mock.asOf);
     return {
       ...buildDigest(profile, optimize(profile, { horizon: 2 }).cheapest),
       source: "template",

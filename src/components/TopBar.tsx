@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import type { Session } from "../api";
 import { authConfig, signIn, signOut, useAuth } from "../auth/auth";
 const members = [
@@ -10,7 +10,7 @@ const members = [
   ["/email", "Messages"],
   ["/habits", "SmileStreak"],
   ["/plan", "Plan rules"],
-  ["/onboarding", "Get started"],
+  ["/onboarding", "My survey"],
 ];
 const partners = [
   ["/admin", "Employer insights"],
@@ -32,6 +32,7 @@ export function TopBar({
   const ref = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const claims = useAuth((s) => s.claims);
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
@@ -126,13 +127,29 @@ export function TopBar({
                 Audit trail
               </button>
             </details>
-            {!!authConfig() && (
+            {claims ? (
               <button
                 className="btn-secondary mt-4"
-                onClick={() => void (claims ? signOut() : signIn())}
+                onClick={() =>
+                  void signOut().then(() => navigate("/login"))
+                }
               >
-                {claims ? "Sign out" : "Sign in"}
+                Sign out
               </button>
+            ) : (
+              <div className="mt-4 flex flex-wrap gap-3">
+                <NavLink to="/signup" className="btn-primary">
+                  Create an account
+                </NavLink>
+                <NavLink to="/login" className="btn-secondary">
+                  Sign in
+                </NavLink>
+                {!!authConfig() && (
+                  <button className="btn-ghost" onClick={() => void signIn()}>
+                    Employer sign-in (Acme)
+                  </button>
+                )}
+              </div>
             )}
             <p className="mt-4 text-xs text-muted">
               {session
