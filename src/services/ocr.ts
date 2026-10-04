@@ -8,7 +8,12 @@ export interface OcrProvider {
 export const localOcr: OcrProvider = {
   async recognize(image) {
     const { createWorker } = await import('tesseract.js');
-    const worker = await createWorker('eng');
+    const base = window.TING_CONFIG?.ocrAssetBase;
+    const worker = await createWorker('eng', 1, base ? {
+      workerPath: `${base}/worker.min.js`,
+      corePath: base,
+      langPath: base,
+    } : {});
     try {
       const { data } = await worker.recognize(image);
       return { text: data.text, confidence: data.confidence / 100 };

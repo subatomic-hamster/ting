@@ -1,0 +1,14 @@
+{
+  "sourceSha256": "0da316943b40273caadb83bd5f0b191d6a9b337519778544c13e5134315eb463",
+  "artifacts": {
+    "docker/site.tar": "f267929637ca50bc8e2021f204d6627795f6362cc2a44410541a60f8239cf8dd",
+    "docker/bin/server-amd64": "7284446fb9dbd5066e2ed132051047fb01d0c8f201e01ea87eb54b5ec530703e",
+    "docker/bin/server-arm64": "310c1b1d6316a8d2e48ef36521252c3e3e268c7ebcbe42abca611b6a8d3f1c5d"
+  },
+  "language": {
+    "url": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/main/eng.traineddata",
+    "sha256": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2",
+    "license": "Apache-2.0"
+  },
+  "mode": "offline demo; original browser engine; local PDF and English OCR assets"
+}

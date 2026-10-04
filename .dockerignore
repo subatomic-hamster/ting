@@ -1,0 +1,7 @@
+**
+!Dockerfile
+!docker/
+!docker/bin/
+!docker/bin/server-amd64
+!docker/bin/server-arm64
+!docker/site.tar
