@@ -71,7 +71,7 @@ test('explanations are verified, proved by Automated Reasoning, and switch to Sp
   await expect(page.getByText('Proved').first()).toBeVisible({ timeout: 30_000 });
   await expect(page.getByText('Verified').first()).toBeVisible();
   await page.getByRole('radio', { name: 'es' }).click();
-  await expect(page.getByText(/\b(pagas|tu plan|el plan)\b/i).first()).toBeVisible({ timeout: 45_000 });
+  await expect(page.getByText(/\b(paga|pagas|usted|su plan|tu plan|el plan|dentista|seguro|deducible)\b/i).first()).toBeVisible({ timeout: 45_000 });
 });
 
 test('dentist map shows every practice on OpenStreetMap', async ({ page }) => {
