@@ -1,13 +1,27 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState, type ReactNode } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { api, USE_MOCKS } from '../api';
 import { PERSONA_IDS, PERSONAS } from '../data/personas';
 import { yearOf } from '../lib/dates';
 import { formatDate } from '../lib/format';
 import { useHabitStore } from '../habits/store';
 import { useAppStore } from '../store';
+import { EmailDemoControls } from './demo/EmailDemoControls';
+import { HabitsDemoControls } from './demo/HabitsDemoControls';
 import { CloseIcon } from './Icons';
+
+const GROUP_TITLE = 'mb-1 text-xs font-semibold text-amber-900';
+
+/** A collapsible group of demo controls; open by default on the page it drives. */
+function Group({ title, open, children }: { title: string; open: boolean; children: ReactNode }) {
+  return (
+    <details open={open} className="mt-2 border-t border-amber-200 pt-2">
+      <summary className={`${GROUP_TITLE} cursor-pointer`}>{title}</summary>
+      <div className="mt-1.5">{children}</div>
+    </details>
+  );
+}
 
 function initiallyOpen() {
   if (typeof window === 'undefined') return false;
@@ -25,6 +39,7 @@ export function DemoPanel() {
   const reset = useAppStore((s) => s.reset);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const fire = useMutation({ mutationFn: () => api.fireMockClaim(useAppStore.getState().profile) });
   const underpaid = useMutation({ mutationFn: () => api.fireMockClaim(useAppStore.getState().profile, { underpay: 90 }) });
   const brushNow = useHabitStore((s) => s.brushNow);
@@ -46,7 +61,7 @@ export function DemoPanel() {
   return (
     <aside
       aria-label="Demo controls"
-      className="no-print fixed right-3 bottom-3 left-3 z-30 rounded-2xl border border-amber-300 bg-amber-50/95 p-3 shadow-xl backdrop-blur sm:left-auto sm:w-80"
+      className="no-print fixed right-3 bottom-3 left-3 z-30 max-h-[75vh] overflow-y-auto rounded-2xl border border-amber-300 bg-amber-50/95 p-3 shadow-xl backdrop-blur sm:left-auto sm:w-80"
     >
       <div className="mb-2 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-amber-900">Demo panel</h2>
@@ -60,7 +75,7 @@ export function DemoPanel() {
       </p>
 
       <fieldset className="mb-3">
-        <legend className="mb-1 text-xs font-semibold text-amber-900">Persona</legend>
+        <legend className={GROUP_TITLE}>Persona</legend>
         <div className="grid grid-cols-3 gap-1">
           {PERSONA_IDS.map((id) => (
             <button
@@ -79,6 +94,7 @@ export function DemoPanel() {
         </div>
       </fieldset>
 
+      <p className={GROUP_TITLE}>Time and claims</p>
       <div className="grid grid-cols-2 gap-1.5 text-xs">
         <button type="button" className="btn-secondary px-2 py-1.5 text-xs" onClick={() => setAsOf(`${yearOf(today)}-11-01`)}>
           Simulate Nov 1
@@ -86,12 +102,7 @@ export function DemoPanel() {
         <button type="button" className="btn-secondary px-2 py-1.5 text-xs" onClick={simulateDec1}>
           Simulate Dec 1
         </button>
-        <button
-          type="button"
-          className="btn-primary px-2 py-1.5 text-xs"
-          disabled={fire.isPending}
-          onClick={() => fire.mutate()}
-        >
+        <button type="button" className="btn-primary px-2 py-1.5 text-xs" disabled={fire.isPending} onClick={() => fire.mutate()}>
           {fire.isPending ? 'Sending…' : fire.isError ? 'Nothing left to claim' : USE_MOCKS ? 'Fire mock claim' : 'Dentist visit'}
         </button>
         <button
@@ -103,21 +114,30 @@ export function DemoPanel() {
         >
           {underpaid.isPending ? 'Sending…' : 'Underpaid EOB'}
         </button>
-        <button type="button" className="btn-secondary px-2 py-1.5 text-xs" disabled={brushing} onClick={brushNow}>
+      </div>
+
+      <Group key={`email-${pathname}`} title="Email" open={pathname.startsWith('/email')}>
+        <EmailDemoControls />
+      </Group>
+
+      <Group key={`habits-${pathname}`} title="SmileStreak" open={pathname.startsWith('/habits')}>
+        <button type="button" className="btn-secondary w-full px-2 py-1.5 text-xs" disabled={brushing} onClick={brushNow}>
           {brushing ? 'Brushing…' : 'Brush now'}
         </button>
-        <button
-          type="button"
-          className="btn-secondary px-2 py-1.5 text-xs"
-          onClick={() => {
-            reset();
-            void api.resetDemo().finally(() => queryClient.invalidateQueries());
-            navigate('/');
-          }}
-        >
-          Reset
-        </button>
-      </div>
+        <HabitsDemoControls />
+      </Group>
+
+      <button
+        type="button"
+        className="btn-secondary mt-3 w-full px-2 py-1.5 text-xs"
+        onClick={() => {
+          reset();
+          void api.resetDemo().finally(() => queryClient.invalidateQueries());
+          navigate('/');
+        }}
+      >
+        Reset demo
+      </button>
       <p className="mt-2 text-[11px] text-amber-800">Ctrl+Shift+D toggles this panel.</p>
     </aside>
   );

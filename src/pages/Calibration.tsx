@@ -36,27 +36,27 @@ export default function CalibrationPage() {
       ) : (
         <Section title={`${c.examples} labelled examples · ${Math.round(c.calibrated.accuracy * 100)}% top-answer accuracy`} id="chart">
           <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-md" role="img" aria-label="Reliability diagram">
-            <line x1={x(0)} y1={y(0)} x2={x(1)} y2={y(1)} stroke="#94a3b8" strokeDasharray="4 3" />
-            <line x1={PAD} y1={y(0)} x2={W - 8} y2={y(0)} stroke="#cbd5e1" />
-            <line x1={PAD} y1={y(0)} x2={PAD} y2={8} stroke="#cbd5e1" />
+            <line x1={x(0)} y1={y(0)} x2={x(1)} y2={y(1)} stroke="var(--color-muted)" strokeDasharray="4 3" />
+            <line x1={PAD} y1={y(0)} x2={W - 8} y2={y(0)} stroke="var(--color-line)" />
+            <line x1={PAD} y1={y(0)} x2={PAD} y2={8} stroke="var(--color-line)" />
             {[0, 0.5, 1].map((t) => (
-              <text key={`y${t}`} x={PAD - 6} y={y(t) + 4} textAnchor="end" fontSize="10" fill="#64748b">
+              <text key={`y${t}`} x={PAD - 6} y={y(t) + 4} textAnchor="end" fontSize="10" fill="var(--color-muted)">
                 {t * 100}%
               </text>
             ))}
             {[0, 0.5, 1].map((t) => (
-              <text key={`x${t}`} x={x(t)} y={H - PAD + 14} textAnchor="middle" fontSize="10" fill="#64748b">
+              <text key={`x${t}`} x={x(t)} y={H - PAD + 14} textAnchor="middle" fontSize="10" fill="var(--color-muted)">
                 {t * 100}%
               </text>
             ))}
-            <text x={(W + PAD) / 2} y={H - 6} textAnchor="middle" fontSize="10" fill="#64748b">
+            <text x={(W + PAD) / 2} y={H - 6} textAnchor="middle" fontSize="10" fill="var(--color-muted)">
               Winnow&rsquo;s confidence
             </text>
             {c.calibrated.bins
               .filter((b) => b.n && b.confidence !== null && b.accuracy !== null)
               .map((b) => (
                 <g key={b.range}>
-                  <circle cx={x(b.confidence ?? 0)} cy={y(b.accuracy ?? 0)} r={3 + Math.sqrt(b.n) * 1.5} fill="#ad1f2d" fillOpacity="0.55" />
+                  <circle cx={x(b.confidence ?? 0)} cy={y(b.accuracy ?? 0)} r={3 + Math.sqrt(b.n) * 1.5} fill="var(--color-brand-600)" fillOpacity="0.55" />
                   <title>{`${b.range}: right ${Math.round((b.accuracy ?? 0) * 100)}% of ${b.n}`}</title>
                 </g>
               ))}

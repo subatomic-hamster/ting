@@ -15,13 +15,8 @@ export function TopBar({
   auditOpen: boolean;
 }) {
   const personaName = useAppStore((s) => PERSONAS[s.personaId].name);
-  const allPlans = useAppStore((s) => s.plans);
-  const plan = useAppStore((s) => s.profile.currentPlan);
   const network = useAppStore((s) => s.network);
   const setNetwork = useAppStore((s) => s.setNetwork);
-  const setCurrentPlan = useAppStore((s) => s.setCurrentPlan);
-  // The plan you're on this year; waiving and membership plans are options for next year, not coverage now.
-  const plans = allPlans.filter((p) => p.kind === 'insurance');
   const claims = useAuth((s) => s.claims);
   const language = useLanguage((s) => s.language);
   const setLanguage = useLanguage((s) => s.setLanguage);
@@ -44,22 +39,6 @@ export function TopBar({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <label className="flex items-center gap-1.5 text-xs text-brand-100">
-            <span className="hidden sm:inline">Plan</span>
-            <select
-              aria-label="Dental plan"
-              className="rounded-lg border border-white/20 bg-white/10 px-2 py-1.5 text-sm text-white [&>option]:text-ink"
-              value={plan.id}
-              onChange={(e) => setCurrentPlan(e.target.value)}
-            >
-              {plans.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </label>
-
           <div role="radiogroup" aria-label="Dentist network" className="flex rounded-lg bg-white/10 p-0.5 text-sm">
             {(['in', 'out'] as const).map((n) => (
               <button
@@ -86,7 +65,7 @@ export function TopBar({
                 aria-checked={language === l}
                 onClick={() => setLanguage(l)}
                 title={l === 'es' ? 'Explicaciones en español (los importes no cambian)' : 'Explanations in English'}
-                className={`rounded-md px-2 py-1 font-medium uppercase ${language === l ? 'bg-white text-brand-900' : 'text-brand-100 hover:text-white'}`}
+                className={`rounded-md px-1.5 py-1 text-xs font-medium uppercase ${language === l ? 'bg-white text-brand-900' : 'text-brand-100 hover:text-white'}`}
               >
                 {l}
               </button>
@@ -98,9 +77,11 @@ export function TopBar({
             onClick={onOpenAudit}
             aria-expanded={auditOpen}
             aria-controls="audit-drawer"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-white/20 px-2.5 py-1.5 text-sm font-medium hover:bg-white/10"
+            aria-label="Audit trail"
+            title="Audit trail: every engine and API call"
+            className="grid h-8 w-8 place-items-center rounded-lg hover:bg-white/10"
           >
-            <ListIcon /> <span>Audit trail</span>
+            <ListIcon />
           </button>
 
           {canSignIn &&
@@ -119,12 +100,6 @@ export function TopBar({
               </button>
             ))}
         </div>
-      </div>
-      <div className="flex h-1" aria-hidden>
-        <span className="flex-[5] bg-brand-600" />
-        <span className="flex-[2] bg-accent-red" />
-        <span className="flex-[2] bg-accent-orange" />
-        <span className="flex-[2] bg-accent-amber" />
       </div>
     </header>
   );

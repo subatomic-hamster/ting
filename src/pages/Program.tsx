@@ -20,7 +20,7 @@ export default function Program() {
     <div className="space-y-5">
       <PageHeader
         title="SmileStreak: insurer view"
-        subtitle="Aggregate data only, in groups of 20 or more. No individual sessions, times or device IDs ever reach the insurer."
+        subtitle="Aggregates only, in groups of 20 or more."
       >
         <DemoDataPill label="Demo cohort" />
       </PageHeader>
@@ -41,8 +41,8 @@ export default function Program() {
 
       <Section title="Does it pay for itself?" id="economics">
         <p className="text-sm text-muted">
-          Participants choose to join, and people who already brush well are the likeliest to sign up. So only part of their lower claim
-          rate is caused by the program. Set that share below; a randomized pilot would measure it.
+          People who already brush well are the likeliest to join, so only part of participants’ lower claim rate is caused by the program.
+          Set that share below; a randomized pilot would measure it.
         </p>
         <label className="mt-4 block text-sm">
           <span className="font-medium">Share of the claims gap caused by the program: {formatPercent(attribution)}</span>

@@ -6,14 +6,14 @@ import type { AdjudicatedLine, PlanRules, WaterfallKey, WaterfallStep } from '..
 import { formatMoney } from '../lib/format';
 import { isTotal, waterfallBars } from '../lib/geometry';
 import { GlossaryTerm } from './GlossaryTerm';
-import { ProofBadge, VerifiedBadge, type Verification } from './VerifiedBadge';
+import { ProofBadge, VerifiedBadge, VerifiedMark, type Verification } from './VerifiedBadge';
 import { useLanguage } from '../lib/language';
 
 const TONE: Record<string, string> = {
-  total: 'bg-slate-400',
+  total: 'bg-muted',
   down: 'bg-plan',
   up: 'bg-cost',
-  flat: 'bg-slate-300',
+  flat: 'bg-line',
 };
 
 const TERM: Partial<Record<WaterfallKey, 'deductible' | 'coinsurance' | 'annual maximum'>> = {
@@ -38,15 +38,23 @@ export function Waterfall({ line, rules, name }: { line: AdjudicatedLine; rules:
   const fresh = explained.data && !explained.isPlaceholderData;
   const bars = waterfallBars(steps);
   const summary = steps.map((s) => `${s.label}: ${formatMoney(shown(s), { signed: !isTotal(s) })}`).join('; ');
+  const explainedStep = (s: WaterfallStep) => (fresh ? explained.data?.find((e) => e.key === s.key) : undefined);
+  const verificationOf = (text?: string): Verification => (!text ? 'pending' : verifyNumbers(text, line).ok ? 'verified' : 'unverified');
+  // One badge for the whole waterfall; the worst step decides it.
+  const states = steps.map((s) => verificationOf(explainedStep(s)?.text));
+  const overall: Verification = states.includes('unverified') ? 'unverified' : states.includes('pending') ? 'pending' : 'verified';
 
   return (
     <figure aria-label={`Cost waterfall for ${name}. ${summary}.`}>
+      <p className="mb-3 text-xs text-muted" aria-live="polite">
+        <VerifiedBadge state={overall} />
+      </p>
       <ol className="space-y-2.5" key={signature}>
         {steps.map((s, i) => {
-          const step = fresh ? explained.data?.find((e) => e.key === s.key) : undefined;
+          const step = explainedStep(s);
           const text = step?.text;
           const proof = step?.reasoning;
-          const verification: Verification = !text ? 'pending' : verifyNumbers(text, line).ok ? 'verified' : 'unverified';
+          const verification = states[i];
           const isFinal = s.key === 'youPay';
           const term = TERM[s.key];
           return (
@@ -60,7 +68,7 @@ export function Waterfall({ line, rules, name }: { line: AdjudicatedLine; rules:
                     {formatMoney(shown(s), { signed: !isTotal(s) })}
                   </div>
                 </div>
-                <div className="relative h-6 flex-1 rounded bg-slate-50">
+                <div className="relative h-6 flex-1 rounded bg-paper">
                   <motion.div
                     className={`absolute top-0.5 bottom-0.5 rounded ${isFinal ? 'bg-ink' : TONE[bars[i].tone]}`}
                     style={{ left: `${bars[i].leftPct}%` }}
@@ -76,7 +84,7 @@ export function Waterfall({ line, rules, name }: { line: AdjudicatedLine; rules:
               <div className="mt-1 text-xs text-muted sm:pl-[16.75rem]">
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <span className="tabular">Running total {formatMoney(s.running)}</span>
-                  <VerifiedBadge state={verification} />
+                  <VerifiedMark state={verification} />
                   {proof && <ProofBadge verdict={proof.verdict} claim={proof.claim} />}
                   {step?.clarity === 'rewritten' && <span className="text-[10px] text-muted">reworded for clarity</span>}
                   {s.section && (
@@ -90,16 +98,13 @@ export function Waterfall({ line, rules, name }: { line: AdjudicatedLine; rules:
                 ) : text ? (
                   <p className="mt-0.5 text-warn">Explanation held back: its numbers didn't match the engine.</p>
                 ) : (
-                  <p className="mt-0.5 h-3 w-2/3 animate-pulse rounded bg-slate-100" aria-hidden />
+                  <p className="mt-0.5 h-3 w-2/3 animate-pulse rounded bg-line" aria-hidden />
                 )}
               </div>
             </li>
           );
         })}
       </ol>
-      <figcaption className="mt-3 text-xs text-muted">
-        You pay {formatMoney(line.memberOwes)} · rules {line.rulesVersion}
-      </figcaption>
     </figure>
   );
 }

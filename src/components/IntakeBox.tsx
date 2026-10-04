@@ -215,7 +215,7 @@ export function IntakeBox() {
       {doc?.text && (
         <details className="mt-1 text-xs text-muted">
           <summary className="cursor-pointer">Text Ting read from the file</summary>
-          <pre className="mt-1 max-h-48 overflow-auto rounded-lg bg-slate-50 p-2 whitespace-pre-wrap">{doc.text}</pre>
+          <pre className="mt-1 max-h-48 overflow-auto rounded-lg bg-paper p-2 whitespace-pre-wrap">{doc.text}</pre>
           {doc.unrecognized.length > 0 && <p className="mt-1 text-warn">Codes Ting doesn't know yet: {doc.unrecognized.join(', ')}</p>}
         </details>
       )}
@@ -255,7 +255,7 @@ export function IntakeBox() {
                     {p && <span className="font-mono text-xs text-muted">{p.cdt}</span>}
                     {inferred && (
                       <span
-                        className="ml-1.5 rounded-full bg-slate-100 px-1.5 py-0.5 text-[11px] text-muted"
+                        className="ml-1.5 rounded-full bg-paper px-1.5 py-0.5 text-[11px] text-muted"
                         title={`Guessing wrong would cost little, so Ting didn't ask. Top guess ${formatPercent(i.confidence)}.`}
                       >
                         inferred

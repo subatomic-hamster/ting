@@ -72,7 +72,7 @@ export function OnboardingStepper() {
     <div className="card mx-auto max-w-xl">
       <ol className="mb-4 flex gap-1.5" aria-label="Progress">
         {steps.map((x, i) => (
-          <li key={x.title} className={`h-1.5 flex-1 rounded-full ${i <= step ? 'bg-brand-500' : 'bg-slate-200'}`}>
+          <li key={x.title} className={`h-1.5 flex-1 rounded-full ${i <= step ? 'bg-brand-500' : 'bg-line'}`}>
             <span className="sr-only">
               Step {i + 1} {i < step ? '(done)' : i === step ? '(current)' : ''}
             </span>

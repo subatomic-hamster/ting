@@ -4,8 +4,6 @@ import { formatDate, formatMoney } from '../../lib/format';
 
 export function RewardsCard({ rewards, program }: { rewards: RewardSummary; program: RewardProgram }) {
   const optedIn = useHabitStore((s) => s.consent.optedIn);
-  const dentistCheck = useHabitStore((s) => s.dentistCheck);
-  const setDentistCheck = useHabitStore((s) => s.setDentistCheck);
   const shown = optedIn ? rewards.earned : rewards.wouldEarn;
   const m = rewards.currentMonth;
 
@@ -19,7 +17,7 @@ export function RewardsCard({ rewards, program }: { rewards: RewardSummary; prog
           </span>
         </div>
         <div
-          className="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-100"
+          className="mt-2 h-2.5 overflow-hidden rounded-full bg-line"
           role="img"
           aria-label={`${formatMoney(shown)} of ${formatMoney(rewards.cap)}`}
         >
@@ -55,18 +53,14 @@ export function RewardsCard({ rewards, program }: { rewards: RewardSummary; prog
         <p className="text-sm text-muted">No credits yet this year.</p>
       )}
 
-      <label className="flex items-start gap-2 rounded-xl border border-line p-3 text-sm">
-        <input type="checkbox" className="mt-1" checked={dentistCheck} onChange={(e) => setDentistCheck(e.target.checked)} />
-        <span>
-          <strong>No smart brush?</strong> Your dentist can confirm good home care at a cleaning. That earns the full brushing portion
-          ({formatMoney(rewards.brushingMax)}), so nobody needs a device to qualify. <em>(demo toggle)</em>
-        </span>
-      </label>
-
       <p className="text-xs text-muted">
         Earn {formatMoney(program.cleaningCredit)} per cleaning (up to {program.maxCleanings}) and {formatMoney(program.brushMonthCredit)} per
         month you brush twice a day on {Math.round(program.monthQualifyShare * 100)}% of days (up to {program.maxBrushMonths} months).{' '}
-        {program.creditUse} Rewards only: your premium never goes up.
+        {program.creditUse}
+      </p>
+      <p className="text-xs text-muted">
+        <strong className="text-ink">No smart brush?</strong> Your dentist can confirm good home care at a cleaning. That earns the full
+        brushing portion ({formatMoney(rewards.brushingMax)}), so nobody needs a device to qualify.
       </p>
     </div>
   );

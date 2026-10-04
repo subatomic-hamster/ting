@@ -53,7 +53,7 @@ export function AuditDrawer({ open, onClose }: { open: boolean; onClose: () => v
                 <h2 className="text-lg font-semibold">Audit trail</h2>
                 <p className="text-xs text-muted">
                   Show your work: every engine run and API call, newest first. Rules version{' '}
-                  <code className="rounded bg-slate-100 px-1">{rulesVersion}</code>.
+                  <code className="rounded bg-paper px-1">{rulesVersion}</code>.
                 </p>
                 <p className="mt-1 text-xs text-muted">The AI translates, tested code decides.</p>
               </div>
@@ -71,8 +71,8 @@ export function AuditDrawer({ open, onClose }: { open: boolean; onClose: () => v
                           e.origin === 'engine'
                             ? 'bg-brand-100 text-brand-900'
                             : e.origin === 'api'
-                              ? 'bg-sky-100 text-sky-900'
-                              : 'bg-slate-100 text-slate-700'
+                              ? 'bg-accent-amber/20 text-ink'
+                              : 'bg-paper text-muted'
                         }`}
                       >
                         {e.origin}

@@ -12,7 +12,7 @@ function Ring({ elapsed }: { elapsed: number }) {
   const done = Math.min(1, elapsed / TARGET_SEC);
   return (
     <svg viewBox="0 0 128 128" width={128} height={128} role="img" aria-label={`${formatDuration(elapsed)} of 2:00`}>
-      <circle cx="64" cy="64" r={R} fill="none" stroke="#e2e8f0" strokeWidth="10" />
+      <circle cx="64" cy="64" r={R} fill="none" stroke="var(--color-line)" strokeWidth="10" />
       <circle
         cx="64"
         cy="64"
@@ -39,8 +39,6 @@ function Ring({ elapsed }: { elapsed: number }) {
 export function LiveBrushPanel() {
   const live = useHabitStore((s) => s.live);
   const last = useHabitStore((s) => s.lastSession);
-  const device = useHabitStore((s) => s.device);
-  const brushNow = useHabitStore((s) => s.brushNow);
   const running = live?.state === 'running';
 
   if (running && live) {
@@ -52,7 +50,7 @@ export function LiveBrushPanel() {
           <p className="mt-1 text-lg font-semibold">{QUADRANTS[live.sector - 1] ?? 'Starting'}</p>
           <QuadrantMap active={live.sector} size={180} />
           {live.pressureHigh ? (
-            <p className="mt-1 inline-flex rounded-full bg-red-50 px-2.5 py-1 text-sm font-semibold text-cost">Too much pressure: ease up</p>
+            <p className="mt-1 inline-flex rounded-full bg-cost/10 px-2.5 py-1 text-sm font-semibold text-cost">Too much pressure: ease up</p>
           ) : (
             <p className="mt-1 text-sm text-save">Pressure OK</p>
           )}
@@ -84,20 +82,14 @@ export function LiveBrushPanel() {
             Tip: {QUADRANTS[minIndex].toLowerCase()} got {s.sectorSeconds[minIndex]}s. Aim for about {Math.round(TARGET_SEC / 4)}s in each area.
           </p>
         )}
-        <button type="button" className="btn-secondary" onClick={brushNow} disabled={!device.kind}>
-          Brush again
-        </button>
       </div>
     );
   }
 
   return (
-    <div className="text-sm text-muted">
-      <p>Connect a brush below, then brush. Each area of your mouth lights up as you go, and the session is checked and saved when you stop.</p>
-      <button type="button" className="btn-primary mt-3" onClick={brushNow}>
-        Brush now (simulated)
-      </button>
-    </div>
+    <p className="text-sm text-muted">
+      Connect a brush, then brush. Each area of your mouth lights up as you go; the session is checked and saved when you stop.
+    </p>
   );
 }
 

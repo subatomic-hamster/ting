@@ -30,44 +30,39 @@ export function ValueMap({
       <Column title="You" accent="border-t-brand-500">
         <li>
           <strong>{formatMoney(optedIn ? rewards.earned : rewards.wouldEarn)}</strong> {optedIn ? 'earned' : 'available'} this year, paid
-          as an FSA/HSA deposit or added to your rollover.
+          to your FSA/HSA or rollover.
         </li>
         <li>{optedIn ? `${streak}-day streak, with coaching on the areas you miss.` : 'Live coaching on the areas you miss.'}</li>
-        <li>A more personal estimate: good habits can lower the odds Ting assumes for “maybe” fillings.</li>
         <li>Your premium never goes up, whatever the data says.</li>
       </Column>
 
       <Column title="Your dentist" accent="border-t-sched">
         {dentist && sharedWithDentist ? (
           <li>
-            Sees your 30-day summary before the visit: twice a day on <strong>{formatPercent(dentist.twiceDailyRate)}</strong> of days
+            Sees your 30-day summary: twice a day on <strong>{formatPercent(dentist.twiceDailyRate)}</strong> of days
             {dentist.weakest && dentist.sectorCount === 4 ? (
               <>
                 , weakest area <strong>{QUADRANTS[dentist.weakest.index].toLowerCase()}</strong>
               </>
             ) : null}
-            , {dentist.pressureWarningsPerWeek} pressure warnings a week.
+            .
           </li>
         ) : (
-          <li>Can see a 30-day summary before your visit, if you choose to share it (it’s off now).</li>
+          <li>Can see a 30-day summary before your visit, if you share it (off now).</li>
         )}
-        <li>Coaches the exact spot you miss instead of giving generic advice.</li>
-        <li>Spots heavy brushing early, before gums recede.</li>
-        <li>Confirms home care for patients without a smart brush, so everyone can earn.</li>
+        <li>Coaches the spot you miss and catches heavy brushing before gums recede.</li>
+        <li>Confirms home care for patients without a smart brush.</li>
       </Column>
 
       <Column title="Insurer" accent="border-t-roll">
         <li>
-          Group counts only (20+ people): cleanings completed by participants{' '}
+          Group counts only (20+ people), never used for pricing, underwriting or claims. Participants complete cleanings{' '}
           <strong>{formatPercent(c.preventiveCompletion.participants)}</strong> vs{' '}
           <strong>{formatPercent(c.preventiveCompletion.nonParticipants)}</strong> (demo cohort).
         </li>
         <li>
-          Restorative claims {econ.restorativeGapPer1000} fewer per 1,000 participants. Pays for itself if at least{' '}
-          <strong>{formatPercent(econ.breakEvenAttribution)}</strong> of that gap is caused by the program, which a pilot would test.
-        </li>
-        <li>Engaged members and employers who renew. Never used for pricing, underwriting or claims.</li>
-        <li>
+          {econ.restorativeGapPer1000} fewer restorative claims per 1,000; pays for itself if the program causes at least{' '}
+          <strong>{formatPercent(econ.breakEvenAttribution)}</strong> of that gap.{' '}
           <Link to="/program" className="font-medium text-brand-700 underline">
             Open the insurer view
           </Link>

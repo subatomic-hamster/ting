@@ -79,7 +79,7 @@ export function InvoiceCheck({ invoice, lineChecks = [] }: { invoice: Invoice; l
             </span>
           </p>
           {flag ? (
-            <p className="mt-2 rounded-lg border border-red-200 bg-red-50 p-2 font-medium text-cost" role="alert">
+            <p className="mt-2 rounded-lg border border-cost/30 bg-cost/10 p-2 font-medium text-cost" role="alert">
               {flag.message}
             </p>
           ) : (

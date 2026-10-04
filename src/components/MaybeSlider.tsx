@@ -31,7 +31,7 @@ export function MaybeSlider({ item }: { item: PlannedProcedure }) {
         />
         {tip && (
           <span
-            className="pointer-events-none absolute -bottom-3 h-3 w-0.5 -translate-x-1/2 bg-violet-600"
+            className="pointer-events-none absolute -bottom-3 h-3 w-0.5 -translate-x-1/2 bg-brand-600"
             style={{ left: `${((tip.likelihood - 0.05) / 0.9) * 100}%` }}
             aria-hidden
           />

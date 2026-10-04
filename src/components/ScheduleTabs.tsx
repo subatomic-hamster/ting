@@ -38,7 +38,7 @@ export function ScheduleTabs({ panelId }: { panelId: string }) {
 
   return (
     <div>
-      <div role="tablist" aria-label="Schedule options" className="grid grid-cols-3 gap-1.5 rounded-2xl bg-slate-100 p-1">
+      <div role="tablist" aria-label="Schedule options" className="grid grid-cols-3 gap-1.5 rounded-2xl bg-line/60 p-1">
         {ORDER.map((kind, i) => {
           const o = optimized[kind];
           const selected = active.kind === kind;

@@ -25,11 +25,11 @@ export function ProcedureList({ selectedId, onSelect }: { selectedId?: string; o
                 aria-pressed={selected}
                 onClick={() => onSelect(p.id)}
               >
-                {p.locked && <LockIcon className="text-slate-500" aria-label="Urgent" />}
+                {p.locked && <LockIcon className="text-muted" aria-label="Urgent" />}
                 <span className="font-medium">{name}</span>
                 <span className="font-mono text-xs text-muted">{p.cdt}</span>
                 {p.likelihood !== undefined && p.likelihood < 1 && (
-                  <span className="rounded-full bg-violet-50 px-1.5 py-0.5 text-[11px] font-medium text-violet-800">maybe · {formatPercent(p.likelihood)}</span>
+                  <span className="rounded-full bg-brand-50 px-1.5 py-0.5 text-[11px] font-medium text-brand-700">maybe · {formatPercent(p.likelihood)}</span>
                 )}
                 <span className="w-full text-xs text-muted">
                   Fee {formatMoney(p.fee)} · you pay <span className="tabular font-medium text-ink">{formatMoney(owes.get(p.id) ?? 0)}</span>
@@ -39,7 +39,7 @@ export function ProcedureList({ selectedId, onSelect }: { selectedId?: string; o
               </button>
               <button
                 type="button"
-                className="rounded-lg p-1.5 text-muted hover:bg-slate-100 hover:text-ink"
+                className="rounded-lg p-1.5 text-muted hover:bg-brand-50 hover:text-ink"
                 aria-label={`Remove ${name}`}
                 onClick={() => removeProcedure(p.id)}
               >
