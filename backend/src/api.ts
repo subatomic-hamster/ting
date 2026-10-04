@@ -324,12 +324,16 @@ const routes: Record<string, Route> = {
     const text = str(bodyOf(e).text, 'text', 120_000);
     const triage = await safeTriage(text);
     if (triage?.quarantined) return json(200, { ...compilePlanText(text), modelFilled: [], triage });
-    const compiled = await compileWithModel(text, callBedrock);
-    // Winnow use 4: an independent reading of each compiled rule; anything under 0.7 goes to human review.
-    const reader = await secondReader(text, compiled.draft, Object.keys(compiled.evidence), decide).catch((err: unknown) => {
-      console.warn('second reader skipped', err);
-      return undefined;
-    });
+    // Winnow use 4 runs alongside the Claude step: an independent reading of each rule the regex compiler found
+    // (anything under 0.7 goes to human review). Both together stay well inside API Gateway's 30 s limit.
+    const local = compilePlanText(text);
+    const [compiled, reader] = await Promise.all([
+      compileWithModel(text, callBedrock),
+      secondReader(text, local.draft, Object.keys(local.evidence), decide).catch((err: unknown) => {
+        console.warn('second reader skipped', err);
+        return undefined;
+      }),
+    ]);
     return json(200, { ...compiled, triage, secondReader: reader?.checks, secondReaderSource: reader?.source });
   },
 
