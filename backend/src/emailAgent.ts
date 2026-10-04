@@ -7,7 +7,7 @@ import { DetectDocumentTextCommand, TextractClient } from '@aws-sdk/client-textr
 import { PERSONAS, type PersonaId } from '../../src/data/personas';
 import { planNewWork } from '../../src/engine/agentPlan';
 import { CDT } from '../../src/engine/cdt';
-import { makeItem } from '../../src/intake/describe';
+import { countIn, makeItem } from '../../src/intake/describe';
 import { toProcedures } from '../../src/intake/questions';
 import { addDays } from '../../src/engine/dates';
 import { HEDGED } from '../../src/engine/decisions';
@@ -266,20 +266,31 @@ export async function handler(mail: InboundEmail) {
 
   // New or recommended work joins the plan, and the agent schedules it.
   const known = new Set(profile.procedures.map((p) => `${p.cdt}#${p.tooth ?? ''}`));
-  const todo = record.procedures.filter((p) => p.status !== 'completed' && p.cdt && !known.has(`${p.cdt}#${p.tooth ?? ''}`));
+  const listed = record.procedures.filter((p) => p.status !== 'completed' && p.cdt && !known.has(`${p.cdt}#${p.tooth ?? ''}`));
+  // "2 fillings" on one line is two fillings; with no tooth named, each copy is its own (unknown) tooth.
+  const todo = listed.flatMap((p) => (p.tooth ? [p] : Array.from({ length: countIn(p.description) }, () => p)));
+  // Same kind of work from one email with the same urgency and deadline is one appointment, not separate events.
+  const visitKey = (p: (typeof todo)[number]) => `${p.cdt}|${p.urgency}|${p.deadline ?? ''}`;
+  const visitSize = new Map<string, number>();
+  for (const p of todo) visitSize.set(visitKey(p), (visitSize.get(visitKey(p)) ?? 0) + 1);
+  const visitId = new Map<string, string>();
   // The tested intake path prices the work and orders same-tooth steps (root canal → buildup → crown).
-  const items = todo.map((p) =>
-    makeItem({
-      id: `email-${p.cdt}-${p.tooth ?? 'x'}-${docId.slice(5, 11)}`,
+  const items = todo.map((p, i) => {
+    const id = `email-${p.cdt}-${p.tooth ?? 'x'}-${docId.slice(5, 11)}-${i}`;
+    const key = visitKey(p);
+    if ((visitSize.get(key) ?? 0) > 1 && !visitId.has(key)) visitId.set(key, id);
+    return makeItem({
+      id,
       source: 'upload',
       phrase: p.description,
       candidates: [{ cdt: p.cdt!, p: 1 }],
       teeth: p.tooth ? [{ tooth: p.tooth, p: 1 }] : [],
       fee: p.billed,
-    }),
-  );
+      visit: visitId.get(key),
+    });
+  });
   const fresh: PlannedProcedure[] = toProcedures(items, profile).map((proc) => {
-    const p = todo.find((x) => proc.id.startsWith(`email-${x.cdt}-${x.tooth ?? 'x'}-`))!;
+    const p = todo[items.findIndex((item) => item.id === proc.id)];
     const urgent = p.urgency === 'urgent';
     return {
       ...proc,

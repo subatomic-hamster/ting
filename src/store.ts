@@ -186,11 +186,15 @@ export const useAppStore = create<AppState>()((set, get) => {
       const s = get();
       const proc = s.profile.procedures.find((p) => p.id === procedureId);
       if (!proc) return { ok: false, reason: 'Unknown item.' };
-      if (proc.locked) return { ok: false, reason: `${procedureName(proc)} is urgent: your dentist set this date.` };
+      // A visit ("2 fillings") moves as one appointment.
+      const together = proc.visit ? s.profile.procedures.filter((p) => p.visit === proc.visit) : [proc];
+      const locked = together.find((p) => p.locked);
+      if (locked) return { ok: false, reason: `${procedureName(locked)} is urgent: your dentist set this date.` };
 
       const before = selectActive(s);
       const date = clampDate(requested, s.profile.asOf, endOfYear(yearOf(s.profile.asOf) + HORIZON - 1));
-      const placements = before.placements.map((p) => (p.id === procedureId ? { id: p.id, date } : p));
+      const ids = new Set(together.map((p) => p.id));
+      const placements = before.placements.map((p) => (ids.has(p.id) ? { id: p.id, date } : p));
       const [violation] = validatePlacements(s.profile, placements);
       if (violation) return { ok: false, reason: violation.message };
 
@@ -229,6 +233,7 @@ export const useAppStore = create<AppState>()((set, get) => {
         ...p,
         id: rename.get(p.id) ?? p.id,
         dependsOn: p.dependsOn?.map((d) => rename.get(d) ?? d),
+        visit: p.visit && (rename.get(p.visit) ?? p.visit),
       }));
       const profile: Profile = {
         ...s.profile,

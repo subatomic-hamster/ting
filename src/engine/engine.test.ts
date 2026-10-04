@@ -64,6 +64,38 @@ describe('worked example: root canal, buildup, two crowns in October', () => {
   });
 });
 
+describe('one visit: procedures that share a visit get one date', () => {
+  const withVisit = (ids: string[]) => profile(WORKED.map((x) => (ids.includes(x.id) ? { ...x, visit: 'v1' } : x)));
+
+  it('both crowns in one appointment: the earlier one waits for the later one, never split across years', () => {
+    const p = withVisit(['cr19', 'cr30']);
+    const r = optimize(p);
+    for (const ev of r.frontier) {
+      const at = new Map(ev.placements.map((x) => [x.id, x.date]));
+      expect(at.get('cr30')).toBe(at.get('cr19'));
+    }
+    // Alone, cr30 could go on Oct 5; with cr19 (after the root canal and buildup) the visit is Oct 19.
+    expect(r.fastest.placements.find((x) => x.id === 'cr30')?.date).toBe('2026-10-19');
+    expect(validatePlacements(p, r.cheapest.placements)).toEqual([]);
+  });
+
+  it('a split visit is a safety violation', () => {
+    const p = withVisit(['cr19', 'cr30']);
+    const v = validatePlacements(p, [
+      { id: 'rc19', date: '2026-10-05' },
+      { id: 'bu19', date: '2026-10-12' },
+      { id: 'cr19', date: '2026-10-19' },
+      { id: 'cr30', date: '2027-01-04' },
+    ]);
+    expect(v.map((x) => x.message)).toContain('Crown (porcelain) on #30 is done in the same visit as Crown (porcelain) on #19.');
+  });
+
+  it('an urgent member pins the whole visit', () => {
+    const p = withVisit(['rc19', 'cr30']);
+    for (const ev of optimize(p).frontier) expect(ev.placements.find((x) => x.id === 'cr30')?.date).toBe('2026-10-05');
+  });
+});
+
 describe('adjudicator rules', () => {
   it('4. frequency limit: a third cleaning in a calendar year is denied, January is covered', () => {
     const p = profile([{ id: 'c', cdt: 'D1110', fee: 120, allowedFee: 85, inNetwork: true }], {

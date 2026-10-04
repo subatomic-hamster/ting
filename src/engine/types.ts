@@ -127,6 +127,8 @@ export interface PlannedProcedure {
   dependsOn?: string[];
   /** Minimum days after the procedures it depends on. */
   gapDays?: number;
+  /** Procedures sharing a visit id are done in one appointment ("2 fillings"), so they're always on the same date. */
+  visit?: string;
   /** 0..1, for the dentist's "maybe" items. Absent = certain. */
   likelihood?: number;
 }
