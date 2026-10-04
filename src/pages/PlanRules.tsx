@@ -29,10 +29,14 @@ export default function PlanRules() {
       setResult(r);
       setAnswers({});
       setApproved(undefined);
+      const filled = r.modelFilled?.length ? ` Bedrock found ${r.modelFilled.length} more rule${r.modelFilled.length === 1 ? '' : 's'}, each quoted from the document.` : '';
+      const guarded = r.triage?.quarantined ? ' This document seems to contain instructions aimed at an AI, so only Ting’s own parser read it.' : '';
       setStatus(
-        r.questions.length
+        (r.questions.length
           ? `Read ${file.name}. The document doesn't say ${r.questions.length === 1 ? 'one thing' : `${r.questions.length} things`}, and Ting won't guess.`
-          : `Read ${file.name}. Every rule was found in the document.`,
+          : `Read ${file.name}. Every rule was found in the document.`) +
+          filled +
+          guarded,
       );
     },
     onError: (err, file) => setStatus(`Couldn't read ${file.name}: ${err instanceof Error ? err.message : String(err)}.`),

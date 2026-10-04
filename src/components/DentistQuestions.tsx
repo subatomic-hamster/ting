@@ -2,7 +2,11 @@ import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { api } from '../api';
 import { useDentistQuestions } from '../hooks/useDentistQuestions';
-import { useActive } from '../store';
+import { PERSONAS } from '../data/personas';
+import { dentistSummary } from '../habits/analytics';
+import { SMILESTREAK } from '../habits/program';
+import { useHabitStore } from '../habits/store';
+import { useActive, useAppStore } from '../store';
 import { ShareIcon } from './Icons';
 
 export function DentistQuestions() {
@@ -17,9 +21,22 @@ export function DentistQuestions() {
 }
 
 export function ShareWithDentist({ compact = false }: { compact?: boolean }) {
-  const { kind } = useActive();
+  const active = useActive();
   const [copied, setCopied] = useState(false);
-  const share = useMutation({ mutationFn: () => api.createShareLink(kind) });
+  const share = useMutation({
+    mutationFn: () => {
+      const { personaId, profile } = useAppStore.getState();
+      const habits = useHabitStore.getState();
+      const homeCare = habits.consent.shareWithDentist ? dentistSummary(habits.sessions, profile.asOf, SMILESTREAK) : null;
+      return api.createShareLink(active.kind, {
+        patientName: PERSONAS[personaId].name,
+        procedures: profile.procedures,
+        schedule: active,
+        rulesVersion: profile.currentPlan.version,
+        homeCare,
+      });
+    },
+  });
 
   return (
     <div>

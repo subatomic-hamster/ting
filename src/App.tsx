@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from './components/AppShell';
+import AuthCallback from './auth/AuthCallback';
 import Admin from './pages/Admin';
 import Dashboard from './pages/Dashboard';
 import Dentists from './pages/Dentists';
@@ -16,6 +17,7 @@ export default function App() {
     <Routes>
       {/* Public dentist handoff: no app chrome. */}
       <Route path="/share/:token" element={<Share />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
       <Route element={<AppShell />}>
         <Route index element={<Dashboard />} />
         <Route path="treatment" element={<Treatment />} />

@@ -12,6 +12,23 @@ const TIPS: Record<Verification, string> = {
   pending: 'Checking the explanation against the engine…',
 };
 
+/** Automated Reasoning's verdict on the engine's number, proved against rules built from the plan document. */
+export function ProofBadge({ verdict, claim }: { verdict: string; claim: string }) {
+  const proved = verdict === 'VALID';
+  const refuted = verdict === 'INVALID' || verdict === 'IMPOSSIBLE';
+  const tip = proved
+    ? `Automated Reasoning proved “${claim}” from your plan document's rules`
+    : refuted
+      ? `Automated Reasoning found “${claim}” contradicts your plan document's rules`
+      : `Automated Reasoning couldn't decide “${claim}” (${verdict.toLowerCase().replace(/_/g, ' ')})`;
+  const cls = proved ? 'border-sky-200 bg-sky-50 text-sky-800' : refuted ? 'border-red-200 bg-red-50 text-red-800' : 'border-line bg-slate-50 text-muted';
+  return (
+    <span className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10px] font-semibold ${cls}`} title={tip} aria-label={tip}>
+      {proved ? 'Proved' : refuted ? 'Rule check failed' : 'Not proved'}
+    </span>
+  );
+}
+
 export function VerifiedBadge({ state }: { state: Verification }) {
   const s = STYLES[state];
   return (

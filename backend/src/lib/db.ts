@@ -65,3 +65,10 @@ export const connectionsFor = async (member: string) => (await queryAll(member, 
 export async function putShare(token: string, data: Record<string, unknown>, days: number) {
   await db.send(new PutCommand({ TableName: TABLE, Item: { pk: `SHARE#${token}`, sk: 'META', ...data, ttl: ttlIn(days) } }));
 }
+
+/** A share link's record; expired links come back as 'expired' even before DynamoDB's TTL sweep removes them. */
+export async function getShare(token: string): Promise<Record<string, unknown> | 'expired' | undefined> {
+  const res = await db.send(new GetCommand({ TableName: TABLE, Key: { pk: `SHARE#${token}`, sk: 'META' } }));
+  if (!res.Item) return undefined;
+  return Number(res.Item.ttl) < Date.now() / 1000 ? 'expired' : res.Item;
+}

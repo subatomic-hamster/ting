@@ -6,7 +6,7 @@ import type { AdjudicatedLine, PlanRules, WaterfallKey, WaterfallStep } from '..
 import { formatMoney } from '../lib/format';
 import { isTotal, waterfallBars } from '../lib/geometry';
 import { GlossaryTerm } from './GlossaryTerm';
-import { VerifiedBadge, type Verification } from './VerifiedBadge';
+import { ProofBadge, VerifiedBadge, type Verification } from './VerifiedBadge';
 
 const TONE: Record<string, string> = {
   total: 'bg-slate-400',
@@ -41,7 +41,9 @@ export function Waterfall({ line, rules, name }: { line: AdjudicatedLine; rules:
     <figure aria-label={`Cost waterfall for ${name}. ${summary}.`}>
       <ol className="space-y-2.5" key={signature}>
         {steps.map((s, i) => {
-          const text = fresh ? explained.data?.find((e) => e.key === s.key)?.text : undefined;
+          const step = fresh ? explained.data?.find((e) => e.key === s.key) : undefined;
+          const text = step?.text;
+          const proof = step?.reasoning;
           const verification: Verification = !text ? 'pending' : verifyNumbers(text, line).ok ? 'verified' : 'unverified';
           const isFinal = s.key === 'youPay';
           const term = TERM[s.key];
@@ -73,6 +75,7 @@ export function Waterfall({ line, rules, name }: { line: AdjudicatedLine; rules:
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <span className="tabular">Running total {formatMoney(s.running)}</span>
                   <VerifiedBadge state={verification} />
+                  {proof && <ProofBadge verdict={proof.verdict} claim={proof.claim} />}
                   {s.section && (
                     <span>
                       Plan rule: <cite className="not-italic text-ink">{s.section}</cite>

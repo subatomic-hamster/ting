@@ -10,6 +10,8 @@ export interface ExplainedStep {
   key: WaterfallKey;
   text: string;
   section?: string;
+  /** AWS only: Automated Reasoning's verdict on the engine's plan-pays amount, proved against the plan document. */
+  reasoning?: { verdict: string; claim: string; premises: string };
 }
 
 export interface Explainer {

@@ -1,0 +1,6 @@
+{
+  "policyArn": "arn:aws:bedrock:us-west-2:648616106975:automated-reasoning-policy/8c0rlrqdj1u5",
+  "policyVersionArn": "arn:aws:bedrock:us-west-2:648616106975:automated-reasoning-policy/8c0rlrqdj1u5:1",
+  "guardrailId": "y17fb44drhjl",
+  "guardrailVersion": "1"
+}

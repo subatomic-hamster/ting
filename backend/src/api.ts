@@ -4,20 +4,26 @@ import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { DetectDocumentTextCommand, TextractClient } from '@aws-sdk/client-textract';
+import { DeleteCommand, GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
 import { DEMO_PLAN_OPTIONS } from '../../src/data/demo';
 import { isPersonaId, PERSONAS, type PersonaId } from '../../src/data/personas';
 import { claimEventSchema } from '../../src/engine/ledger';
 import type { AdjudicatedLine } from '../../src/engine/types';
+import { compilePlanText } from '../../src/compiler/compile';
 import { classifyDocument } from '../../src/intake/classify';
 import { addDays, todayISO } from '../../src/lib/dates';
 import { compileWithModel } from './ai/compile';
 import { describeWithModel } from './ai/describe';
 import { explainWithModel } from './ai/explain';
 import { isRec } from './ai/model';
+import { liveWinnow, simulatedWinnow, triageDocument, type Decide, type Triage } from './ai/winnow';
 import { callBedrock } from './lib/bedrock';
-import { deleteClaims, putShare } from './lib/db';
+import { AuthError, callerOf, type Caller } from './lib/auth';
+import { db, deleteClaims, getShare, putShare } from './lib/db';
+import admin from '../../src/fixtures/admin.json';
 import { rowsToText } from './lib/layout';
+import { checkLine } from './lib/reasoning';
 import { cancelReminder, deliverDue, reminderSchema, scheduleReminder } from './lib/reminders';
 
 const s3 = new S3Client({});
@@ -26,6 +32,31 @@ const events = new EventBridgeClient({});
 const BUCKET = process.env.DOCS_BUCKET ?? '';
 const BUS = process.env.EVENT_BUS ?? '';
 const WEB_ORIGIN = process.env.WEB_ORIGIN ?? '';
+const WINNOW_URL = process.env.WINNOW_URL ?? '';
+const TABLE = process.env.TABLE_NAME ?? '';
+
+// Winnow when its server is up; otherwise the labelled Claude simulation (the spec's fallback path).
+const simulated = simulatedWinnow(callBedrock);
+const decide: Decide = WINNOW_URL
+  ? async (state, questions) => {
+      try {
+        return await liveWinnow(WINNOW_URL)(state, questions);
+      } catch (err) {
+        console.warn('Winnow unavailable, using the simulation', err);
+        return simulated(state, questions);
+      }
+    }
+  : simulated;
+
+async function safeTriage(text: string): Promise<Triage | undefined> {
+  if (!text.trim()) return undefined;
+  try {
+    return await triageDocument(text, decide);
+  } catch (err) {
+    console.warn('triage failed', err);
+    return undefined;
+  }
+}
 
 class HttpError extends Error {
   constructor(
@@ -60,10 +91,13 @@ const str = (v: unknown, name: string, max = 20_000): string => {
   return v;
 };
 
-/** Demo session: the persona and "as of" date the demo panel picked. A real deployment reads them from Cognito. */
+const callers = new WeakMap<APIGatewayProxyEventV2, Caller>();
+
+/** Signed in: the member from the Cognito token. Public demo: the persona the demo panel picked. */
 function context(event: APIGatewayProxyEventV2): { personaId: PersonaId; asOf: string } {
   const q = event.queryStringParameters ?? {};
-  const personaId = q.persona && isPersonaId(q.persona) ? q.persona : 'dale';
+  const signedIn = callers.get(event)?.personaId;
+  const personaId = signedIn ?? (q.persona && isPersonaId(q.persona) ? q.persona : 'dale');
   const asOf = q.asOf && /^\d{4}-\d{2}-\d{2}$/.test(q.asOf) ? q.asOf : todayISO();
   return { personaId, asOf };
 }
@@ -85,7 +119,7 @@ async function readUpload(key: string, contentType: string) {
         return { text: b.Text ?? '', top: box?.Top ?? 0, left: box?.Left ?? 0, height: box?.Height ?? 0 };
       }),
   );
-  return { docId: key, text, ...classifyDocument(text, contentType.startsWith('image/')) };
+  return { docId: key, text, ...classifyDocument(text, contentType.startsWith('image/')), triage: await safeTriage(text) };
 }
 
 type Route = (event: APIGatewayProxyEventV2) => Promise<APIGatewayProxyResultV2>;
@@ -131,13 +165,28 @@ const routes: Record<string, Route> = {
     }
   },
 
-  'POST /rules/compile': async (e) => json(200, await compileWithModel(str(bodyOf(e).text, 'text', 120_000), callBedrock)),
+  // Winnow screens the document first; a quarantined document is read by the regex compiler only.
+  'POST /rules/compile': async (e) => {
+    const text = str(bodyOf(e).text, 'text', 120_000);
+    const triage = await safeTriage(text);
+    if (triage?.quarantined) return json(200, { ...compilePlanText(text), modelFilled: [], triage });
+    return json(200, { ...(await compileWithModel(text, callBedrock)), triage });
+  },
+
+  'GET /winnow/status': async () => json(200, { mode: WINNOW_URL ? 'live' : 'simulated', url: WINNOW_URL ? 'configured' : undefined }),
 
   'POST /explain': async (e) => {
     const body = bodyOf(e);
     const line = body.line as AdjudicatedLine | undefined;
     if (!isRec(line) || !Array.isArray(line.waterfall)) throw new HttpError(400, 'line is required');
-    return json(200, await explainWithModel(line, callBedrock, body.language === 'es' ? 'es' : 'en'));
+    const [steps, reasoning] = await Promise.all([
+      explainWithModel(line, callBedrock, body.language === 'es' ? 'es' : 'en'),
+      checkLine(line).catch((err: unknown) => {
+        console.warn('automated reasoning failed', err);
+        return undefined;
+      }),
+    ]);
+    return json(200, reasoning ? steps.map((s) => (s.key === 'coinsurance' ? { ...s, reasoning } : s)) : steps);
   },
 
   // Demo control standing in for Lincoln's claims platform: validate, then publish to the claims bus.
@@ -158,9 +207,13 @@ const routes: Record<string, Route> = {
     const kind = str(body.scheduleKind, 'scheduleKind', 20);
     if (!/^(cheapest|fastest|balanced|custom)$/.test(kind)) throw new HttpError(400, 'Unknown schedule');
     const { personaId } = context(e);
-    const token = `${personaId}.${kind}.${randomUUID().slice(0, 8)}`;
-    await putShare(token, { personaId, scheduleKind: kind }, 30);
-    return json(200, { url: `${trustedOrigin(body.origin)}/share/${token}`, expiresAt: addDays(todayISO(), 30) });
+    // Unguessable token; the persona/kind prefix keeps old mock-style links readable.
+    const token = `${personaId}.${kind}.${randomUUID().replace(/-/g, '')}`;
+    const snapshot = body.snapshot;
+    if (snapshot !== undefined && (!isRec(snapshot) || JSON.stringify(snapshot).length > 200_000)) throw new HttpError(400, 'Bad snapshot');
+    const expiresAt = addDays(todayISO(), 30);
+    await putShare(token, { personaId, scheduleKind: kind, snapshot: snapshot ? { ...snapshot, sharedAt: new Date().toISOString(), expiresAt } : undefined }, 30);
+    return json(200, { url: `${trustedOrigin(body.origin)}/share/${token}`, expiresAt });
   },
 
   'POST /reminders': async (e) => {
@@ -172,6 +225,41 @@ const routes: Record<string, Route> = {
   // Demo control: send the reminders due on the demo's "as of" date, the way the daily rule does.
   'POST /demo/reminders/run': async (e) => json(200, { delivered: await deliverDue(context(e).asOf) }),
 
+  // Employer view: aggregates only, and groups under 20 never leave the server.
+  'GET /admin/insights': async (e) => {
+    const caller = callers.get(e);
+    if (!caller) throw new HttpError(401, 'Sign in as an employer benefits admin');
+    if (caller.group !== 'employer_admin') throw new HttpError(403, 'Employer admins only');
+    const shown = admin.groups.filter((g) => g.n >= 20);
+    return json(200, { employer: admin.employer, isDemoData: true, groups: shown, hidden: admin.groups.length - shown.length });
+  },
+
+  // First sign-in consent: what Ting reads, what it never shares with the employer, how to delete everything.
+  'POST /consent': async (e) => {
+    const caller = callers.get(e);
+    if (!caller) throw new HttpError(401, 'Sign in first');
+    const version = str(bodyOf(e).version, 'version', 20);
+    await db.send(new PutCommand({ TableName: TABLE, Item: { pk: `USER#${caller.sub}`, sk: 'CONSENT', version, at: new Date().toISOString() } }));
+    return json(200, { version });
+  },
+  'GET /consent': async (e) => {
+    const caller = callers.get(e);
+    if (!caller) throw new HttpError(401, 'Sign in first');
+    const res = await db.send(new GetCommand({ TableName: TABLE, Key: { pk: `USER#${caller.sub}`, sk: 'CONSENT' } }));
+    return json(200, res.Item ? { version: res.Item.version, at: res.Item.at } : {});
+  },
+
+  // "Delete everything": claims, reminders and consent for the signed-in member.
+  'POST /me/delete': async (e) => {
+    const caller = callers.get(e);
+    if (!caller) throw new HttpError(401, 'Sign in first');
+    const member = caller.personaId ? PERSONAS[caller.personaId].memberId : undefined;
+    const removed = member ? await deleteClaims(member) : 0;
+    if (member) for (const id of ['nov1', 'dec1', 'fsa']) await cancelReminder(member, `${todayISO().slice(0, 4)}-${id}`);
+    await db.send(new DeleteCommand({ TableName: TABLE, Key: { pk: `USER#${caller.sub}`, sk: 'CONSENT' } }));
+    return json(200, { removed });
+  },
+
   'POST /demo/reset': async (e) => {
     const removed = await deleteClaims(PERSONAS[context(e).personaId].memberId);
     return json(200, { removed });
@@ -182,7 +270,21 @@ export async function handler(event: APIGatewayProxyEventV2): Promise<APIGateway
   // CORS preflights reach the $default route; API Gateway adds the CORS headers, the status must be 2xx.
   if (event.requestContext.http.method === 'OPTIONS') return { statusCode: 204, body: '' };
   const method = event.requestContext.http.method;
+  try {
+    const caller = await callerOf(event);
+    if (caller) callers.set(event, caller);
+  } catch (err) {
+    if (err instanceof AuthError) return json(401, { error: err.message });
+    throw err;
+  }
   const reminder = /^\/reminders\/([\w-]{1,40})$/.exec(event.rawPath);
+  const share = /^\/share\/([\w.-]{1,80})$/.exec(event.rawPath);
+  if (method === 'GET' && share) {
+    const item = await getShare(share[1]);
+    if (item === 'expired') return json(410, { error: 'This link has expired' });
+    if (!item?.snapshot) return json(404, { error: 'Not found' });
+    return json(200, item.snapshot);
+  }
   const route: Route | undefined =
     method === 'DELETE' && reminder
       ? async (e) => {

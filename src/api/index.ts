@@ -7,9 +7,11 @@
 import type { CompileResult } from '../compiler/compile';
 import type { ExplainedStep } from '../engine/explain';
 import type { Reminder } from '../engine/reminders';
-import type { AdjudicatedLine, Ledger, PlanRules, Profile } from '../engine/types';
+import type { AdjudicatedLine, Ledger, PlannedProcedure, PlanRules, Profile } from '../engine/types';
 import type { DocumentKind } from '../intake/classify';
+import type { DentistSummary } from '../habits/analytics';
 import type { IntakeItem } from '../intake/types';
+import type { ActiveSchedule } from '../store';
 import { httpApi } from './httpApi';
 import { mockApi } from './mockApi';
 
@@ -31,6 +33,39 @@ export interface ReadDocument {
   items: IntakeItem[];
   /** Codes on a treatment plan Ting doesn't know yet. */
   unrecognized: string[];
+  /** Winnow's read of the file (AWS only): document type and whether it tries to instruct an AI. */
+  triage?: DocumentTriage;
+}
+
+export interface DocumentTriage {
+  docType: string;
+  docTypeP: number;
+  injectionP: number;
+  /** The text never reached the writing model. */
+  quarantined: boolean;
+  /** 'simulated' until the Winnow GPU server is up. */
+  source: 'winnow' | 'simulated';
+}
+
+export type CompiledPlan = CompileResult & { triage?: DocumentTriage; modelFilled?: string[] };
+
+/** What a dentist handoff link shows: a frozen copy of the member's plan at the moment they shared it. */
+export interface ShareSnapshot {
+  patientName: string;
+  procedures: PlannedProcedure[];
+  schedule: ActiveSchedule;
+  rulesVersion: string;
+  /** Only when the member chose to share smart-brush data with their dentist. */
+  homeCare?: DentistSummary | null;
+  sharedAt: string;
+  expiresAt: string;
+}
+
+export interface AdminInsights {
+  employer: string;
+  groups: { id: string; title: string; metric: string; detail: string; n: number }[];
+  hidden: number;
+  isDemoData: boolean;
 }
 
 export interface TraceEvent {
@@ -57,14 +92,23 @@ export interface TingApi {
   /** Photo, PDF or text file → its text and, for a treatment plan, the procedures on it (Textract in AWS). */
   readDocument(file: File): Promise<ReadDocument>;
   /** Benefits summary text → draft plan rules, the evidence for each, and questions for what it doesn't say (Bedrock in AWS). */
-  compilePlan(text: string): Promise<CompileResult>;
+  compilePlan(text: string): Promise<CompiledPlan>;
   /** One plain sentence per waterfall step; the caller checks every dollar with verifyNumbers before showing it. */
   explain(line: AdjudicatedLine, rules: PlanRules): Promise<ExplainedStep[]>;
   /** Live "claim adjudicated" events (WebSocket in AWS); the store validates and applies them. */
   subscribeLedger(onEvent: (event: unknown) => void): () => void;
   /** Demo control: Lincoln's mock claims feed emits an EOB for the next planned procedure. */
   fireMockClaim(profile: Profile): Promise<void>;
-  createShareLink(scheduleKind: string): Promise<{ url: string; expiresAt: string }>;
+  /** A signed, expiring link for the dentist. The snapshot is what the link shows on any device. */
+  createShareLink(scheduleKind: string, snapshot?: Omit<ShareSnapshot, 'sharedAt' | 'expiresAt'>): Promise<{ url: string; expiresAt: string }>;
+  /** The snapshot behind a link, or null when it's unknown or expired. */
+  getShare(token: string): Promise<ShareSnapshot | null>;
+  /** Employer view: aggregates only. The server drops groups under 20 and requires the employer_admin role. */
+  getAdminInsights(): Promise<AdminInsights>;
+  getConsent(): Promise<{ version?: string; at?: string }>;
+  giveConsent(version: string): Promise<void>;
+  /** Signed-in member: delete claims, reminders and consent. */
+  deleteMyData(): Promise<void>;
   /** Demo control: forget this member's claims so the next session starts clean. */
   resetDemo(): Promise<void>;
   /**

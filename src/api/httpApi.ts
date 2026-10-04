@@ -1,10 +1,11 @@
 // AWS backend client (infra/ deploys it). Same TingApi, same engine types; the Lambda runs the same src/ code.
 
+import { currentIdToken } from '../auth/auth';
 import { PERSONAS } from '../data/personas';
 import { classifyDocument } from '../intake/classify';
 import { pdfText } from '../services/pdf';
 import { apiContext } from './context';
-import type { ReadDocument, TingApi } from './index';
+import type { ReadDocument, ShareSnapshot, TingApi } from './index';
 import { mockClaimEvent } from './mockClaim';
 
 const runtime = typeof window === 'undefined' ? undefined : window.TING_CONFIG;
@@ -23,9 +24,10 @@ function withContext(path: string): string {
 
 async function http<T>(path: string, init?: RequestInit): Promise<T> {
   if (!API_URL) notWired(`VITE_API_URL is not set (${path})`);
+  const token = currentIdToken();
   const res = await fetch(`${API_URL}${withContext(path)}`, {
     ...init,
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...init?.headers },
   });
   if (!res.ok) {
     const detail = await res.text().catch(() => '');
@@ -96,8 +98,23 @@ export const httpApi: TingApi = {
   fireMockClaim: async (profile) => {
     await http('/mock/claims', post(mockClaimEvent(profile, PERSONAS[apiContext.personaId].memberId)));
   },
-  createShareLink: (scheduleKind) => http('/share', post({ scheduleKind, origin: window.location.origin })),
+  createShareLink: (scheduleKind, snapshot) => http('/share', post({ scheduleKind, origin: window.location.origin, snapshot })),
+  getShare: async (token) => {
+    if (!API_URL) return null;
+    const res = await fetch(`${API_URL}/share/${encodeURIComponent(token)}`);
+    if (res.status === 404 || res.status === 410) return null;
+    if (!res.ok) throw new Error(`GET /share → ${res.status}`);
+    return (await res.json()) as ShareSnapshot;
+  },
   resetDemo: () => http('/demo/reset', post({})),
+  getAdminInsights: () => http('/admin/insights'),
+  getConsent: () => http('/consent'),
+  giveConsent: async (version) => {
+    await http('/consent', post({ version }));
+  },
+  deleteMyData: async () => {
+    await http('/me/delete', post({}));
+  },
   scheduleReminder: (reminder) => http('/reminders', post(reminder)),
   cancelReminder: (reminderId) => http(`/reminders/${encodeURIComponent(reminderId)}`, { method: 'DELETE' }),
 };

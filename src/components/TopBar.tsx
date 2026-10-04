@@ -1,4 +1,5 @@
 import type { Session } from '../api';
+import { authConfig, signIn, signOut, useAuth } from '../auth/auth';
 import { PERSONAS } from '../data/personas';
 import { useAppStore } from '../store';
 import { ListIcon, ToothIcon } from './Icons';
@@ -20,6 +21,9 @@ export function TopBar({
   const setCurrentPlan = useAppStore((s) => s.setCurrentPlan);
   // The plan you're on this year; waiving and membership plans are options for next year, not coverage now.
   const plans = allPlans.filter((p) => p.kind === 'insurance');
+  const claims = useAuth((s) => s.claims);
+  const canSignIn = !!authConfig();
+  const role = claims?.groups.includes('employer_admin') ? 'Benefits admin' : claims?.groups.includes('lincoln_analyst') ? 'Lincoln analyst' : 'Member';
 
   return (
     <header className="no-print bg-brand-900 text-white">
@@ -79,6 +83,22 @@ export function TopBar({
           >
             <ListIcon /> <span>Audit trail</span>
           </button>
+
+          {canSignIn &&
+            (claims ? (
+              <button
+                type="button"
+                onClick={() => void signOut()}
+                className="rounded-lg border border-white/20 px-2.5 py-1.5 text-sm font-medium hover:bg-white/10"
+                title={claims.email}
+              >
+                {role} · Sign out
+              </button>
+            ) : (
+              <button type="button" onClick={() => void signIn()} className="rounded-lg bg-white px-2.5 py-1.5 text-sm font-medium text-brand-900 hover:bg-brand-50">
+                Sign in with Acme
+              </button>
+            ))}
         </div>
       </div>
     </header>

@@ -3,6 +3,7 @@
 
 import { localCompiler } from '../compiler/compile';
 import { DEMO_PLAN_OPTIONS } from '../data/demo';
+import admin from '../fixtures/admin.json';
 import { PERSONAS } from '../data/personas';
 import { localExplainer } from '../engine/explain';
 import { classifyDocument } from '../intake/classify';
@@ -11,7 +12,7 @@ import { addDays, todayISO } from '../lib/dates';
 import { localOcr } from '../services/ocr';
 import { pdfText } from '../services/pdf';
 import { apiContext as mock } from './context';
-import type { ScheduledReminder, TingApi } from './index';
+import type { ScheduledReminder, ShareSnapshot, TingApi } from './index';
 import { mockClaimEvent } from './mockClaim';
 
 const latency = () => new Promise<void>((r) => setTimeout(r, 300 + Math.random() * 500));
@@ -26,6 +27,9 @@ async function fileText(file: File): Promise<string> {
 // --- ledger events ------------------------------------------------------------
 
 const ledgerListeners = new Set<(e: unknown) => void>();
+
+/** Shared snapshots, this browser only (the AWS backend keeps them in DynamoDB). */
+const shares = new Map<string, ShareSnapshot>();
 
 /** Scheduled reminders, by member. In mock mode the app itself shows them when they come due. */
 const reminders = new Map<string, Map<string, ScheduledReminder>>();
@@ -83,14 +87,31 @@ export const mockApi: TingApi = {
     ledgerListeners.forEach((l) => l(event));
   },
 
-  async createShareLink(scheduleKind) {
+  async createShareLink(scheduleKind, snapshot) {
     await latency();
     const token = `${mock.personaId}.${scheduleKind}.${uid()}`;
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://ting.example';
-    return { url: `${origin}/share/${token}`, expiresAt: addDays(todayISO(), 30) };
+    const expiresAt = addDays(todayISO(), 30);
+    if (snapshot) shares.set(token, { ...snapshot, sharedAt: new Date().toISOString(), expiresAt });
+    return { url: `${origin}/share/${token}`, expiresAt };
+  },
+
+  async getShare(token) {
+    return shares.get(token) ?? null;
   },
 
   async resetDemo() {},
+
+  async getAdminInsights() {
+    await latency();
+    const shown = admin.groups.filter((g) => g.n >= 20);
+    return { employer: admin.employer, groups: shown, hidden: admin.groups.length - shown.length, isDemoData: true };
+  },
+  async getConsent() {
+    return {};
+  },
+  async giveConsent() {},
+  async deleteMyData() {},
 
   async scheduleReminder(reminder) {
     await latency();

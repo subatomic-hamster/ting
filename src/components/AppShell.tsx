@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { ConsentDialog } from '../auth/ConsentDialog';
 import { useBootstrap } from '../hooks/useBootstrap';
 import { AuditDrawer } from './AuditDrawer';
 import { ErrorBoundary } from './ErrorBoundary';
@@ -31,6 +32,7 @@ export function AppShell() {
         Skip to content
       </a>
       <TopBar session={session} onOpenAudit={() => setAuditOpen(true)} auditOpen={auditOpen} />
+      <ConsentDialog />
       <nav aria-label="Main" className="no-print border-b border-line bg-white">
         <ul className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-3 sm:px-6">
           {NAV.map((n) => (

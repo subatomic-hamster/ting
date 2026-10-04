@@ -24,6 +24,7 @@
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@tanstack/react-query": "^5.104.1",
+    "aws-jwt-verify": "^5.2.1",
     "framer-motion": "^14.0.0",
     "pdfjs-dist": "^6.4.299",
     "react": "^18.3.1",
@@ -35,7 +36,9 @@
   },
   "devDependencies": {
     "@aws-sdk/client-apigatewaymanagementapi": "^3.1146.0",
+    "@aws-sdk/client-bedrock": "^3.1146.0",
     "@aws-sdk/client-bedrock-runtime": "^3.1146.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.1146.0",
     "@aws-sdk/client-dynamodb": "^3.1146.0",
     "@aws-sdk/client-eventbridge": "^3.1146.0",
     "@aws-sdk/client-s3": "^3.1146.0",

@@ -1,3 +1,4 @@
+import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { CfnOutput, Duration, RemovalPolicy, Stack, type StackProps } from 'aws-cdk-lib';
 import { CorsHttpMethod, HttpApi, WebSocketApi, WebSocketStage } from 'aws-cdk-lib/aws-apigatewayv2';
@@ -12,11 +13,26 @@ import { Architecture, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction, type NodejsFunctionProps } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { EmailIdentity, Identity } from 'aws-cdk-lib/aws-ses';
+import {
+  CfnUserPoolGroup,
+  ClientAttributes,
+  OAuthScope,
+  OidcAttributeRequestMethod,
+  ProviderAttribute,
+  StringAttribute,
+  UserPool,
+  UserPoolClientIdentityProvider,
+  UserPoolIdentityProviderOidc,
+} from 'aws-cdk-lib/aws-cognito';
 import { BlockPublicAccess, Bucket, BucketEncryption, HttpMethods } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import type { Construct } from 'constructs';
 
 const ROOT = path.join(__dirname, '..', '..');
+
+/** Automated Reasoning guardrail from scripts/ar-policy.mjs, when it has been built. */
+const arFile = path.join(__dirname, '..', 'ar.json');
+const ar: { guardrailId: string; guardrailVersion: string } | undefined = fs.existsSync(arFile) ? JSON.parse(fs.readFileSync(arFile, 'utf8')) : undefined;
 
 /** Bedrock inference profiles. The event's private Marketplace allows Haiku 4.5 and Sonnet 5 (not Sonnet 5.5). */
 const MODEL_FAST = 'us.anthropic.claude-haiku-4-5-20251001-v1:0';
@@ -123,6 +139,79 @@ export class TingStack extends Stack {
     });
     const webOrigin = `https://${distribution.distributionDomainName}`;
 
+    // --- Sign-in: Ting's member pool, federated over OIDC to a mock "Acme Corp" employer IdP (a second pool) -----
+    const employeeAttrs = {
+      employer_id: new StringAttribute({ mutable: true }),
+      employee_id: new StringAttribute({ mutable: true }),
+      role: new StringAttribute({ mutable: true }),
+    };
+    const acme = new UserPool(this, 'AcmeIdp', {
+      userPoolName: 'acme-corp-workforce',
+      selfSignUpEnabled: false,
+      signInAliases: { email: true },
+      customAttributes: employeeAttrs,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+    acme.addDomain('AcmeDomain', { cognitoDomain: { domainPrefix: `acme-sso-${this.account}` } });
+
+    const preTokenFn = fn('PreTokenFn', 'pretoken.ts');
+    const members = new UserPool(this, 'Members', {
+      userPoolName: 'ting-members',
+      selfSignUpEnabled: false,
+      signInAliases: { email: true },
+      customAttributes: employeeAttrs,
+      lambdaTriggers: { preTokenGeneration: preTokenFn },
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+    const membersDomain = members.addDomain('MembersDomain', { cognitoDomain: { domainPrefix: `ting-${this.account}` } });
+    for (const group of ['member', 'employer_admin', 'lincoln_analyst'])
+      new CfnUserPoolGroup(this, `Group-${group}`, { userPoolId: members.userPoolId, groupName: group });
+
+    const employeeRead = new ClientAttributes().withStandardAttributes({ email: true }).withCustomAttributes('employer_id', 'employee_id', 'role');
+    const acmeClient = acme.addClient('TingFederation', {
+      generateSecret: true,
+      readAttributes: employeeRead,
+      oAuth: {
+        flows: { authorizationCodeGrant: true },
+        scopes: [OAuthScope.OPENID, OAuthScope.EMAIL, OAuthScope.PROFILE],
+        callbackUrls: [`${membersDomain.baseUrl()}/oauth2/idpresponse`],
+      },
+    });
+    const acmeIdp = new UserPoolIdentityProviderOidc(this, 'AcmeOidc', {
+      userPool: members,
+      name: 'AcmeCorp',
+      clientId: acmeClient.userPoolClientId,
+      clientSecret: acmeClient.userPoolClientSecret.unsafeUnwrap(),
+      issuerUrl: `https://cognito-idp.${this.region}.amazonaws.com/${acme.userPoolId}`,
+      scopes: ['openid', 'email', 'profile'],
+      attributeRequestMethod: OidcAttributeRequestMethod.GET,
+      attributeMapping: {
+        email: ProviderAttribute.other('email'),
+        custom: {
+          'custom:employer_id': ProviderAttribute.other('custom:employer_id'),
+          'custom:employee_id': ProviderAttribute.other('custom:employee_id'),
+          'custom:role': ProviderAttribute.other('custom:role'),
+        },
+      },
+    });
+    const webClient = members.addClient('Web', {
+      generateSecret: false,
+      supportedIdentityProviders: [UserPoolClientIdentityProvider.custom('AcmeCorp')],
+      readAttributes: employeeRead,
+      oAuth: {
+        flows: { authorizationCodeGrant: true },
+        scopes: [OAuthScope.OPENID, OAuthScope.EMAIL, OAuthScope.PROFILE],
+        callbackUrls: [`${webOrigin}/auth/callback`, 'http://localhost:5173/auth/callback'],
+        logoutUrls: [`${webOrigin}/`, 'http://localhost:5173/'],
+      },
+      accessTokenValidity: Duration.hours(1),
+      idTokenValidity: Duration.hours(1),
+      refreshTokenValidity: Duration.hours(12),
+      enableTokenRevocation: true,
+      preventUserExistenceErrors: true,
+    });
+    webClient.node.addDependency(acmeIdp);
+
     // --- HTTP API: the TingApi routes ---------------------------------------------------------------------------
     const apiFn = fn('ApiFn', 'api.ts', {
       memorySize: 1024,
@@ -134,6 +223,13 @@ export class TingStack extends Stack {
         WEB_ORIGIN: webOrigin,
         WS_ENDPOINT: wsStage.callbackUrl,
         REMINDER_EMAIL: reminderEmail,
+        // Set with `cdk deploy -c winnowUrl=http://<gpu-host>:8080` once the Winnow server runs; empty = simulated.
+        WINNOW_URL: this.node.tryGetContext('winnowUrl') ?? '',
+        AR_GUARDRAIL_ID: ar?.guardrailId ?? '',
+        AR_GUARDRAIL_VERSION: ar?.guardrailVersion ?? '',
+        AR_RULES_PREFIX: 'PLAN-ACME-LOW',
+        USER_POOL_ID: members.userPoolId,
+        USER_POOL_CLIENT_ID: webClient.userPoolClientId,
         MODEL_FAST,
         MODEL_SMART,
         NODE_OPTIONS: '--enable-source-maps',
@@ -169,6 +265,17 @@ export class TingStack extends Stack {
         ],
       }),
     );
+    apiFn.addToRolePolicy(
+      new PolicyStatement({
+        actions: ['bedrock:ApplyGuardrail', 'bedrock:InvokeAutomatedReasoningPolicy'],
+        resources: [
+          `arn:aws:bedrock:${this.region}:${this.account}:guardrail/*`,
+          `arn:aws:bedrock:*:${this.account}:guardrail-profile/*`,
+          'arn:aws:bedrock:*::guardrail-profile/*',
+          `arn:aws:bedrock:${this.region}:${this.account}:automated-reasoning-policy/*`,
+        ],
+      }),
+    );
     // Anthropic models on Bedrock check the caller's Marketplace subscription on each call.
     apiFn.addToRolePolicy(new PolicyStatement({ actions: ['aws-marketplace:ViewSubscriptions', 'aws-marketplace:Subscribe'], resources: ['*'] }));
 
@@ -177,7 +284,7 @@ export class TingStack extends Stack {
       corsPreflight: {
         allowOrigins: ['*'],
         allowMethods: [CorsHttpMethod.GET, CorsHttpMethod.POST, CorsHttpMethod.DELETE, CorsHttpMethod.OPTIONS],
-        allowHeaders: ['content-type'],
+        allowHeaders: ['content-type', 'authorization'],
         maxAge: Duration.hours(1),
       },
     });
@@ -187,7 +294,11 @@ export class TingStack extends Stack {
     new BucketDeployment(this, 'DeployWeb', {
       sources: [
         Source.asset(path.join(ROOT, 'dist'), { exclude: ['config.js'] }),
-        Source.data('config.js', `window.TING_CONFIG = {"useMocks":false,"apiUrl":"${apiUrl}","wsUrl":"${wsStage.url}"};\n`),
+        Source.data(
+          'config.js',
+          `window.TING_CONFIG = {"useMocks":false,"apiUrl":"${apiUrl}","wsUrl":"${wsStage.url}",` +
+            `"auth":{"domain":"${membersDomain.baseUrl()}","clientId":"${webClient.userPoolClientId}","idp":"AcmeCorp"}};\n`,
+        ),
       ],
       destinationBucket: site,
       distribution,
@@ -199,5 +310,9 @@ export class TingStack extends Stack {
     new CfnOutput(this, 'ApiUrl', { value: apiUrl });
     new CfnOutput(this, 'WsUrl', { value: wsStage.url });
     new CfnOutput(this, 'DocsBucket', { value: docs.bucketName });
+    new CfnOutput(this, 'AcmePoolId', { value: acme.userPoolId });
+    new CfnOutput(this, 'MembersPoolId', { value: members.userPoolId });
+    new CfnOutput(this, 'SignInDomain', { value: membersDomain.baseUrl() });
+    new CfnOutput(this, 'WebClientId', { value: webClient.userPoolClientId });
   }
 }
