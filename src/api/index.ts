@@ -6,6 +6,7 @@
 
 import type { CompileResult } from '../compiler/compile';
 import type { ExplainedStep } from '../engine/explain';
+import type { Reminder } from '../engine/reminders';
 import type { AdjudicatedLine, Ledger, PlanRules, Profile } from '../engine/types';
 import type { IntakeItem } from '../intake/types';
 import { httpApi } from './httpApi';
@@ -38,6 +39,13 @@ export interface TraceEvent {
   ms: number;
 }
 
+export interface ScheduledReminder {
+  reminderId: string;
+  sendOn: string;
+  /** Where it will be delivered: in the app (mock), or email too once SES is wired. */
+  channels: ('in_app' | 'email')[];
+}
+
 export interface TingApi {
   getSession(): Promise<Session>;
   /** Plan options at open enrollment, including waiving coverage and the dentist's membership plan. */
@@ -56,6 +64,12 @@ export interface TingApi {
   /** Demo control: Lincoln's mock claims feed emits an EOB for the next planned procedure. */
   fireMockClaim(profile: Profile): Promise<void>;
   createShareLink(scheduleKind: string): Promise<{ url: string; expiresAt: string }>;
+  /**
+   * Year-end reminder from engine/reminders (EventBridge Scheduler + SES in AWS, where the Lambda can rebuild
+   * the text with buildReminders at send time). Scheduling the same reminder id again replaces it.
+   */
+  scheduleReminder(reminder: Reminder): Promise<ScheduledReminder>;
+  cancelReminder(reminderId: string): Promise<void>;
 }
 
 export const USE_MOCKS = import.meta.env.VITE_USE_MOCKS !== 'false';
@@ -82,6 +96,7 @@ function describe(value: unknown): string {
     if (Array.isArray(v.items) && typeof v.kind === 'string') return `${v.kind}: ${v.items.length} items`;
     if (Array.isArray(v.history)) return `${v.history.length} services`;
     if (typeof v.url === 'string') return 'link created';
+    if (typeof v.reminderId === 'string' && typeof v.sendOn === 'string') return `reminder scheduled for ${v.sendOn}`;
     if (typeof v.name === 'string') return `signed in as ${v.name}`;
   }
   return 'ok';

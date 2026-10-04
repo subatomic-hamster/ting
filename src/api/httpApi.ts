@@ -18,6 +18,7 @@ async function http<T>(path: string, init?: RequestInit): Promise<T> {
     headers: init?.body instanceof FormData ? init.headers : { 'Content-Type': 'application/json', ...init?.headers },
   });
   if (!res.ok) throw new Error(`${init?.method ?? 'GET'} ${path} → ${res.status}`);
+  if (res.status === 204) return undefined as T;
   return (await res.json()) as T;
 }
 
@@ -49,4 +50,6 @@ export const httpApi: TingApi = {
   },
   fireMockClaim: async () => notWired('fireMockClaim (demo control, mock mode only)'),
   createShareLink: (scheduleKind) => http('/share', post({ scheduleKind })),
+  scheduleReminder: (reminder) => http('/reminders', post(reminder)),
+  cancelReminder: (reminderId) => http(`/reminders/${encodeURIComponent(reminderId)}`, { method: 'DELETE' }),
 };

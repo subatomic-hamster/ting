@@ -5,6 +5,7 @@ import { AuditDrawer } from './AuditDrawer';
 import { ErrorBoundary } from './ErrorBoundary';
 import { DemoPanel } from './DemoPanel';
 import { EstimateFooter } from './EstimateFooter';
+import { ReminderToast } from './ReminderToast';
 import { TopBar } from './TopBar';
 
 const NAV = [
@@ -54,6 +55,7 @@ export function AppShell() {
       </main>
       <EstimateFooter />
       <AuditDrawer open={auditOpen} onClose={() => setAuditOpen(false)} />
+      <ReminderToast />
       <DemoPanel />
     </div>
   );
