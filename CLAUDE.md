@@ -19,8 +19,13 @@ npm run build        # tsc -b && vite build into dist/
 # AWS (from infra/, with AWS_PROFILE=ting-aws AWS_REGION=us-west-2)
 npm ci               # infra has its own package.json (CDK)
 npm run deploy       # builds the web app, then cdk deploy; writes infra/outputs.json
-node smoke.mjs       # prod smoke test: every route, Bedrock, Textract, claim → WebSocket round trip
+node smoke.mjs       # prod smoke test (23 checks): every route, Bedrock, Textract, reasoning, Winnow, claims, reminders, inbox
+node eval.mjs        # intake accuracy on evals/intake.json against the live API → docs/accuracy.md
+node scripts/ar-policy.mjs   # one-time: build the Automated Reasoning policy + guardrail → infra/ar.json (committed)
+node scripts/seed-acme.mjs   # demo Acme SSO users; passwords only in infra/acme-users.local.json (gitignored, never commit)
 ```
+
+Deploy-time context: `-c reminderEmail=you@example.com` (SES-verified address for reminder/digest email; omitted = in-app only), `-c winnowUrl=http://host:port` (live Winnow server; omitted = simulated).
 
 Locally, `VITE_USE_MOCKS=true` (the default) runs everything in the browser on demo data. The deployed site gets its settings from `config.js`: the stack writes `window.TING_CONFIG` (useMocks false, API and WebSocket URLs) at deploy time, and those settings win over the `VITE_*` values.
 
@@ -50,7 +55,20 @@ Stack: React 18, Vite, Tailwind 4, Zustand, React Query and zod.
   - `POST /mock/claims` → EventBridge bus `ting-claims` → `claims.ts`, which stores the claim in DynamoDB and pushes it to the member's sockets.
   - On connect, the client sends `replay` and gets its stored claims back, so state survives a reload.
   - `POST /demo/reset` clears a member's claims.
-- **Documents:** the browser uploads to S3 with a presigned URL, then Textract runs `DetectDocumentText`. `backend/src/lib/layout.ts` rebuilds table rows from line positions. Multi-page PDFs fall back to the PDF's text layer in the browser.
+- **More backend features**, each with a pure engine rule plus a thin AWS adapter:
+  - **Automated Reasoning** (`lib/reasoning.ts`): per estimate line, states the engine's premises and "The plan pays $X." against a policy built from the Acme Low benefits summary. A VALID verdict shows a "Proved" badge.
+  - **Winnow** (`ai/winnow.ts`): the spec's `/v1/systemone` typed questions. It's simulated by Claude Haiku until a GPU server is set with `winnowUrl`; results are labelled `simulated`. Uses so far:
+    - document triage, plus an injection check that quarantines text before Claude sees it;
+    - invoice-to-EOB matching.
+  - **Sign-in:** Cognito federated over OIDC to a mock "Acme Corp" pool.
+    - `pretoken.ts` maps the employee to a member and group via `lib/identity.ts`.
+    - The API verifies the ID token when one is sent; otherwise it serves the public demo persona.
+    - `/admin/insights` requires `employer_admin` and drops groups under 20 on the server.
+  - **Share links** store a snapshot of the member's plan in DynamoDB (30-day expiry, 410 once expired); `/share/:token` renders it on any device.
+  - **Reminders and digests:** a daily EventBridge rule (`reminders.ts`) sends them. Email is content-free unless the member opts into detail.
+  - **EOB appeal draft** (`engine/eobAppeal.ts`), **invoice reconciliation and the overbilling check** (`engine/reconcile.ts`), and the **forwarding inbox** (`engine/inbox.ts`, simulated SES inbound).
+  - **Spanish explanations** (EN/ES switch) go through the same amount checks.
+- **Documents:** the browser uploads to S3 with a presigned URL, then Textract runs `DetectDocumentText`. `backend/src/lib/layout.ts` rebuilds table rows from line positions. Multi-page PDFs fall back to the PDF's text layer in the browser. When deployed, `/documents` runs the Express Step Functions workflow `Ingest` (read → screen → record), and a repeat upload (same S3 ETag) is flagged `duplicate`.
 - **`infra/lib/ting-stack.ts` is one CDK stack:**
   - DynamoDB single table (`pk`/`sk`/`ttl`).
   - S3 buckets for documents and the site.
@@ -67,6 +85,8 @@ Stack: React 18, Vite, Tailwind 4, Zustand, React Query and zod.
 ## Invariants (don't break these)
 
 - Every dollar figure on screen comes from the engine. The UI only formats it with `formatMoney()` in `src/lib/format.ts`, or shows the difference between two engine totals.
+- Model text never changes an amount: `polish()` in `backend/src/ai/polish.ts` and `explainWithModel` reject any rewording whose dollar figures differ from the engine's, and the template is shown instead.
+- A document Winnow flags as instructing an AI is quarantined: only the regex/parsers read it.
 - Model-written explanation sentences are shown only if `verifyNumbers(text, line)` in `src/engine/explain.ts` passes.
 - The plan compiler never fills in defaults: a missing field becomes a question.
 - Claim events must pass `claimEventSchema` and are applied idempotently per `claimId`.

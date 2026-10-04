@@ -17,6 +17,9 @@ export interface Digest {
   amounts: number[];
 }
 
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const shortDate = (iso: string) => `${MONTHS[Number(iso.slice(5, 7)) - 1]} ${Number(iso.slice(8, 10))}`;
+
 export const PRIVATE_DIGEST = { title: 'You have a dental benefits update', body: 'Sign in to Ting to see it. For your privacy, details stay inside the app.' };
 
 export function buildDigest(profile: Profile, ev: ScheduleEvaluation, days = 30): Digest {
@@ -26,7 +29,7 @@ export function buildDigest(profile: Profile, ev: ScheduleEvaluation, days = 30)
   const lines: string[] = [];
   const amounts: number[] = [];
   for (const l of next.slice(0, 3)) {
-    lines.push(`${cdtLabel(l.cdt, l.tooth)} on ${l.date}: you pay about ${usd(l.memberOwes)}.`);
+    lines.push(`${cdtLabel(l.cdt, l.tooth)} on ${shortDate(l.date)}: you pay about ${usd(l.memberOwes)}.`);
     amounts.push(l.memberOwes);
   }
   if (left.maxRemaining > 0) {
@@ -35,7 +38,7 @@ export function buildDigest(profile: Profile, ev: ScheduleEvaluation, days = 30)
   }
   if (left.unusedCleanings > 0) lines.push(`${left.unusedCleanings} covered cleaning${left.unusedCleanings === 1 ? '' : 's'} left this year.`);
   if (left.fsaExpiring > 0) {
-    lines.push(`${usd(left.fsaExpiring)} of FSA money expires on ${left.fsaDeadline}.`);
+    lines.push(`${usd(left.fsaExpiring)} of FSA money expires on ${shortDate(left.fsaDeadline)}.`);
     amounts.push(left.fsaExpiring);
   }
   return {

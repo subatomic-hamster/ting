@@ -79,6 +79,25 @@ Engine entry points for Lambda: `optimize(profile, { nextPlan, horizon })`, `eva
 - Plan years are calendar years; one covered person per profile (family optimizer is roadmap).
 - The optimizer is exhaustive: about 12 procedures × 3 years is the practical ceiling.
 
+## AWS features (deployed)
+
+The live site (`infra/outputs.json` → `WebUrl`) runs the same app against the AWS backend. `/try` shows a QR code for judges. On top of the mock-mode features it adds:
+
+- **Bedrock** for intake translation (including Spanish), plan-compiler gap filling (verified quotes only), plain explanations (EN/ES), digests and EOB appeal drafts. Every amount is checked against the engine.
+- **Automated Reasoning:** a "Proved" badge when the engine's plan-pays amount is proved against rules built from the benefits summary.
+- **Winnow decision layer** (simulated until the GPU is approved): document triage, prompt-injection quarantine, and invoice-to-EOB matching.
+- **Employer sign-in:** "Sign in with Acme" (Cognito, OIDC), a consent screen, delete-my-data, and server-enforced admin aggregates.
+- **Live claims feed** over WebSocket with replay, dentist share links backed by snapshots, year-end reminders and digests (content-free email by default).
+- **Documents:** the Step Functions ingestion workflow with duplicate detection. A dentist's bill is reconciled with Lincoln's EOB and flagged if it asks for more than the EOB says.
+- **A simulated forwarding address**, with sender approval.
+- **Scorecard:** `docs/accuracy.md`.
+
+Extra demo moments (demo panel):
+- **Underpaid EOB:** an EOB $90 below the estimate. Use **Draft a message to Lincoln** on it.
+- **Overbilling check:** after **Fire mock claim**, upload `public/samples/invoice.png` on /treatment.
+- **Forwarding:** on the dashboard, click **Demo: the dentist emails a bill**.
+- **Digest:** **Send a test digest now** on the dashboard.
+
 ## Demo script
 
 1. Open `/?demo=1` (or press **Ctrl+Shift+D**). Choose persona **Dale, 56**.
