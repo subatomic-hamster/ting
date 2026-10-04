@@ -254,6 +254,21 @@ await check('digest: preferences, engine digest, private send', async () => {
   return `"${d.title}" (${d.source}); sent privately`;
 });
 
+await check('invoice: Textract → classify → Winnow match → overbilling flag', async () => {
+  const png = readFileSync(new URL('../public/samples/invoice.png', import.meta.url));
+  const { uploadUrl, key } = await call('/documents/upload', { name: 'invoice.png', contentType: 'image/png' });
+  await fetch(uploadUrl, { method: 'PUT', body: png, headers: { 'Content-Type': 'image/png' } });
+  const doc = await call('/documents', { key, contentType: 'image/png' });
+  assert(doc.kind === 'invoice' && doc.invoice?.amountDue === 412 && doc.invoice?.serviceDate === '2026-10-03', JSON.stringify(doc.invoice));
+  const claims = [
+    { claimId: 'CLM-RC19', date: '2026-10-03', codes: ['D3330'], inNetwork: true, memberOwes: 200 },
+    { claimId: 'CLM-CLEAN', date: '2026-04-10', codes: ['D1110'], inNetwork: true, memberOwes: 0 },
+  ];
+  const m = await call('/invoices/match', { invoice: doc.invoice, claims });
+  assert((m.probs['CLM-RC19'] ?? 0) >= 0.9, `match ${JSON.stringify(m)}`);
+  return `amount due $412 → CLM-RC19 p=${m.probs['CLM-RC19']} (${m.source}); EOB says $200, so the bill is flagged`;
+});
+
 await check('rejects a malformed claim', async () => {
   try {
     await call('/mock/claims', { type: 'claim.adjudicated', member: 'x' });

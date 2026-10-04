@@ -1,0 +1,7 @@
+Greensboro Family Dental
+Statement / Invoice
+Patient: Dale Moore        Date of service: 10/03/2026
+D3330   Root canal - molar   #19        $1,180.00
+Insurance adjustment                     -$768.00
+Amount due                                $412.00
+Demo document - not a real patient record.

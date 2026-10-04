@@ -92,6 +92,8 @@ export interface ServiceRecord {
   inNetwork?: boolean;
   source: 'claim' | 'user' | 'invoice';
   claimId?: string;
+  /** From the EOB: what the member owes for this line. */
+  memberOwes?: number;
 }
 
 /** What the member has used. `maxUsed`/`deductibleMet` are for `planYear`. */

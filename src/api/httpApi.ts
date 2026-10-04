@@ -42,6 +42,8 @@ const post = (body: unknown): RequestInit => ({ method: 'POST', body: JSON.strin
 /** Uploads straight to S3 with a short-lived presigned URL, then Textract reads it in the backend. */
 async function readDocument(file: File): Promise<ReadDocument> {
   const contentType = file.type || 'application/octet-stream';
+  // Text files (a forwarded email body, a pasted bill) skip Textract; the backend still screens them.
+  if (contentType.startsWith('text/')) return http<ReadDocument>('/documents/text', post({ text: (await file.text()).slice(0, 60_000) }));
   const { uploadUrl, key } = await http<{ uploadUrl: string; key: string }>('/documents/upload', post({ name: file.name, contentType }));
   const put = await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': contentType } });
   if (!put.ok) throw new Error(`Upload failed → ${put.status}`);
@@ -100,6 +102,7 @@ export const httpApi: TingApi = {
   fireMockClaim: async (profile, opts) => {
     await http('/mock/claims', post(mockClaimEvent(profile, PERSONAS[apiContext.personaId].memberId, opts?.underpay)));
   },
+  matchInvoice: (invoice, claims) => http('/invoices/match', post({ invoice, claims })),
   draftAppeal: (discrepancy, plan) => http('/eob/appeal', post({ discrepancy, plan: { name: plan.name, sections: plan.sections } })),
   createShareLink: (scheduleKind, snapshot) => http('/share', post({ scheduleKind, origin: window.location.origin, snapshot })),
   getShare: async (token) => {

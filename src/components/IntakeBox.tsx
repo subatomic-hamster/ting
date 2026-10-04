@@ -1,3 +1,4 @@
+import { InvoiceCheck } from './InvoiceCheck';
 import { useMutation } from '@tanstack/react-query';
 import { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -67,7 +68,9 @@ export function IntakeBox() {
       else if (r.kind === 'treatment_plan') review(r.items, `Read your treatment plan: found ${r.items.length} item${r.items.length === 1 ? '' : 's'}. Check them below.`);
       else
         setNote(
-          r.kind === 'plan_summary'
+          r.kind === 'invoice'
+            ? "This is a dentist's bill. Ting checks it against Lincoln's EOB below."
+            : r.kind === 'plan_summary'
             ? 'This looks like a benefits summary. Load it on the Plan rules page.'
             : r.kind === 'insurance_card'
               ? 'This looks like an insurance card. Scan it on the Plan rules page.'
@@ -198,12 +201,14 @@ export function IntakeBox() {
 
       <p className="mt-2 min-h-5 text-sm text-muted" aria-live="polite">
         {upload.isPending ? 'Reading your document…' : note}
-        {doc && doc.kind !== 'treatment_plan' && doc.kind !== 'unknown' && (
+        {doc && (doc.kind === 'plan_summary' || doc.kind === 'insurance_card') && (
           <Link to="/plan" className="ml-1 font-medium text-brand-700 underline">
             Open Plan rules
           </Link>
         )}
       </p>
+
+      {doc?.kind === 'invoice' && doc.invoice && <InvoiceCheck invoice={doc.invoice} />}
 
       {doc?.text && (
         <details className="mt-1 text-xs text-muted">

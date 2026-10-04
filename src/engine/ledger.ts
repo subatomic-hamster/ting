@@ -78,6 +78,7 @@ export function applyClaim(profile: Profile, raw: unknown): ClaimUpdate {
             cdt: l.cdt,
             tooth: l.tooth,
             planPaid: l.planPaid,
+            memberOwes: l.memberOwes,
             inNetwork: event.provider.inNetwork,
             source: 'claim' as const,
             claimId: event.claimId,

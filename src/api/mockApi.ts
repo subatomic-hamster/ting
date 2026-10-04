@@ -7,6 +7,7 @@ import admin from '../fixtures/admin.json';
 import { PERSONAS } from '../data/personas';
 import { buildDigest } from '../engine/digest';
 import { appealDraft } from '../engine/eobAppeal';
+import { heuristicMatch } from '../engine/reconcile';
 import { optimize } from '../engine/schedule';
 import { localExplainer } from '../engine/explain';
 import { classifyDocument } from '../intake/classify';
@@ -105,6 +106,11 @@ export const mockApi: TingApi = {
   },
 
   async resetDemo() {},
+
+  async matchInvoice(invoice, claims) {
+    await latency();
+    return { probs: heuristicMatch(invoice, claims), source: 'heuristic' };
+  },
 
   async draftAppeal(discrepancy, plan) {
     await latency();

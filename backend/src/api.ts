@@ -11,6 +11,7 @@ import { isPersonaId, PERSONAS, type PersonaId } from '../../src/data/personas';
 import { claimEventSchema } from '../../src/engine/ledger';
 import type { AdjudicatedLine } from '../../src/engine/types';
 import { compilePlanText } from '../../src/compiler/compile';
+import { heuristicMatch, type ClaimRecord, type Invoice } from '../../src/engine/reconcile';
 import { classifyDocument } from '../../src/intake/classify';
 import { addDays, todayISO } from '../../src/lib/dates';
 import { compileWithModel } from './ai/compile';
@@ -153,6 +154,38 @@ const routes: Record<string, Route> = {
     const key = `uploads/${randomUUID()}/${name}`;
     const uploadUrl = await getSignedUrl(s3, new PutObjectCommand({ Bucket: BUCKET, Key: key, ContentType: contentType }), { expiresIn: 300 });
     return json(200, { uploadUrl, key });
+  },
+
+  'POST /documents/text': async (e) => {
+    const text = str(bodyOf(e).text, 'text', 60_000);
+    return json(200, { docId: `text-${randomUUID().slice(0, 8)}`, text, ...classifyDocument(text, false), triage: await safeTriage(text) });
+  },
+
+  // Winnow use 3: which EOB is this invoice for? The thresholds (0.9 link / 0.5 confirm) live in the engine.
+  'POST /invoices/match': async (e) => {
+    const body = bodyOf(e);
+    const claims = Array.isArray(body.claims) ? (body.claims as ClaimRecord[]).slice(0, 5) : [];
+    const invoice = body.invoice as Invoice | undefined;
+    if (!isRec(invoice)) throw new HttpError(400, 'invoice is required');
+    if (!claims.length) return json(200, { probs: { none: 1 }, source: 'heuristic' });
+    const labels = 'ABCDE';
+    const criteria: Record<string, string> = {};
+    claims.forEach((c, i) => (criteria[labels[i]] = `EOB ${c.claimId}: service ${c.date}, codes ${c.codes.join(' ')}, member owes $${c.memberOwes}`));
+    criteria.none = 'none of these';
+    try {
+      const { answers, source } = await decide(
+        { invoice: { provider: invoice.provider, serviceDate: invoice.serviceDate, amountDue: invoice.amountDue, codes: invoice.codes } },
+        { match: { type: 'choice', instructions: 'Which EOB is for the same dental visit as this invoice?', criteria } },
+      );
+      const dist = answers.match;
+      if (!dist) throw new Error('no distribution');
+      const probs: Record<string, number> = { none: dist.none ?? 0 };
+      claims.forEach((c, i) => (probs[c.claimId] = dist[labels[i]] ?? 0));
+      return json(200, { probs, source });
+    } catch (err) {
+      console.warn('invoice match fell back to the heuristic', err);
+      return json(200, { probs: heuristicMatch(invoice, claims), source: 'heuristic' });
+    }
   },
 
   'POST /documents': async (e) => {

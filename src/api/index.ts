@@ -7,6 +7,7 @@
 import type { CompileResult } from '../compiler/compile';
 import type { Cadence, Detail, Digest } from '../engine/digest';
 import type { EobDiscrepancy } from '../engine/eobAppeal';
+import type { ClaimRecord, Invoice } from '../engine/reconcile';
 import type { ExplainedStep } from '../engine/explain';
 import type { Reminder } from '../engine/reminders';
 import type { AdjudicatedLine, Ledger, PlannedProcedure, PlanRules, Profile } from '../engine/types';
@@ -35,6 +36,8 @@ export interface ReadDocument {
   items: IntakeItem[];
   /** Codes on a treatment plan Ting doesn't know yet. */
   unrecognized: string[];
+  /** A dentist's bill, parsed. */
+  invoice?: Invoice;
   /** Winnow's read of the file (AWS only): document type and whether it tries to instruct an AI. */
   triage?: DocumentTriage;
 }
@@ -106,6 +109,8 @@ export interface TingApi {
   subscribeLedger(onEvent: (event: unknown) => void): () => void;
   /** Demo control: Lincoln's mock claims feed emits an EOB for the next planned procedure. */
   fireMockClaim(profile: Profile, opts?: { underpay?: number }): Promise<void>;
+  /** Which of the member's claims (EOBs) this invoice is for: a probability per claim id plus "none" (Winnow use 3 in AWS). */
+  matchInvoice(invoice: Invoice, claims: ClaimRecord[]): Promise<{ probs: Record<string, number>; source: 'winnow' | 'simulated' | 'heuristic' }>;
   /** F7: a factual message to Lincoln about an EOB that differs from the estimate. */
   draftAppeal(discrepancy: EobDiscrepancy, plan: Pick<PlanRules, 'name' | 'sections'>): Promise<{ text: string; source: 'model' | 'template' }>;
   /** A signed, expiring link for the dentist. The snapshot is what the link shows on any device. */
