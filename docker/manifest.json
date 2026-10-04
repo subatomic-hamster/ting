@@ -1,7 +1,7 @@
 {
-  "sourceSha256": "306b16ff0e269d18782ae42ed5d6c3eea52e894632b77cbce70cd85b455dd9dd",
+  "sourceSha256": "e6472419d31e2b71ba74bb3b7be2e7837a58bef74ff4f86dbccc2bb86fbea5d8",
   "artifacts": {
-    "docker/site.tar": "071020dfcb7d4fbc053a6184ce265b0212422e6551b8e05d8d1a33f4b7fd4f04",
+    "docker/site.tar": "3a9f5091feadc7b71268db594c0515c2f1b13f0ae2b3926cafe3795a65f5ed09",
     "docker/bin/server-amd64": "7284446fb9dbd5066e2ed132051047fb01d0c8f201e01ea87eb54b5ec530703e",
     "docker/bin/server-arm64": "310c1b1d6316a8d2e48ef36521252c3e3e268c7ebcbe42abca611b6a8d3f1c5d"
   },
