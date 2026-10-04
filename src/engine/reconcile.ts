@@ -93,7 +93,7 @@ export function overbilling(inv: Invoice, claim: ClaimRecord, notCovered = 0): {
   return {
     over,
     message: notCovered
-      ? `Your bill asks for ${usd(inv.amountDue)}. Leaving out ${usd(notCovered)} the plan doesn't cover, that's ${usd(inv.amountDue - notCovered)}, but Lincoln's EOB says you owe ${usd(claim.memberOwes)}. In-network dentists agree to accept Lincoln's allowed fee. Ask the office for a corrected bill.`
-      : `Your bill asks for ${usd(inv.amountDue)}, but Lincoln's EOB says you owe ${usd(claim.memberOwes)}. In-network dentists agree to accept Lincoln's allowed fee. Ask the office for a corrected bill.`,
+      ? `Your bill asks for ${usd(inv.amountDue)}. Leaving out ${usd(notCovered)} the plan doesn't cover, that's ${usd(inv.amountDue - notCovered)}, but your insurer's EOB says you owe ${usd(claim.memberOwes)}. In-network dentists agree to accept your insurer's allowed fee. Ask the office for a corrected bill.`
+      : `Your bill asks for ${usd(inv.amountDue)}, but your insurer's EOB says you owe ${usd(claim.memberOwes)}. In-network dentists agree to accept your insurer's allowed fee. Ask the office for a corrected bill.`,
   };
 }

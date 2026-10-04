@@ -4,7 +4,7 @@ import { GROUP_PLANS, parseInsuranceCard, plansForGroup } from './insuranceCard'
 describe('insurance card', () => {
   it('pulls group, member and carrier from OCR text', () => {
     const text = 'LINCOLN Dental\nMember Name: Pat Smith\nMember ID: W123456789\nGroup Number: 00412345\nPlan: DentalConnect';
-    expect(parseInsuranceCard(text)).toEqual({ groupNumber: '00412345', memberId: 'W123456789', carrier: 'Lincoln Financial' });
+    expect(parseInsuranceCard(text)).toEqual({ groupNumber: '00412345', memberId: 'W123456789', carrier: undefined });
   });
 
   it('accepts short labels and OCR letter-for-digit slips in the group number', () => {

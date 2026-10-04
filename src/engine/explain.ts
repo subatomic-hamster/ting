@@ -32,7 +32,7 @@ export function explainLine(line: AdjudicatedLine): ExplainedStep[] {
       case 'fee':
         return s(`Your dentist's fee for the ${name} is ${usd(line.billed)}.`);
       case 'networkDiscount':
-        return s(`Your dentist is in network, so Lincoln's contracted fee of ${usd(line.allowed)} replaces the ${usd(line.billed)} fee, taking ${amount} off.`);
+        return s(`Your dentist is in network, so your insurer's contracted fee of ${usd(line.allowed)} replaces the ${usd(line.billed)} fee, taking ${amount} off.`);
       case 'membershipDiscount':
         return s(line.memberOwes === 0 ? `Your membership fee already covers this ${name}.` : `Your dentist's membership plan takes ${amount} off the fee.`);
       case 'coinsurance':

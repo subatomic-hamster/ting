@@ -41,7 +41,7 @@ describe('plan comparison (F4)', () => {
     const p = t?.likelihood ?? 0;
     expect(at(p - 0.03)).toBeGreaterThan(0);
     expect(at(p + 0.03)).toBeLessThan(0);
-    expect(t?.text).toMatch(/^Above a \d+% chance of the root canal on #3, Lincoln DentalConnect High pays for itself\.$/);
+    expect(t?.text).toMatch(/^Above a \d+% chance of the root canal on #3, Acme Dental High pays for itself\.$/);
   });
 
   it('flags a past year that hit the max', () => {
@@ -67,7 +67,7 @@ describe('FSA amount', () => {
 describe('Enrollment Card', () => {
   const { card } = compare(DEMO_PROFILE, DEMO_PLAN_OPTIONS);
   it('sums up plan, FSA, dates and savings with the disclaimer', () => {
-    expect(card.summary).toContain('choose Lincoln DentalConnect High');
+    expect(card.summary).toContain('choose Acme Dental High');
     expect(card.summary).toContain(`elect $${card.fsa.election.toLocaleString('en-US')} FSA`);
     expect(card.summary).toMatch(/before Dec 31 \(2026 FSA\)/);
     expect(card.summary).toMatch(/Jan 4 \(2027 FSA\)/);
@@ -93,6 +93,6 @@ describe('explanations', () => {
 
   it('rejects a sentence with a dollar figure the engine never produced', () => {
     expect(dollarsIn('You pay $1,180.50 and $7')).toEqual([1180.5, 7]);
-    expect(verifyNumbers('Lincoln pays $999 for this crown.', line)).toEqual({ ok: false, unknown: [999] });
+    expect(verifyNumbers('The plan pays $999 for this crown.', line)).toEqual({ ok: false, unknown: [999] });
   });
 });

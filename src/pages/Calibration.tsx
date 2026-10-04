@@ -56,7 +56,7 @@ export default function CalibrationPage() {
               .filter((b) => b.n && b.confidence !== null && b.accuracy !== null)
               .map((b) => (
                 <g key={b.range}>
-                  <circle cx={x(b.confidence ?? 0)} cy={y(b.accuracy ?? 0)} r={3 + Math.sqrt(b.n) * 1.5} fill="#0f766e" fillOpacity="0.55" />
+                  <circle cx={x(b.confidence ?? 0)} cy={y(b.accuracy ?? 0)} r={3 + Math.sqrt(b.n) * 1.5} fill="#ad1f2d" fillOpacity="0.55" />
                   <title>{`${b.range}: right ${Math.round((b.accuracy ?? 0) * 100)}% of ${b.n}`}</title>
                 </g>
               ))}

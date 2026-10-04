@@ -120,7 +120,7 @@ export const useHabitStore = create<HabitState>()((set, get) => ({
 
   setShare: (key, value) => {
     set((s) => ({ consent: { ...s.consent, [key]: value } }));
-    trace('habits.share', `${key === 'shareWithDentist' ? 'Dentist summary' : 'Lincoln aggregate counts'} ${value ? 'on' : 'off'}`);
+    trace('habits.share', `${key === 'shareWithDentist' ? 'Dentist summary' : 'Insurer aggregate counts'} ${value ? 'on' : 'off'}`);
   },
 
   connect: (kind) => {

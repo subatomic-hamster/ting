@@ -118,11 +118,11 @@ const CATEGORY_LABEL: Record<CdtCategory, string> = {
   adjunctive: 'adjunctive services (sedation, night guards)',
 };
 const MAX_REWARDS_PROMPT: Record<keyof MaxRewards, string> = {
-  threshold: 'MaxRewards: what is the most the plan can pay in a year (in dollars) and still earn a rollover?',
-  rolloverAmount: 'MaxRewards: how many dollars roll over in a qualifying year?',
-  inNetworkBonus: 'MaxRewards: how many extra dollars are added when every claim was in network?',
-  accountLimit: 'MaxRewards: what is the most the rollover account can hold (in dollars)?',
-  depositDay: 'MaxRewards: on which day of the following plan year is the rollover deposited?',
+  threshold: 'Max Rollover: what is the most the plan can pay in a year (in dollars) and still earn a rollover?',
+  rolloverAmount: 'Max Rollover: how many dollars roll over in a qualifying year?',
+  inNetworkBonus: 'Max Rollover: how many extra dollars are added when every claim was in network?',
+  accountLimit: 'Max Rollover: what is the most the rollover account can hold (in dollars)?',
+  depositDay: 'Max Rollover: on which day of the following plan year is the rollover deposited?',
 };
 
 function questionFor(field: AnswerPath): CompilerQuestion {
@@ -244,9 +244,9 @@ export function compilePlanText(text: string): CompileResult {
     cite(path, l);
   };
 
-  const hasMaxRewards = /maxrewards/i.test(text);
+  const hasMaxRewards = /maxrewards|max rollover/i.test(text);
   if (hasMaxRewards) draft.maxRewards = {};
-  const maxRewardsMention = lines.find((l) => /maxrewards/i.test(l.text));
+  const maxRewardsMention = lines.find((l) => /maxrewards|max rollover/i.test(l.text));
 
   for (const l of lines) {
     const t = l.text;
@@ -359,7 +359,7 @@ export function compilePlanText(text: string): CompileResult {
   if (maxRewardsMention && getPath(draft, 'maxRewards.depositDay') === undefined) {
     setPath(draft, 'maxRewards.depositDay', 65);
     evidence['maxRewards.depositDay'] = {
-      snippet: `Deposit day not stated; Lincoln MaxRewards deposits on day 65. (${maxRewardsMention.text})`,
+      snippet: `Deposit day not stated; Max Rollover deposits on day 65 by default. (${maxRewardsMention.text})`,
       ...(maxRewardsMention.section && { section: maxRewardsMention.section }),
     };
   }

@@ -2,23 +2,26 @@
 
 @theme {
   --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --color-paper: #f6f7f4;
-  --color-ink: #1d2a2f;
-  --color-muted: #5b6b70;
-  --color-line: #dde3e0;
-  --color-brand-50: #eef7f5;
-  --color-brand-100: #d5ece7;
-  --color-brand-200: #a9d8cf;
-  --color-brand-500: #2f8f80;
-  --color-brand-600: #1f776a;
-  --color-brand-700: #175f55;
-  --color-brand-900: #0e3a34;
-  --color-plan: #2f8f80;       /* plan pays */
-  --color-sched: #8fb8d6;      /* scheduled against the max */
-  --color-roll: #c9b6e4;       /* rollover */
+  --color-paper: #faf7f6;
+  --color-ink: #2a1c1e;
+  --color-muted: #6e5c5e;
+  --color-line: #ecdfdd;
+  --color-brand-50: #fdf2f3;
+  --color-brand-100: #fadfe2;
+  --color-brand-200: #f2b8be;
+  --color-brand-500: #c8283a;
+  --color-brand-600: #ad1f2d;
+  --color-brand-700: #8f1925;
+  --color-brand-900: #5c1018;
+  --color-accent-red: #fe242a;
+  --color-accent-orange: #f15a23;
+  --color-accent-amber: #f9a61a;
+  --color-plan: #ad1f2d;       /* plan pays */
+  --color-sched: #f9a61a;      /* scheduled against the max */
+  --color-roll: #f6b48f;       /* rollover */
   --color-save: #1c7c4d;       /* money saved */
-  --color-cost: #b3412f;       /* money added */
-  --color-warn: #b7791f;
+  --color-cost: #d9481b;       /* money added */
+  --color-warn: #b45309;
 }
 
 html {
@@ -37,7 +40,7 @@ body {
 }
 
 @utility card {
-  @apply rounded-2xl border border-line bg-white p-4 shadow-[0_1px_2px_rgba(16,40,36,0.04)] sm:p-5;
+  @apply rounded-2xl border border-line bg-white p-4 shadow-[0_1px_2px_rgba(60,16,20,0.05)] sm:p-5;
 }
 
 @utility btn {

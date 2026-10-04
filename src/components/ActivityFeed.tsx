@@ -16,7 +16,7 @@ function AppealDraft({ discrepancy }: { discrepancy: EobDiscrepancy }) {
   if (!draft.data)
     return (
       <button type="button" className="btn-secondary mt-1.5 px-2 py-1 text-xs" onClick={() => draft.mutate()} disabled={draft.isPending}>
-        {draft.isPending ? 'Drafting…' : 'Draft a message to Lincoln'}
+        {draft.isPending ? 'Drafting…' : 'Draft a message to your insurer'}
       </button>
     );
   return (
@@ -30,7 +30,7 @@ function AppealDraft({ discrepancy }: { discrepancy: EobDiscrepancy }) {
         >
           {copied ? 'Copied' : 'Copy'}
         </button>
-        <span className="text-[11px] text-muted">Every amount is from the EOB or Ting's estimate. You send it; Ting never contacts Lincoln for you.</span>
+        <span className="text-[11px] text-muted">Every amount is from the EOB or Ting's estimate. You send it; Ting never contacts your insurer for you.</span>
       </div>
     </div>
   );
@@ -62,7 +62,7 @@ export function ActivityFeed() {
               {check && (
                 <span className={`mt-0.5 block text-xs ${check.mismatch ? 'font-medium text-cost' : 'text-save'}`}>
                   {check.mismatch
-                    ? `EOB says you owe ${formatMoney(check.actual)}; Ting estimated ${formatMoney(check.estimated)}. Worth a message to Lincoln.`
+                    ? `EOB says you owe ${formatMoney(check.actual)}; Ting estimated ${formatMoney(check.estimated)}. Worth a message to your insurer.`
                     : `Matches Ting's estimate of ${formatMoney(check.estimated)}.`}
                 </span>
               )}

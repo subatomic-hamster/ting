@@ -71,7 +71,7 @@ export function IntakeBox() {
       else
         setNote(
           r.kind === 'invoice'
-            ? "This is a dentist's bill. Ting checks it against Lincoln's EOB below."
+            ? "This is a dentist's bill. Ting checks it against your insurer's EOB below."
             : r.kind === 'plan_summary'
             ? 'This looks like a benefits summary. Load it on the Plan rules page.'
             : r.kind === 'insurance_card'

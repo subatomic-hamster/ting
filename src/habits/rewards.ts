@@ -94,7 +94,7 @@ export function computeRewards({ program, sessions, ledger, consent, asOf, denti
         id: `clean-${e.claimId ?? `${e.date}-${e.cdt}`}`,
         date: e.date,
         reason: 'cleaning_verified',
-        label: 'Cleaning verified from your Lincoln claim',
+        label: 'Cleaning verified from your insurance claim',
         credit: program.cleaningCredit,
         source: e.claimId ? `Claim ${e.claimId}` : `Claim on ${e.date}`,
       }),

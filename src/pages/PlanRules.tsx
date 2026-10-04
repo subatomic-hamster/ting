@@ -194,7 +194,7 @@ export default function PlanRules() {
                 Approve these rules
               </button>
               <button type="button" className="btn-secondary" disabled={!final?.ok || submit.isPending} onClick={() => submit.mutate()}>
-                {submit.isSuccess ? 'Sent to Lincoln for review' : 'Send to Lincoln for review'}
+                {submit.isSuccess ? 'Sent for plan review' : 'Send for plan review'}
               </button>
               {final && !final.ok && <span className="text-xs text-muted">{final.missing.length} answer(s) still needed.</span>}
             </div>
@@ -275,7 +275,7 @@ function RulesView({ rules, title }: { rules: Rules; title: string }) {
         </li>
         {rules.maxRewards && (
           <li>
-            MaxRewards: plan payments of {formatMoney(rules.maxRewards.threshold)} or less in a year add {formatMoney(rules.maxRewards.rolloverAmount)} (+
+            Max Rollover: plan payments of {formatMoney(rules.maxRewards.threshold)} or less in a year add {formatMoney(rules.maxRewards.rolloverAmount)} (+
             {formatMoney(rules.maxRewards.inNetworkBonus)} if all in network) to next year's max, deposited on day {rules.maxRewards.depositDay}, up to{' '}
             {formatMoney(rules.maxRewards.accountLimit)}. <cite className="text-xs not-italic text-muted">{s.maxRewards}</cite>
           </li>

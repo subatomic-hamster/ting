@@ -48,10 +48,10 @@ export function InvoiceCheck({ invoice, lineChecks = [] }: { invoice: Invoice; l
         </ul>
       )}
       {!match.data || !decision ? (
-        <p className="mt-1 text-muted">Matching it to your Lincoln claims…</p>
+        <p className="mt-1 text-muted">Matching it to your insurance claims…</p>
       ) : decision.kind === 'unlinked' || !claim ? (
         <p className="mt-1 text-muted">
-          No Lincoln claim for this visit yet. When the EOB arrives, Ting links it to this bill and checks the amount. Nothing is counted twice.
+          No insurance claim for this visit yet. When the EOB arrives, Ting links it to this bill and checks the amount. Nothing is counted twice.
         </p>
       ) : decision.kind === 'confirm' && confirmed === null ? (
         <div className="mt-1">
@@ -73,7 +73,7 @@ export function InvoiceCheck({ invoice, lineChecks = [] }: { invoice: Invoice; l
       ) : (
         <>
           <p className="mt-1 text-muted">
-            Linked to Lincoln claim {claim.claimId} ({formatDate(claim.date, { year: true })}). The EOB says you owe {formatMoney(claim.memberOwes)}.
+            Linked to claim {claim.claimId} ({formatDate(claim.date, { year: true })}). The EOB says you owe {formatMoney(claim.memberOwes)}.
             <span className="ml-1 text-xs">
               {decision.kind === 'linked' ? `${Math.round(decision.p * 100)}% match` : 'you confirmed'} · {match.data.source}
             </span>
@@ -83,7 +83,7 @@ export function InvoiceCheck({ invoice, lineChecks = [] }: { invoice: Invoice; l
               {flag.message}
             </p>
           ) : (
-            <p className="mt-2 text-save">The bill matches what Lincoln says you owe.</p>
+            <p className="mt-2 text-save">The bill matches what your insurer says you owe.</p>
           )}
         </>
       )}

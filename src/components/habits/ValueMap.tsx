@@ -56,7 +56,7 @@ export function ValueMap({
         <li>Confirms home care for patients without a smart brush, so everyone can earn.</li>
       </Column>
 
-      <Column title="Lincoln" accent="border-t-roll">
+      <Column title="Insurer" accent="border-t-roll">
         <li>
           Group counts only (20+ people): cleanings completed by participants{' '}
           <strong>{formatPercent(c.preventiveCompletion.participants)}</strong> vs{' '}
@@ -69,7 +69,7 @@ export function ValueMap({
         <li>Engaged members and employers who renew. Never used for pricing, underwriting or claims.</li>
         <li>
           <Link to="/program" className="font-medium text-brand-700 underline">
-            Open the Lincoln view
+            Open the insurer view
           </Link>
         </li>
       </Column>

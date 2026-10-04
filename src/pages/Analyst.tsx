@@ -15,12 +15,12 @@ export default function Analyst() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Plan rules review" subtitle="Lincoln analysts check each compiled rule against the plan document before members' estimates use it.">
+      <PageHeader title="Plan rules review" subtitle="Plan analysts check each compiled rule against the plan document before members' estimates use it.">
         <DemoDataPill label="Demo plans" />
       </PageHeader>
       {!isAnalyst ? (
         <p className="rounded-xl border border-line bg-white p-3 text-sm text-muted">
-          Lincoln plan analysts only.{' '}
+          Plan analysts only.{' '}
           {authConfig() && (
             <button type="button" className="font-medium text-brand-700 underline" onClick={() => void signIn()}>
               Sign in

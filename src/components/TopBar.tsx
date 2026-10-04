@@ -26,13 +26,13 @@ export function TopBar({
   const language = useLanguage((s) => s.language);
   const setLanguage = useLanguage((s) => s.setLanguage);
   const canSignIn = !!authConfig();
-  const role = claims?.groups.includes('employer_admin') ? 'Benefits admin' : claims?.groups.includes('lincoln_analyst') ? 'Lincoln analyst' : 'Member';
+  const role = claims?.groups.includes('employer_admin') ? 'Benefits admin' : claims?.groups.includes('lincoln_analyst') ? 'Plan analyst' : 'Member';
 
   return (
-    <header className="no-print bg-brand-900 text-white">
+    <header className="no-print bg-brand-600 text-white">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5 sm:px-6">
         <div className="flex min-w-0 flex-1 items-center gap-2.5">
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-500" aria-hidden>
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/15" aria-hidden>
             <ToothIcon width={18} height={18} />
           </span>
           <div className="min-w-0 leading-tight">
@@ -119,6 +119,12 @@ export function TopBar({
               </button>
             ))}
         </div>
+      </div>
+      <div className="flex h-1" aria-hidden>
+        <span className="flex-[5] bg-brand-600" />
+        <span className="flex-[2] bg-accent-red" />
+        <span className="flex-[2] bg-accent-orange" />
+        <span className="flex-[2] bg-accent-amber" />
       </div>
     </header>
   );

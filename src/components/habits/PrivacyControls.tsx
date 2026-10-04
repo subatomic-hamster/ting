@@ -10,7 +10,7 @@ const ROWS: { who: string; sees: string; never: string }[] = [
     never: 'Individual sessions or times.',
   },
   {
-    who: 'Lincoln',
+    who: 'Your insurer',
     sees: 'Your credit total (to pay it) and, if you allow, counts in groups of 20 or more.',
     never: 'Sessions, times or device IDs. Never used for pricing, underwriting or claim decisions.',
   },
@@ -56,7 +56,7 @@ export function PrivacyControls() {
               onChange={(v) => setShare('shareWithDentist', v)}
             />
             <Toggle
-              label="Include me in Lincoln's group counts (20+ people)"
+              label="Include me in your insurer's group counts (20+ people)"
               checked={consent.shareAggregateWithLincoln}
               onChange={(v) => setShare('shareAggregateWithLincoln', v)}
             />

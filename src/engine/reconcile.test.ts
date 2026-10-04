@@ -31,7 +31,7 @@ describe('matching and the overbilling check', () => {
     const flag = overbilling(inv, claims[0]);
     expect(flag?.over).toBe(212);
     expect(flag?.message).toBe(
-      "Your bill asks for $412, but Lincoln's EOB says you owe $200. In-network dentists agree to accept Lincoln's allowed fee. Ask the office for a corrected bill.",
+      "Your bill asks for $412, but your insurer's EOB says you owe $200. In-network dentists agree to accept your insurer's allowed fee. Ask the office for a corrected bill.",
     );
   });
   it('leaves out charges the plan never covers', () => {

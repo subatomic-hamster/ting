@@ -165,6 +165,6 @@ Like a safe-driving app for teeth, but **rewards only**: sharing data can lower 
 
 ## Notes
 
-- No Lincoln Financial logos or brand marks are used (event rules). The palette is our own.
+- No carrier names, logos or brand marks appear in the UI (event rules); the carrier is "your insurer" and plans are "Acme Dental". The crimson/red/orange/amber palette echoes the event host's colours.
 - The site works down to 375 px wide. The timeline scrolls horizontally inside its own card.
 - Accessibility: the timeline works from the keyboard, focus is always visible, and charts have ARIA labels.

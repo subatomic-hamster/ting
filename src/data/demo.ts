@@ -44,7 +44,7 @@ const SECTIONS: PlanRules['sections'] = {
   waitingPeriods: 'Eligibility, §6',
   frequencyLimits: 'Limitations, §8',
   alternateBenefit: 'Limitations, §8.3',
-  maxRewards: 'Lincoln MaxRewards, §5',
+  maxRewards: 'Max Rollover, §5',
   preventiveMax: 'Plan Maximums, §4.2',
   q4Carryover: 'Schedule of Benefits, §1.4',
   outOfNetwork: 'Out-of-Network Benefits, §3',
@@ -55,7 +55,7 @@ const SECTIONS: PlanRules['sections'] = {
 
 export const ACME_LOW: PlanRules = {
   id: 'acme-low',
-  name: 'Lincoln DentalConnect Low',
+  name: 'Acme Dental Low',
   kind: 'insurance',
   version: 'PLAN-ACME-LOW-v3',
   premiumMonthly: 24,
@@ -81,7 +81,7 @@ export const ACME_LOW: PlanRules = {
 export const ACME_HIGH: PlanRules = {
   ...ACME_LOW,
   id: 'acme-high',
-  name: 'Lincoln DentalConnect High',
+  name: 'Acme Dental High',
   version: 'PLAN-ACME-HIGH-v3',
   premiumMonthly: 48,
   coinsurance: {

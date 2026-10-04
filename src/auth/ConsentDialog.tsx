@@ -19,11 +19,11 @@ export function ConsentDialog() {
     <div role="dialog" aria-modal="true" aria-labelledby="consent-title" className="fixed inset-0 z-40 grid place-items-center bg-ink/40 p-4">
       <div className="card max-h-[90vh] w-full max-w-lg overflow-y-auto">
         <h2 id="consent-title" className="text-lg font-semibold">Before you start</h2>
-        <p className="mt-1 text-sm text-muted">You signed in with your company account. Your dental information stays with Lincoln, your carrier.</p>
+        <p className="mt-1 text-sm text-muted">You signed in with your company account. Your dental information stays with your insurer.</p>
         <dl className="mt-3 space-y-3 text-sm">
           <div>
             <dt className="font-semibold">What Ting reads</dt>
-            <dd className="text-muted">Your Lincoln plan, your claims, and anything you type, say or upload. Nothing from your inbox.</dd>
+            <dd className="text-muted">Your dental plan, your claims, and anything you type, say or upload. Nothing from your inbox.</dd>
           </div>
           <div>
             <dt className="font-semibold">What your employer sees</dt>

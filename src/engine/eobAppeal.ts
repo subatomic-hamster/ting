@@ -27,7 +27,7 @@ export function appealDraft(d: EobDiscrepancy, plan: Pick<PlanRules, 'name' | 's
   const direction = d.actual > d.estimated ? 'more' : 'less';
   const cite = plan.sections.coinsurance ? ` (${plan.sections.coinsurance})` : '';
   return [
-    `Hello Lincoln Member Services,`,
+    `Hello Member Services,`,
     ``,
     `I'm writing about claim ${d.claimId} for a ${what} on ${longDate(d.serviceDate)}.`,
     `The Explanation of Benefits says I owe ${usd(d.actual)}. Based on my plan, ${plan.name}${cite}, I expected to owe ${usd(d.estimated)}, which is ${usd(diff)} ${direction}.`,

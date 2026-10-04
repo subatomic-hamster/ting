@@ -6,7 +6,6 @@ export const GROUP_PLANS: Record<string, string[]> = {
 export const plansForGroup = (groupNumber: string): string[] => (Object.hasOwn(GROUP_PLANS, groupNumber) ? GROUP_PLANS[groupNumber] : []);
 
 const CARRIERS: [RegExp, string][] = [
-  [/\blincoln\b/i, 'Lincoln Financial'],
   [/\bdelta\s+dental\b/i, 'Delta Dental'],
   [/\bcigna\b/i, 'Cigna'],
   [/\baetna\b/i, 'Aetna'],

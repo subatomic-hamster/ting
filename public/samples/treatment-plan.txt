@@ -1,6 +1,6 @@
 Greensboro Family Dental — Treatment Plan
 Patient: Jordan Rivera        Date: 10/02/2026
-Insurance: Lincoln DentalConnect, Group 00412345
+Insurance: Acme Dental, Group 00412345
 
 Tooth   Code    Description                          Fee
 #19     D3330   Root canal - molar                   $1,180.00

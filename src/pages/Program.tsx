@@ -19,8 +19,8 @@ export default function Program() {
   return (
     <div className="space-y-5">
       <PageHeader
-        title="SmileStreak: Lincoln view"
-        subtitle="Aggregate data only, in groups of 20 or more. No individual sessions, times or device IDs ever reach Lincoln."
+        title="SmileStreak: insurer view"
+        subtitle="Aggregate data only, in groups of 20 or more. No individual sessions, times or device IDs ever reach the insurer."
       >
         <DemoDataPill label="Demo cohort" />
       </PageHeader>
@@ -63,7 +63,7 @@ export default function Program() {
           <Row label="Extra cleanings paid at 100% (intended)" value={`−${formatMoney(e.extraCleaningsCost)}`} />
           <Row label="Device subsidies" value={`−${formatMoney(e.deviceCost)}`} />
           <div className="mt-1 flex justify-between border-t border-line pt-2 font-semibold">
-            <dt>Net for Lincoln this year</dt>
+            <dt>Net for the insurer this year</dt>
             <dd className={`tabular ${e.lincolnNet >= 0 ? 'text-save' : 'text-cost'}`}>{formatMoney(e.lincolnNet, { signed: true })}</dd>
           </div>
         </dl>
@@ -102,7 +102,7 @@ export default function Program() {
           )}
         </Section>
 
-        <Section title="What Lincoln receives" id="data-flow">
+        <Section title="What the insurer receives" id="data-flow">
           <ul className="space-y-2 text-sm">
             <li>
               <strong>Receives:</strong> monthly counts per employer group (20+ members), from members who allow it, and each member’s credit
@@ -116,7 +116,7 @@ export default function Program() {
               surcharges.
             </li>
             <li>
-              <strong>Before launch:</strong> Lincoln actuarial and compliance review against wellness-incentive rules (opt-in, reasonable
+              <strong>Before launch:</strong> insurer actuarial and compliance review against wellness-incentive rules (opt-in, reasonable
               alternative, cap, yearly re-qualification) and state filings.
             </li>
           </ul>

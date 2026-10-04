@@ -40,7 +40,7 @@ describe('Low sample (endodontics not stated)', () => {
   it("after answering 'basic', rules equal ACME_LOW (all fields but id/name/version/sections)", () => {
     const rules = finalized(applyAnswers(result.draft, { 'categoryClass.endodontics': 'basic' }));
     expect(rulesBody(rules)).toEqual(rulesBody(ACME_LOW));
-    expect(rules.name).toBe('Lincoln DentalConnect Low');
+    expect(rules.name).toBe('Acme Dental Low');
   });
 
   it('cites the same sections as ACME_LOW', () => {
@@ -48,8 +48,8 @@ describe('Low sample (endodontics not stated)', () => {
   });
 
   it('cites MaxRewards when it applies the day-65 deposit default', () => {
-    expect(result.evidence['maxRewards.depositDay']?.snippet).toMatch(/day 65.*MaxRewards/);
-    expect(result.evidence['maxRewards.depositDay']?.section).toBe('Lincoln MaxRewards, §5');
+    expect(result.evidence['maxRewards.depositDay']?.snippet).toMatch(/Max Rollover deposits on day 65/);
+    expect(result.evidence['maxRewards.depositDay']?.section).toBe('Max Rollover, §5');
     expect(result.evidence.annualMax).toEqual({ snippet: expect.stringContaining('$1,500'), section: 'Plan Maximums, §4' });
   });
 
@@ -152,7 +152,7 @@ describe('approveRules', () => {
     const b = await approveRules({ ...base, version: 'something-else' });
     expect(a.hash).toMatch(/^[0-9a-f]{64}$/);
     expect(b.hash).toBe(a.hash);
-    expect(a.rules.version).toBe(`PLAN-LINCOLN-DENTALCONNECT-HIGH-${a.hash.slice(0, 8)}`);
+    expect(a.rules.version).toBe(`PLAN-ACME-DENTAL-HIGH-${a.hash.slice(0, 8)}`);
     // key order must not matter
     const reordered = JSON.parse(JSON.stringify(Object.fromEntries(Object.entries(base).reverse()))) as PlanRules;
     expect((await approveRules(reordered)).hash).toBe(a.hash);

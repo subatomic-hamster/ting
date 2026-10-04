@@ -1,10 +1,10 @@
-Lincoln DentalConnect High — Benefits Summary
+Acme Dental High — Benefits Summary
 Acme Corp · Group 00412345 · Plan year: calendar year (January 1 – December 31)
 For eligible employees and enrolled dependents. This summary describes your dental benefits.
 
 Enrollment Summary
 Your monthly premium: $48.00, deducted pre-tax from your paycheck.
-Network: Lincoln DentalConnect PPO. You may also see dentists outside the network (see §3).
+Network: Acme Dental PPO. You may also see dentists outside the network (see §3).
 
 Schedule of Benefits, §1  Annual Deductible
 Annual deductible: $50 per person per calendar year. Applies to Basic and Major services.
@@ -31,10 +31,10 @@ Orthodontic lifetime maximum: $1,500 per person.
 Plan Maximums, §4.2  Preventive Care
 Preventive care does not count toward the annual maximum (SmileRewards).
 
-Lincoln MaxRewards, §5  Rollover for Low-Use Years
+Max Rollover, §5  Rollover for Low-Use Years
 If your plan-paid claims for a calendar year total $1,000 or less, $500 rolls over to next year's maximum.
 If every claim that year was in network, an extra $150 is added to the rollover.
-Your MaxRewards rollover account can hold up to $2,000.
+Your Max Rollover rollover account can hold up to $2,000.
 Rollover amounts are deposited on day 65 of the following plan year.
 
 --- Page 2 ---
@@ -72,4 +72,4 @@ No alternate benefit: tooth-colored fillings on back teeth are paid at the compo
 Work in Progress, §9  Crowns and Bridges
 A crown or bridge is payable on the date of preparation, not the date it is seated.
 
-Demo document — not a real Lincoln Financial plan
+Demo document — not a real insurance plan

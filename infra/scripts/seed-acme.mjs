@@ -19,7 +19,7 @@ const EMPLOYEES = [
   { email: 'jordan@acme.example', employeeId: 'E1002', role: 'member', name: 'Jordan (member)' },
   { email: 'priya@acme.example', employeeId: 'E1003', role: 'member', name: 'Priya (member)' },
   { email: 'benefits@acme.example', employeeId: 'E2001', role: 'employer_admin', name: 'Acme benefits admin' },
-  { email: 'analyst@lincoln.example', employeeId: 'L0001', role: 'lincoln_analyst', name: 'Lincoln plan analyst' },
+  { email: 'analyst@lincoln.example', employeeId: 'L0001', role: 'lincoln_analyst', name: 'Plan analyst' },
 ];
 
 // Meets Cognito's default policy: upper, lower, digit, symbol, 8+.

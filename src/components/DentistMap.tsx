@@ -34,7 +34,7 @@ export function DentistMap() {
     L.circleMarker([MAP_CENTER.lat, MAP_CENTER.lng], { radius: 5, color: '#0f172a', fillOpacity: 1 }).bindTooltip(`You (${MAP_CENTER.label})`).addTo(group);
     for (const d of DENTISTS) {
       const q = quotes.get(d.id);
-      const color = d.inNetwork ? '#0f766e' : '#b45309';
+      const color = d.inNetwork ? '#ad1f2d' : '#b45309';
       L.circleMarker([d.lat, d.lng], { radius: 9, color, weight: 2, fillColor: color, fillOpacity: 0.35 })
         .bindPopup(
           `<strong>${esc(d.name)}</strong><br>${d.inNetwork ? 'In network' : 'Out of network'} · ${d.distanceMiles} mi` +
@@ -50,7 +50,7 @@ export function DentistMap() {
       <div ref={el} className="aspect-square w-full overflow-hidden rounded-xl border border-line" role="region" aria-label="Map of nearby dentists" />
       <p className="mt-2 flex gap-3 text-xs text-muted">
         <span className="inline-flex items-center gap-1">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#0f766e]" aria-hidden /> In network
+          <span className="h-2.5 w-2.5 rounded-full bg-[#ad1f2d]" aria-hidden /> In network
         </span>
         <span className="inline-flex items-center gap-1">
           <span className="h-2.5 w-2.5 rounded-full bg-[#b45309]" aria-hidden /> Out of network

@@ -43,7 +43,7 @@ export function ForwardingCard() {
   return (
     <Section id="forwarding" title="Your forwarding address" actions={<DemoDataPill label="Simulated mail" />}>
       <p className="text-sm text-muted">
-        For bills and receipts Lincoln can&rsquo;t see. Forward an email, or set a filter in your own mail app. Ting never reads your inbox.
+        For bills and receipts your insurer can&rsquo;t see. Forward an email, or set a filter in your own mail app. Ting never reads your inbox.
       </p>
       {inbox.data && (
         <p className="mt-2 font-mono text-sm">

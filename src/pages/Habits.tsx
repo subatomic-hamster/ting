@@ -50,7 +50,7 @@ export default function Habits() {
         </Section>
       </div>
 
-      <Section className="min-w-0" title="Who benefits from this data" id="value" eyebrow="You · your dentist · Lincoln">
+      <Section className="min-w-0" title="Who benefits from this data" id="value" eyebrow="You · your dentist · your insurer">
         <ValueMap rewards={rewards} streak={streak} dentist={dentist} optedIn={consent.optedIn} sharedWithDentist={consent.shareWithDentist} />
       </Section>
 
