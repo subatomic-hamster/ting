@@ -1,3 +1,4 @@
+import { PLAN_BASIS } from "../data/demo";
 import { serviceCoverage } from "../engine/coverage";
 import type { PlanRules } from "../engine/types";
 import { formatMoney, formatPercent } from "../lib/format";
@@ -87,6 +88,7 @@ export function PlanCoverage({
   return (
     <Section title={title}>
       <p className="text-lg font-medium">{rules.name}</p>
+      {PLAN_BASIS[rules.id] && <p className="mt-1 text-xs text-muted">{PLAN_BASIS[rules.id]}</p>}
       <dl className="mt-5 rounded-lg bg-paper px-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:bg-transparent sm:px-0">
         {[
           ["Monthly premium", rules.premiumMonthly],
