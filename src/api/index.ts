@@ -40,6 +40,8 @@ export interface ReadDocument {
   invoice?: Invoice;
   /** The same file was uploaded before (content hash); it's never counted twice. */
   duplicate?: boolean;
+  /** Winnow use 5 (AWS only): what each bill line is; only covered procedures count toward the plan. */
+  lineChecks?: { text: string; amount: number; category: string; p: number; ask: boolean }[];
   /** Winnow's read of the file (AWS only): document type and whether it tries to instruct an AI. */
   triage?: DocumentTriage;
 }
@@ -54,7 +56,21 @@ export interface DocumentTriage {
   source: 'winnow' | 'simulated';
 }
 
-export type CompiledPlan = CompileResult & { triage?: DocumentTriage; modelFilled?: string[] };
+export type CompiledPlan = CompileResult & {
+  triage?: DocumentTriage;
+  modelFilled?: string[];
+  /** Winnow use 4: an independent reading of each compiled rule; `review` when it's under 0.7. */
+  secondReader?: { field: string; statement: string; p: number; review: boolean }[];
+};
+
+export interface AskResult {
+  intent: 'engine_question' | 'plan_lookup' | 'explanation' | 'medical_advice' | 'out_of_scope';
+  p?: number;
+  /** Set when the backend answered (redirects, refusals, model explanations). Otherwise the app's engine answers. */
+  answer?: string;
+  answerBy?: 'engine' | 'model';
+  source?: 'winnow' | 'simulated';
+}
 
 /** What a dentist handoff link shows: a frozen copy of the member's plan at the moment they shared it. */
 export interface ShareSnapshot {
@@ -122,6 +138,8 @@ export interface TingApi {
   submitRules(rules: PlanRules, evidence: CompileResult['evidence'], source: string): Promise<{ id: string; status: 'pending' }>;
   pendingRules(): Promise<{ id: string; rules: PlanRules; evidence: CompileResult['evidence']; source: string; submittedAt: string }[]>;
   approveSubmittedRules(id: string): Promise<{ rules: PlanRules; hash: string }>;
+  /** Winnow use 8: routes a typed question; `facts` (engine numbers) is all a model may use for explanations. */
+  ask(question: string, facts: string): Promise<AskResult>;
   /** F7: a factual message to Lincoln about an EOB that differs from the estimate. */
   draftAppeal(discrepancy: EobDiscrepancy, plan: Pick<PlanRules, 'name' | 'sections'>): Promise<{ text: string; source: 'model' | 'template' }>;
   /** A signed, expiring link for the dentist. The snapshot is what the link shows on any device. */
@@ -209,7 +227,7 @@ function traced(impl: TingApi): TingApi {
 }
 
 /** The engine runs in the browser, so when the network drops the live API falls back to the in-browser one. */
-const LOCAL_WHEN_OFFLINE = new Set<keyof TingApi>(['getSession', 'getPlans', 'getLedger', 'parseDescription', 'readDocument', 'compilePlan', 'explain', 'getDigest', 'matchInvoice', 'draftAppeal']);
+const LOCAL_WHEN_OFFLINE = new Set<keyof TingApi>(['getSession', 'getPlans', 'getLedger', 'parseDescription', 'readDocument', 'compilePlan', 'explain', 'getDigest', 'matchInvoice', 'draftAppeal', 'ask']);
 const offline = (err: unknown) =>
   (typeof navigator !== 'undefined' && !navigator.onLine) || err instanceof TypeError || (err instanceof DOMException && err.name === 'TimeoutError');
 

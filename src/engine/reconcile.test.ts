@@ -11,7 +11,13 @@ Amount due                         $412.00`;
 
 describe('parseInvoice', () => {
   it('reads the amount due, date and codes', () =>
-    expect(parseInvoice(INVOICE)).toEqual({ provider: 'Greensboro Family Dental', serviceDate: '2026-10-03', amountDue: 412, codes: ['D3330'] }));
+    expect(parseInvoice(INVOICE)).toEqual({
+      provider: 'Greensboro Family Dental',
+      serviceDate: '2026-10-03',
+      amountDue: 412,
+      codes: ['D3330'],
+      lines: [{ text: 'D3330  Root canal - molar  #19   $1,180.00', amount: 1180 }],
+    }));
 });
 
 describe('matching and the overbilling check', () => {
@@ -27,6 +33,10 @@ describe('matching and the overbilling check', () => {
     expect(flag?.message).toBe(
       "Your bill asks for $412, but Lincoln's EOB says you owe $200. In-network dentists agree to accept Lincoln's allowed fee. Ask the office for a corrected bill.",
     );
+  });
+  it('leaves out charges the plan never covers', () => {
+    expect(overbilling({ ...inv, amountDue: 250 }, claims[0], 50)).toBeUndefined();
+    expect(overbilling(inv, claims[0], 50)?.over).toBe(162);
   });
   it('does not flag out-of-network bills or bills at the EOB amount', () => {
     expect(overbilling({ ...inv, amountDue: 200 }, claims[0])).toBeUndefined();

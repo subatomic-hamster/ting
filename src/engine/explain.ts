@@ -12,6 +12,8 @@ export interface ExplainedStep {
   section?: string;
   /** AWS only: Automated Reasoning's verdict on the engine's plan-pays amount, proved against the plan document. */
   reasoning?: { verdict: string; claim: string; premises: string };
+  /** AWS only: Winnow's plain-language gate; 'rewritten' when the sentence was reworded for clarity. */
+  clarity?: 'plain' | 'rewritten';
 }
 
 export interface Explainer {

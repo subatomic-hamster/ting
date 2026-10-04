@@ -70,7 +70,7 @@ export function ForwardingCard() {
         {forward.isPending ? 'Sending…' : 'Demo: the dentist emails a bill'}
       </button>
       {note && <p className="mt-2 text-sm text-muted">{note}</p>}
-      {doc?.kind === 'invoice' && doc.invoice && <InvoiceCheck invoice={doc.invoice} />}
+      {doc?.kind === 'invoice' && doc.invoice && <InvoiceCheck invoice={doc.invoice} lineChecks={doc.lineChecks} />}
     </Section>
   );
 }

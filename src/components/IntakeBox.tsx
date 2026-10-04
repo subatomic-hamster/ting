@@ -43,7 +43,8 @@ export function IntakeBox() {
 
   const review = (found: IntakeItem[], message: string) => {
     setItems(found);
-    setExtra(Object.fromEntries(found.map((i) => [i.id, { deadline: '', maybe: false, likelihood: 0.5 }])));
+    // A "maybe" read from the dentist's own wording (Winnow use 6) starts the slider there; the member can change it.
+    setExtra(Object.fromEntries(found.map((i) => [i.id, { deadline: '', maybe: i.likelihood !== undefined, likelihood: i.likelihood ?? 0.5 }])));
     setNote(found.length ? message : "We couldn't spot a procedure. Try words like crown, filling or cleaning.");
   };
 
@@ -209,7 +210,7 @@ export function IntakeBox() {
         )}
       </p>
 
-      {doc?.kind === 'invoice' && doc.invoice && <InvoiceCheck invoice={doc.invoice} />}
+      {doc?.kind === 'invoice' && doc.invoice && <InvoiceCheck invoice={doc.invoice} lineChecks={doc.lineChecks} />}
 
       {doc?.text && (
         <details className="mt-1 text-xs text-muted">
@@ -290,6 +291,7 @@ export function IntakeBox() {
                       onChange={(ev) => set({ likelihood: Number(ev.target.value) / 100 })}
                     />
                   )}
+                  {e?.maybe && i.likelihoodFrom === 'notes' && <span className="text-[11px] text-muted">from your dentist&rsquo;s notes</span>}
                 </li>
               );
             })}

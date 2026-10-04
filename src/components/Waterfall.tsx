@@ -78,6 +78,7 @@ export function Waterfall({ line, rules, name }: { line: AdjudicatedLine; rules:
                   <span className="tabular">Running total {formatMoney(s.running)}</span>
                   <VerifiedBadge state={verification} />
                   {proof && <ProofBadge verdict={proof.verdict} claim={proof.claim} />}
+                  {step?.clarity === 'rewritten' && <span className="text-[10px] text-muted">reworded for clarity</span>}
                   {s.section && (
                     <span>
                       Plan rule: <cite className="not-italic text-ink">{s.section}</cite>

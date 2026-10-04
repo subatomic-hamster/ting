@@ -4,6 +4,7 @@ import { DetectDocumentTextCommand, TextractClient } from '@aws-sdk/client-textr
 import { classifyDocument } from '../../src/intake/classify';
 import { triageDocument } from './ai/winnow';
 import { makeDecide } from './ai/winnowDecide';
+import { enrichDocument } from './ai/winnowUses';
 import { rowsToText } from './lib/layout';
 
 const s3 = new S3Client({});
@@ -36,7 +37,7 @@ export async function handler(event: ReadInput | ScreenInput) {
     // The S3 ETag of a single-part upload is its content hash: the same file uploaded twice is caught.
     return { key: event.key, contentType: event.contentType, text, hash: (head.ETag ?? '').replace(/"/g, '') };
   }
-  const doc = classifyDocument(event.text, event.contentType.startsWith('image/'));
+  const doc = await enrichDocument(classifyDocument(event.text, event.contentType.startsWith('image/')), decide);
   let triage;
   try {
     triage = await triageDocument(event.text, decide);

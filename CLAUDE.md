@@ -19,6 +19,8 @@ npm run build        # tsc -b && vite build into dist/
 # AWS (from infra/, with AWS_PROFILE=ting-aws AWS_REGION=us-west-2)
 npm ci               # infra has its own package.json (CDK)
 npm run deploy       # builds the web app, then cdk deploy; writes infra/outputs.json
+npm run e2e         # (repo root) Playwright on the live site: desktop Chrome + iPhone WebKit; needs AWS_PROFILE for test tokens
+node scripts/seed-e2e.mjs    # test users for e2e (admin-API sign-in only); credentials in infra/e2e-users.local.json (gitignored)
 node smoke.mjs       # prod smoke test (23 checks): every route, Bedrock, Textract, reasoning, Winnow, claims, reminders, inbox
 node eval.mjs        # intake accuracy on evals/intake.json against the live API → docs/accuracy.md
 node scripts/ar-policy.mjs   # one-time: build the Automated Reasoning policy + guardrail → infra/ar.json (committed)
@@ -64,10 +66,16 @@ Stack: React 18, Vite, Tailwind 4, Zustand, React Query and zod.
     - **How prod reaches it:** the Lambdas put requests on the `WinnowRequests` SQS queue. `scripts/winnow-worker.mjs` long-polls the queue, asks the local server, and writes answers to DynamoDB (`WINNOW#<id>`). A heartbeat item (`WINNOW/HEARTBEAT`) tells the Lambdas whether the worker is up.
     - **Why a queue:** the venue network blocks Cloudflare tunnels (port 7844), so the Mac connects out to AWS instead. Nothing on the Mac is exposed.
     - **Fallback:** with no fresh heartbeat, or on any error, it uses the Claude simulation, labelled `simulated`. `-c winnowUrl/-c winnowKey` points at a directly reachable server instead.
-    - **Uses:**
-      - intake code and replacement probabilities, blended with the parser's prior (`blend`);
-      - document triage, plus an injection check that quarantines text before Claude sees it;
-      - invoice-to-EOB matching.
+    - **Uses** (all nine from the spec). The rules that act on the answers are in `src/engine/decisions.ts`; the questions are in `backend/src/ai/winnowUses.ts`:
+      1. intake code and replacement probabilities, blended with the parser's prior (`blend`);
+      2. document triage, plus an injection check that quarantines text before Claude sees it;
+      3. invoice-to-EOB matching;
+      4. the plan compiler's second reader (rules under 0.7 go to review);
+      5. invoice line items (non-covered charges are left out of the overbilling check);
+      6. the dentist's wording sets where the "maybe" slider starts;
+      7. the notification ranker (push "act this week" at 0.6+, at most 2 a week);
+      8. the `/ask` router and safety gate (medical advice at 0.3+ goes to the dentist; plan and cost questions are answered by `src/engine/answer.ts`);
+      9. the plain-language gate on explanations.
     - **Calibration:** `/calibration`.
   - **Sign-in:** Cognito federated over OIDC to a mock "Acme Corp" pool.
     - `pretoken.ts` maps the employee to a member and group via `lib/identity.ts`.

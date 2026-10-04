@@ -25,6 +25,9 @@ import { appealAmounts, appealDraft, type EobDiscrepancy } from '../../src/engin
 import { isRec } from './ai/model';
 import { triageDocument, type Triage } from './ai/winnow';
 import { makeDecide } from './ai/winnowDecide';
+import { clarity, enrichDocument, readNotes, routeQuestion, secondReader } from './ai/winnowUses';
+import { needsRewrite } from '../../src/engine/decisions';
+import { dollarsIn } from '../../src/engine/explain';
 import { workerAlive } from './lib/winnowQueue';
 import { callBedrock } from './lib/bedrock';
 import { AuthError, callerOf, type Caller } from './lib/auth';
@@ -110,10 +113,23 @@ function trustedOrigin(origin: unknown): string {
   return WEB_ORIGIN;
 }
 
+/** Winnow use 9 on a set of sentences: the confusing ones are reworded once (amounts checked), the rest kept. */
+async function plainLanguage(sentences: string[]) {
+  const { scores } = await clarity(sentences, decide);
+  return Promise.all(
+    sentences.map(async (text, i) => {
+      if (!needsRewrite(scores[i])) return { text, clarity: 'plain' as const };
+      const r = await polish(text, dollarsIn(text), callBedrock, 'sentence for a patient with no insurance knowledge; use everyday words and no jargon');
+      return { text: r.text, clarity: r.source === 'model' ? ('rewritten' as const) : ('plain' as const) };
+    }),
+  );
+}
+
 /** Accepted mail: only the text is kept long enough to classify and screen it. */
 async function readMailText(mail: InboundEmail) {
   const text = `${mail.subject}\n${mail.text}`.slice(0, 60_000);
-  return { docId: `mail-${randomUUID().slice(0, 8)}`, text, ...classifyDocument(text, false), triage: await safeTriage(text) };
+  const doc = await enrichDocument(classifyDocument(text, false), decide);
+  return { docId: `mail-${randomUUID().slice(0, 8)}`, text, ...doc, triage: await safeTriage(text) };
 }
 
 async function readUpload(key: string, contentType: string) {
@@ -127,7 +143,8 @@ async function readUpload(key: string, contentType: string) {
         return { text: b.Text ?? '', top: box?.Top ?? 0, left: box?.Left ?? 0, height: box?.Height ?? 0 };
       }),
   );
-  return { docId: key, text, ...classifyDocument(text, contentType.startsWith('image/')), triage: await safeTriage(text) };
+  const doc = await enrichDocument(classifyDocument(text, contentType.startsWith('image/')), decide);
+  return { docId: key, text, ...doc, triage: await safeTriage(text) };
 }
 
 type Route = (event: APIGatewayProxyEventV2) => Promise<APIGatewayProxyResultV2>;
@@ -196,7 +213,8 @@ const routes: Record<string, Route> = {
     const text = str(bodyOf(e).text, 'text', 2000);
     const items = await describeWithModel(text, callBedrock);
     try {
-      return json(200, await withWinnow(text, items, decide));
+      // Winnow use 1 (field probabilities) and use 6 (the dentist's own wording on "maybe" items).
+      return json(200, await readNotes(await withWinnow(text, items, decide), decide));
     } catch (err) {
       console.warn('intake: Winnow step failed, keeping the parser probabilities', err);
       return json(200, items);
@@ -215,7 +233,8 @@ const routes: Record<string, Route> = {
 
   'POST /documents/text': async (e) => {
     const text = str(bodyOf(e).text, 'text', 60_000);
-    return json(200, { docId: `text-${randomUUID().slice(0, 8)}`, text, ...classifyDocument(text, false), triage: await safeTriage(text) });
+    const doc = await enrichDocument(classifyDocument(text, false), decide);
+    return json(200, { docId: `text-${randomUUID().slice(0, 8)}`, text, ...doc, triage: await safeTriage(text) });
   },
 
   // Winnow use 3: which EOB is this invoice for? The thresholds (0.9 link / 0.5 confirm) live in the engine.
@@ -305,7 +324,13 @@ const routes: Record<string, Route> = {
     const text = str(bodyOf(e).text, 'text', 120_000);
     const triage = await safeTriage(text);
     if (triage?.quarantined) return json(200, { ...compilePlanText(text), modelFilled: [], triage });
-    return json(200, { ...(await compileWithModel(text, callBedrock)), triage });
+    const compiled = await compileWithModel(text, callBedrock);
+    // Winnow use 4: an independent reading of each compiled rule; anything under 0.7 goes to human review.
+    const reader = await secondReader(text, compiled.draft, Object.keys(compiled.evidence), decide).catch((err: unknown) => {
+      console.warn('second reader skipped', err);
+      return undefined;
+    });
+    return json(200, { ...compiled, triage, secondReader: reader?.checks, secondReaderSource: reader?.source });
   },
 
   'GET /winnow/status': async () =>
@@ -322,7 +347,13 @@ const routes: Record<string, Route> = {
         return undefined;
       }),
     ]);
-    return json(200, reasoning ? steps.map((s) => (s.key === 'coinsurance' ? { ...s, reasoning } : s)) : steps);
+    // Winnow use 9: a sentence scored as confusing gets one plainer rewrite, with every amount kept.
+    const plain = await plainLanguage(steps.map((s) => s.text)).catch((err: unknown) => {
+      console.warn('plain-language gate skipped', err);
+      return undefined;
+    });
+    const out = steps.map((s, i) => ({ ...s, text: plain?.[i]?.text ?? s.text, clarity: plain?.[i]?.clarity }));
+    return json(200, reasoning ? out.map((s) => (s.key === 'coinsurance' ? { ...s, reasoning } : s)) : out);
   },
 
   // Demo control standing in for Lincoln's claims platform: validate, then publish to the claims bus.
@@ -362,7 +393,33 @@ const routes: Record<string, Route> = {
   },
 
   // Demo control: send the reminders due on the demo's "as of" date, the way the daily rule does.
-  'POST /demo/reminders/run': async (e) => json(200, { delivered: await deliverDue(context(e).asOf) }),
+  'POST /demo/reminders/run': async (e) => json(200, { delivered: await deliverDue(context(e).asOf, decide) }),
+
+  // Winnow use 8: route a typed question. Engine and plan questions are answered by tested code in the app;
+  // medical questions go to the dentist; explanations get a model answer built only from the facts sent.
+  'POST /ask': async (e) => {
+    const body = bodyOf(e);
+    const question = str(body.question, 'question', 1000);
+    const r = await routeQuestion(question, decide);
+    if (r.intent === 'medical_advice')
+      return json(200, { ...r, answer: "That's a question for your dentist. Ting helps with costs and timing, not with what treatment you need." });
+    if (r.intent === 'out_of_scope') return json(200, { ...r, answer: 'Ting can answer questions about your dental plan, your costs and when to schedule work.' });
+    if (!r.viaModel) return json(200, { ...r, answerBy: 'engine' });
+    const facts = String(body.facts ?? '').slice(0, 6000);
+    const allowed = dollarsIn(facts);
+    const draft = await callBedrock({
+      model: 'fast',
+      system:
+        'Answer the dental-benefits question in at most three plain sentences, using only the facts given. Use only dollar amounts that appear in the facts, exactly as written. If the facts do not answer it, say so. No medical advice.',
+      prompt: `Facts:\n${facts}\n\nQuestion: ${question}`,
+      tool: { name: 'answer', description: 'The answer.', schema: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'] } },
+      maxTokens: 400,
+    }).catch(() => undefined);
+    const text = isRec(draft) && typeof draft.text === 'string' ? draft.text : '';
+    const cents = new Set(allowed.map((n) => Math.round(n * 100)));
+    const ok = text && dollarsIn(text).every((n) => cents.has(Math.round(n * 100)));
+    return json(200, ok ? { ...r, answer: text, answerBy: 'model' } : { ...r, answerBy: 'engine' });
+  },
 
   // F7: the engine drafts the message from the EOB and the estimate; the model may only reword it.
   'POST /eob/appeal': async (e) => {

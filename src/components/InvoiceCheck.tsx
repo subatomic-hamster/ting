@@ -1,12 +1,23 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { api } from '../api';
+import { api, type ReadDocument } from '../api';
 import { claimsFromLedger, decideMatch, overbilling, type Invoice } from '../engine/reconcile';
 import { formatDate, formatMoney } from '../lib/format';
 import { useAppStore } from '../store';
 
 /** A dentist's bill, matched to Lincoln's EOB for the same visit, then checked against what the EOB says you owe. */
-export function InvoiceCheck({ invoice }: { invoice: Invoice }) {
+const CATEGORY: Record<string, string> = {
+  covered: 'dental procedure',
+  missed_appointment: 'missed-appointment fee',
+  cosmetic: 'cosmetic',
+  finance_charge: 'finance charge',
+  other: 'other charge',
+};
+
+export function InvoiceCheck({ invoice, lineChecks = [] }: { invoice: Invoice; lineChecks?: ReadDocument['lineChecks'] }) {
+  // Winnow use 5: charges the plan never covers (confidently classified) are left out of the EOB comparison.
+  const notCovered = (lineChecks ?? []).filter((l) => l.category !== 'covered' && !l.ask).reduce((s, l) => s + l.amount, 0);
+  const odd = (lineChecks ?? []).filter((l) => l.category !== 'covered' || l.ask);
   const history = useAppStore((s) => s.profile.ledger.history);
   const claims = claimsFromLedger(history);
   const [confirmed, setConfirmed] = useState<boolean | null>(null);
@@ -18,7 +29,7 @@ export function InvoiceCheck({ invoice }: { invoice: Invoice }) {
   const decision = match.data ? decideMatch(match.data.probs) : undefined;
   const claim = decision && decision.kind !== 'unlinked' ? claims.find((c) => c.claimId === decision.claimId) : undefined;
   const linked = claim && (decision?.kind === 'linked' || confirmed === true);
-  const flag = linked ? overbilling(invoice, claim) : undefined;
+  const flag = linked ? overbilling(invoice, claim, notCovered) : undefined;
 
   return (
     <div className="mt-2 rounded-xl border border-line bg-white p-3 text-sm">
@@ -26,6 +37,16 @@ export function InvoiceCheck({ invoice }: { invoice: Invoice }) {
         Dentist&rsquo;s bill{invoice.serviceDate ? ` for ${formatDate(invoice.serviceDate, { year: true })}` : ''}
         {invoice.amountDue !== undefined && <> · asks for {formatMoney(invoice.amountDue)}</>}
       </p>
+      {odd.length > 0 && (
+        <ul className="mt-1 space-y-0.5 text-xs text-muted">
+          {odd.map((l) => (
+            <li key={l.text}>
+              {l.ask ? 'Not sure what this line is: ' : `Not covered by insurance (${CATEGORY[l.category] ?? l.category}): `}
+              <span className="text-ink">{l.text}</span>
+            </li>
+          ))}
+        </ul>
+      )}
       {!match.data || !decision ? (
         <p className="mt-1 text-muted">Matching it to your Lincoln claims…</p>
       ) : decision.kind === 'unlinked' || !claim ? (

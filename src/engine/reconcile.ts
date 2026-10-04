@@ -11,6 +11,8 @@ export interface Invoice {
   /** What the invoice asks the patient to pay. */
   amountDue?: number;
   codes: string[];
+  /** Charge lines (not totals, payments or adjustments), for the line-item check. */
+  lines: { text: string; amount: number }[];
 }
 
 export interface ClaimRecord {
@@ -34,7 +36,11 @@ export function parseInvoice(text: string): Invoice {
   const m = /(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(dateLine) ?? /(\d{4})-(\d{2})-(\d{2})/.exec(dateLine);
   const serviceDate = !m ? undefined : m[3].length === 4 ? `${m[3]}-${m[1].padStart(2, '0')}-${m[2].padStart(2, '0')}` : `${m[1]}-${m[2]}-${m[3]}`;
   const codes = [...new Set([...text.matchAll(/\bD\d{4}\b/g)].map((x) => x[0]))];
-  return { provider: lines[0], serviceDate, amountDue, codes };
+  const charges = lines
+    .filter((l) => !DUE.test(l) && !/insurance|adjustment|payment|paid|total|balance|credit/i.test(l) && /\$\s*\d/.test(l) && !/-\s*\$/.test(l))
+    .map((l) => ({ text: l, amount: Number((/\$\s*([\d,]+(?:\.\d{2})?)\s*$/.exec(l) ?? /\$\s*([\d,]+(?:\.\d{2})?)/.exec(l))?.[1].replace(/,/g, '')) }))
+    .filter((c) => Number.isFinite(c.amount) && c.amount > 0);
+  return { provider: lines[0], serviceDate, amountDue, codes, lines: charges };
 }
 
 export const isInvoiceText = (text: string) => /\binvoice\b|\bstatement\b|amount due|balance due/i.test(text) && !/explanation of benefits/i.test(text);
@@ -77,12 +83,17 @@ export function decideMatch(probs: Record<string, number>): MatchDecision {
   return { kind: p >= 0.9 ? 'linked' : 'confirm', claimId, p };
 }
 
-/** The consumer-protection check: an in-network bill above the EOB's member-owes amount. */
-export function overbilling(inv: Invoice, claim: ClaimRecord): { over: number; message: string } | undefined {
-  if (!claim.inNetwork || inv.amountDue === undefined || inv.amountDue <= claim.memberOwes + 0.5) return undefined;
-  const over = Math.round((inv.amountDue - claim.memberOwes) * 100) / 100;
+/**
+ * The consumer-protection check: an in-network bill above the EOB's member-owes amount. `notCovered` is what the bill
+ * legitimately charges outside the plan (a missed-appointment fee, whitening), found by the line-item check.
+ */
+export function overbilling(inv: Invoice, claim: ClaimRecord, notCovered = 0): { over: number; message: string } | undefined {
+  if (!claim.inNetwork || inv.amountDue === undefined || inv.amountDue - notCovered <= claim.memberOwes + 0.5) return undefined;
+  const over = Math.round((inv.amountDue - notCovered - claim.memberOwes) * 100) / 100;
   return {
     over,
-    message: `Your bill asks for ${usd(inv.amountDue)}, but Lincoln's EOB says you owe ${usd(claim.memberOwes)}. In-network dentists agree to accept Lincoln's allowed fee. Ask the office for a corrected bill.`,
+    message: notCovered
+      ? `Your bill asks for ${usd(inv.amountDue)}. Leaving out ${usd(notCovered)} the plan doesn't cover, that's ${usd(inv.amountDue - notCovered)}, but Lincoln's EOB says you owe ${usd(claim.memberOwes)}. In-network dentists agree to accept Lincoln's allowed fee. Ask the office for a corrected bill.`
+      : `Your bill asks for ${usd(inv.amountDue)}, but Lincoln's EOB says you owe ${usd(claim.memberOwes)}. In-network dentists agree to accept Lincoln's allowed fee. Ask the office for a corrected bill.`,
   };
 }

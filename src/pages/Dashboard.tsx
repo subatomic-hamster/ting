@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ActivityFeed } from '../components/ActivityFeed';
+import { AskTing } from '../components/AskTing';
 import { ForwardingCard } from '../components/ForwardingCard';
 import { DeductibleBar } from '../components/DeductibleBar';
 import { DemoDataPill } from '../components/DemoDataPill';
@@ -72,6 +73,10 @@ export default function Dashboard() {
             Opt in to share smart-brush data and earn up to {formatMoney(smile.rewards.cap)} a year. Your cleanings already count. Rewards only.
           </p>
         )}
+      </Section>
+
+      <Section title="Ask about your plan" id="ask">
+        <AskTing />
       </Section>
 
       <Section title="Treatment timeline" id="timeline" actions={<Link to="/treatment" className="btn-ghost">Details</Link>}>

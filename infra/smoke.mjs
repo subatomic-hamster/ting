@@ -313,6 +313,21 @@ await check('web: offline service worker and map assets are served', async () =>
   return 'sw.js served';
 });
 
+await check('Winnow uses 4, 5, 8: second reader, bill lines, question router', async () => {
+  const text = readFileSync(new URL('../public/samples/acme-benefits-summary.txt', import.meta.url), 'utf8');
+  const c = await call('/rules/compile', { text });
+  assert(c.secondReader?.length > 10, `second reader checked ${c.secondReader?.length}`);
+  const d = await call('/documents/text', {
+    text: 'Greensboro Family Dental\nStatement / Invoice\nDate of service: 10/03/2026\nD3330 Root canal $1,180.00\nMissed appointment fee $50.00\nInsurance adjustment -$768.00\nAmount due $462.00',
+  });
+  const missed = d.lineChecks?.find((l) => /Missed/.test(l.text));
+  assert(missed?.category === 'missed_appointment', JSON.stringify(d.lineChecks));
+  const med = await call('/ask', { question: 'my gum is bleeding, is that serious?', facts: '' });
+  const plan = await call('/ask', { question: "what's my deductible?", facts: '' });
+  assert(med.intent === 'medical_advice' && plan.intent === 'plan_lookup' && plan.answerBy === 'engine', `${med.intent} / ${plan.intent}`);
+  return `${c.secondReader.filter((x) => x.review).length}/${c.secondReader.length} rules flagged; missed-appointment fee found; router ok (${med.source})`;
+});
+
 await check('rejects a malformed claim', async () => {
   try {
     await call('/mock/claims', { type: 'claim.adjudicated', member: 'x' });

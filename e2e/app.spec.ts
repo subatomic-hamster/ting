@@ -158,3 +158,24 @@ test('judge QR page and calibration chart render', async ({ page }) => {
   await page.goto('/calibration');
   await expect(page.getByText(/labelled examples/)).toBeVisible();
 });
+
+test('Ask Ting: plan questions answered by the engine, symptoms routed to the dentist', async ({ page }) => {
+  await page.goto('/');
+  const box = page.getByRole('textbox', { name: 'Ask about your plan' });
+  await box.fill("What's my deductible?");
+  await page.getByRole('button', { name: 'Ask', exact: true }).click();
+  await expect(page.getByText(/deductible is \$50/)).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByText(/Answered by the engine/)).toBeVisible();
+  await box.fill('My tooth really hurts, do I need a root canal?');
+  await page.getByRole('button', { name: 'Ask', exact: true }).click();
+  await expect(page.getByText(/question for your dentist/)).toBeVisible({ timeout: 30_000 });
+});
+
+test("a 'maybe' from the dentist's wording starts the likelihood slider", async ({ page }) => {
+  await page.goto('/treatment');
+  await page.getByPlaceholder(/Root canal on #19/).fill('my dentist said to watch tooth #3, it might need a filling eventually');
+  await page.getByRole('button', { name: 'Find procedures' }).click();
+  await expect(page.getByText(/from your dentist.s notes/)).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByLabel('Likelihood percent')).not.toHaveValue('50');
+});
+

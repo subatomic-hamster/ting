@@ -274,12 +274,13 @@ export class TingStack extends Stack {
     // Year-end reminders: a daily rule (EventBridge Scheduler isn't available in event accounts) sends the due ones.
     const remindersFn = fn('RemindersFn', 'reminders.ts', {
       timeout: Duration.seconds(60),
-      environment: { TABLE_NAME: table.tableName, WS_ENDPOINT: wsStage.callbackUrl, WEB_ORIGIN: webOrigin, REMINDER_EMAIL: reminderEmail, MODEL_FAST },
+      environment: { TABLE_NAME: table.tableName, WS_ENDPOINT: wsStage.callbackUrl, WEB_ORIGIN: webOrigin, REMINDER_EMAIL: reminderEmail, MODEL_FAST, ...winnowEnv },
     });
     table.grantReadWriteData(remindersFn);
     wsApi.grantManageConnections(remindersFn);
     const sesSend = new PolicyStatement({ actions: ['ses:SendEmail'], resources: ['*'] });
     remindersFn.addToRolePolicy(sesSend);
+    winnowQueue.grantSendMessages(remindersFn);
     // Digests are reworded by the fast model (amounts checked), same as the API's explanations.
     remindersFn.addToRolePolicy(
       new PolicyStatement({

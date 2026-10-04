@@ -19,6 +19,9 @@ export interface IntakeItem {
   confidence: number;
   /** Who set the probabilities: the built-in heuristics (default), Winnow, or Winnow's labelled simulation. */
   decidedBy?: 'winnow' | 'simulated';
+  /** A "maybe" item: how likely the work is this year, read from the dentist's own wording. */
+  likelihood?: number;
+  likelihoodFrom?: 'notes';
 }
 
 export interface IntakeQuestion {

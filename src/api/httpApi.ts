@@ -107,6 +107,7 @@ export const httpApi: TingApi = {
   submitRules: (rules, evidence, source) => http('/rules/submit', post({ rules, evidence, source })),
   pendingRules: () => http('/rules/pending'),
   approveSubmittedRules: (id) => http('/rules/approve', post({ id })),
+  ask: (question, facts) => http('/ask', post({ question, facts })),
   getInbox: () => http('/inbox'),
   simulateForward: (mail) => http('/mock/inbound-email', post(mail)),
   approveSender: (address, heldId) => http('/inbox/senders', post({ address, heldId })),

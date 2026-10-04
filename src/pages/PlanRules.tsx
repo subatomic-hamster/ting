@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { api } from '../api';
-import { applyAnswers, approveRules, finalizeRules, type Answer, type AnswerPath, type CompileResult } from '../compiler/compile';
+import { api, type CompiledPlan } from '../api';
+import { applyAnswers, approveRules, finalizeRules, type Answer, type AnswerPath } from '../compiler/compile';
 import { PageHeader, Section } from '../components/Section';
 import type { PlanRules as Rules, ServiceClass } from '../engine/types';
 import { parseInsuranceCard, plansForGroup } from '../intake/insuranceCard';
@@ -17,7 +17,7 @@ export default function PlanRules() {
   const currentPlan = useAppStore((s) => s.profile.currentPlan);
   const plans = useAppStore((s) => s.plans);
   const addPlan = useAppStore((s) => s.addPlan);
-  const [result, setResult] = useState<CompileResult>();
+  const [result, setResult] = useState<CompiledPlan>();
   const [answers, setAnswers] = useState<Partial<Record<AnswerPath, Answer>>>({});
   const [status, setStatus] = useState('');
   const [approved, setApproved] = useState<{ rules: Rules; hash: string }>();
@@ -154,6 +154,29 @@ export default function PlanRules() {
                 {final.errors.map((e) => (
                   <p key={e}>{e}</p>
                 ))}
+              </div>
+            )}
+            {result.secondReader && result.secondReader.length > 0 && (
+              <div
+                className={`rounded-xl border p-3 text-sm ${result.secondReader.some((c) => c.review) ? 'border-amber-200 bg-amber-50' : 'border-emerald-200 bg-emerald-50'}`}
+              >
+                {result.secondReader.some((c) => c.review) ? (
+                  <>
+                    <p className="font-medium">A second reading wasn&rsquo;t sure the document says:</p>
+                    <ul className="mt-1 list-disc pl-5">
+                      {result.secondReader
+                        .filter((c) => c.review)
+                        .map((c) => (
+                          <li key={c.field}>
+                            {c.statement} <span className="text-xs text-muted">({Math.round(c.p * 100)}%)</span>
+                          </li>
+                        ))}
+                    </ul>
+                    <p className="mt-1 text-xs text-muted">Check these against the document before approving.</p>
+                  </>
+                ) : (
+                  <p>A second, independent reading confirmed all {result.secondReader.length} rules it checked.</p>
+                )}
               </div>
             )}
             <details className="text-xs text-muted">

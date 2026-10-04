@@ -9,6 +9,7 @@ import { buildDigest } from '../engine/digest';
 import { appealDraft } from '../engine/eobAppeal';
 import { decideInbound, forwardingAddress } from '../engine/inbox';
 import { heuristicMatch } from '../engine/reconcile';
+import { localIntent } from '../engine/answer';
 import { optimize } from '../engine/schedule';
 import type { PlanRules } from '../engine/types';
 import { localExplainer } from '../engine/explain';
@@ -125,6 +126,14 @@ export const mockApi: TingApi = {
     if (i < 0) throw new Error('No such submission');
     const [p] = pending.splice(i, 1);
     return approveRules(p.rules);
+  },
+
+  async ask(question) {
+    await latency();
+    const intent = localIntent(question);
+    if (intent === 'medical_advice') return { intent, answer: "That's a question for your dentist. Ting helps with costs and timing, not with what treatment you need." };
+    if (intent === 'out_of_scope') return { intent, answer: 'Ting can answer questions about your dental plan, your costs and when to schedule work.' };
+    return { intent, answerBy: 'engine' };
   },
 
   async getInbox() {
