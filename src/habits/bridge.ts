@@ -17,7 +17,8 @@ export function connectBridge(handlers: {
   const source = new EventSource(`${BRIDGE_URL}/events`);
   source.onopen = () => handlers.onOpen();
   source.onerror = () =>
-    handlers.onError(`Can't reach the device bridge at ${BRIDGE_URL}. Start it with: python hardware/bridge/ting_bridge.py --oralb`);
+    // Members see this; how to start the bridge is in the demo panel and hardware/README.md.
+    handlers.onError("Can't find the Ting brush bridge on this computer. Make sure it's running, then connect again.");
   source.onmessage = (msg) => {
     try {
       handlers.onEvent(JSON.parse(msg.data) as BridgeEvent);
