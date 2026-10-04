@@ -66,6 +66,10 @@ export default function PlanRules() {
     if (final?.ok) setApproved(await approveRules(final.rules));
   };
 
+  const submit = useMutation({
+    mutationFn: () => (final?.ok && result ? api.submitRules(final.rules, result.evidence, status.replace(/^Read /, '').split('.')[0]) : Promise.reject(new Error('Not final'))),
+  });
+
   const use = (asCurrent: boolean) => {
     if (!approved) return;
     addPlan(approved.rules, asCurrent);
@@ -165,6 +169,9 @@ export default function PlanRules() {
             <div className="flex flex-wrap items-center gap-2">
               <button type="button" className="btn-primary" disabled={!final?.ok} onClick={() => void approve()}>
                 Approve these rules
+              </button>
+              <button type="button" className="btn-secondary" disabled={!final?.ok || submit.isPending} onClick={() => submit.mutate()}>
+                {submit.isSuccess ? 'Sent to Lincoln for review' : 'Send to Lincoln for review'}
               </button>
               {final && !final.ok && <span className="text-xs text-muted">{final.missing.length} answer(s) still needed.</span>}
             </div>

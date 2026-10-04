@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from './components/AppShell';
 import AuthCallback from './auth/AuthCallback';
 import Admin from './pages/Admin';
+import Analyst from './pages/Analyst';
 import Dashboard from './pages/Dashboard';
 import Dentists from './pages/Dentists';
 import Enroll from './pages/Enroll';
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="habits" element={<Habits />} />
         <Route path="program" element={<Program />} />
         <Route path="admin" element={<Admin />} />
+        <Route path="analyst" element={<Analyst />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

@@ -102,6 +102,9 @@ export const httpApi: TingApi = {
   fireMockClaim: async (profile, opts) => {
     await http('/mock/claims', post(mockClaimEvent(profile, PERSONAS[apiContext.personaId].memberId, opts?.underpay)));
   },
+  submitRules: (rules, evidence, source) => http('/rules/submit', post({ rules, evidence, source })),
+  pendingRules: () => http('/rules/pending'),
+  approveSubmittedRules: (id) => http('/rules/approve', post({ id })),
   getInbox: () => http('/inbox'),
   simulateForward: (mail) => http('/mock/inbound-email', post(mail)),
   approveSender: (address, heldId) => http('/inbox/senders', post({ address, heldId })),

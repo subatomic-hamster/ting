@@ -15,6 +15,8 @@ export interface Caller {
   group: Group;
   personaId?: PersonaId;
   email?: string;
+  /** When the user last actually signed in (epoch seconds), for step-up checks. */
+  authTime: number;
 }
 
 export class AuthError extends Error {}
@@ -38,5 +40,6 @@ export async function callerOf(event: APIGatewayProxyEventV2): Promise<Caller | 
     group,
     personaId: isPersonaId(persona) ? persona : undefined,
     email: typeof claims.email === 'string' ? claims.email : undefined,
+    authTime: Number(claims.auth_time ?? 0),
   };
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { DemoDataPill } from '../components/DemoDataPill';
 import { DentistList } from '../components/DentistList';
+import { DentistMap } from '../components/DentistMap';
 import { DENTISTS, FEE_ZIP } from '../hooks/useDentistQuotes';
 import { NetworkCompare } from '../components/NetworkCompare';
 import { PageHeader, Section } from '../components/Section';
@@ -38,15 +39,7 @@ export default function Dentists() {
           <DentistList pinnedId={keep ? mine?.id : undefined} />
         </Section>
         <Section title="Map" id="map" actions={<DemoDataPill />}>
-          <div
-            className="grid aspect-square place-items-center rounded-xl border border-dashed border-line bg-[repeating-linear-gradient(45deg,#f1f4f2_0_10px,#fff_10px_20px)] text-center text-sm text-muted"
-            role="img"
-            aria-label="Map placeholder"
-          >
-            Map coming soon
-            <br />
-            (no map SDK yet)
-          </div>
+          <DentistMap />
         </Section>
       </div>
     </div>

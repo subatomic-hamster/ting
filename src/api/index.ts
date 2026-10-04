@@ -118,6 +118,10 @@ export interface TingApi {
   /** Demo control standing in for SES inbound: an email arrives at the member's forwarding address. */
   simulateForward(mail: { from: string; subject: string; text: string }): Promise<{ status: 'accepted' | 'held' | 'rejected'; reason?: string; doc?: ReadDocument }>;
   approveSender(address: string, heldId?: string): Promise<{ senders: string[]; doc?: ReadDocument }>;
+  /** Plan rules review: submit compiled rules with their evidence; a Lincoln analyst approves them. */
+  submitRules(rules: PlanRules, evidence: CompileResult['evidence'], source: string): Promise<{ id: string; status: 'pending' }>;
+  pendingRules(): Promise<{ id: string; rules: PlanRules; evidence: CompileResult['evidence']; source: string; submittedAt: string }[]>;
+  approveSubmittedRules(id: string): Promise<{ rules: PlanRules; hash: string }>;
   /** F7: a factual message to Lincoln about an EOB that differs from the estimate. */
   draftAppeal(discrepancy: EobDiscrepancy, plan: Pick<PlanRules, 'name' | 'sections'>): Promise<{ text: string; source: 'model' | 'template' }>;
   /** A signed, expiring link for the dentist. The snapshot is what the link shows on any device. */
@@ -204,4 +208,28 @@ function traced(impl: TingApi): TingApi {
   return wrapped as unknown as TingApi;
 }
 
-export const api: TingApi = traced(USE_MOCKS ? mockApi : httpApi);
+/** The engine runs in the browser, so when the network drops the live API falls back to the in-browser one. */
+const LOCAL_WHEN_OFFLINE = new Set<keyof TingApi>(['getSession', 'getPlans', 'getLedger', 'parseDescription', 'readDocument', 'compilePlan', 'explain', 'getDigest', 'matchInvoice', 'draftAppeal']);
+const offline = (err: unknown) => (typeof navigator !== 'undefined' && !navigator.onLine) || err instanceof TypeError;
+
+function withOfflineFallback(live: TingApi, local: TingApi): TingApi {
+  const wrapped: Record<string, unknown> = {};
+  for (const [name, fn] of Object.entries(live) as [keyof TingApi, (...args: unknown[]) => unknown][]) {
+    if (!LOCAL_WHEN_OFFLINE.has(name)) {
+      wrapped[name] = fn;
+      continue;
+    }
+    wrapped[name] = async (...args: unknown[]) => {
+      try {
+        return await fn.apply(live, args);
+      } catch (err) {
+        if (!offline(err)) throw err;
+        emit(`api.${name} (offline)`, 'network unavailable; answered in the browser', 0);
+        return (local[name] as (...a: unknown[]) => unknown).apply(local, args);
+      }
+    };
+  }
+  return wrapped as unknown as TingApi;
+}
+
+export const api: TingApi = traced(USE_MOCKS ? mockApi : withOfflineFallback(httpApi, mockApi));

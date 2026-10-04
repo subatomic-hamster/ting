@@ -23,7 +23,7 @@ export default function AuthCallback() {
     completeSignIn(code, state)
       .then((claims) => {
         if (claims.persona && isPersonaId(claims.persona)) useAppStore.getState().loadPersona(claims.persona);
-        navigate(claims.groups.includes('employer_admin') ? '/admin' : '/', { replace: true });
+        navigate(claims.returnTo ?? (claims.groups.includes('employer_admin') ? '/admin' : claims.groups.includes('lincoln_analyst') ? '/analyst' : '/'), { replace: true });
       })
       .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)));
   }, [navigate]);

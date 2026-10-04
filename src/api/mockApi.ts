@@ -1,7 +1,7 @@
 // Mock backend: runs Ting's own intake, OCR and engine in the browser, with 300–800 ms of simulated latency.
 // The AWS backend runs the same code in Lambda; only the transport differs.
 
-import { localCompiler } from '../compiler/compile';
+import { approveRules, localCompiler, type CompileResult } from '../compiler/compile';
 import { DEMO_PLAN_OPTIONS } from '../data/demo';
 import admin from '../fixtures/admin.json';
 import { PERSONAS } from '../data/personas';
@@ -10,6 +10,7 @@ import { appealDraft } from '../engine/eobAppeal';
 import { decideInbound, forwardingAddress } from '../engine/inbox';
 import { heuristicMatch } from '../engine/reconcile';
 import { optimize } from '../engine/schedule';
+import type { PlanRules } from '../engine/types';
 import { localExplainer } from '../engine/explain';
 import { classifyDocument } from '../intake/classify';
 import { parseDescription } from '../intake/describe';
@@ -35,6 +36,7 @@ const ledgerListeners = new Set<(e: unknown) => void>();
 
 /** Shared snapshots, this browser only (the AWS backend keeps them in DynamoDB). */
 const shares = new Map<string, ShareSnapshot>();
+const pending: { id: string; rules: PlanRules; evidence: CompileResult['evidence']; source: string; submittedAt: string }[] = [];
 let prefs: NotificationPrefs = { cadence: 'monthly', detail: 'private' };
 const inbox: { senders: string[]; held: { id: string; from: string; subject: string; text: string; receivedAt: string }[] } = { senders: [], held: [] };
 
@@ -108,6 +110,22 @@ export const mockApi: TingApi = {
   },
 
   async resetDemo() {},
+
+  async submitRules(rules, evidence, source) {
+    await latency();
+    const id = uid();
+    pending.push({ id, rules, evidence, source, submittedAt: new Date().toISOString() });
+    return { id, status: 'pending' };
+  },
+  async pendingRules() {
+    return [...pending];
+  },
+  async approveSubmittedRules(id) {
+    const i = pending.findIndex((p) => p.id === id);
+    if (i < 0) throw new Error('No such submission');
+    const [p] = pending.splice(i, 1);
+    return approveRules(p.rules);
+  },
 
   async getInbox() {
     await latency();

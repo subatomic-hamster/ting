@@ -11,7 +11,11 @@ export interface Dentist {
   inNetwork: boolean;
   feeMultiplier: number;
   acceptingNew: boolean;
+  lat: number;
+  lng: number;
 }
+
+export const MAP_CENTER = dentistsJson.center;
 
 export const DENTISTS: Dentist[] = dentistsJson.dentists;
 export const FEE_ZIP = dentistsJson.zip;

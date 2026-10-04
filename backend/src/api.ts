@@ -5,13 +5,15 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { DetectDocumentTextCommand, TextractClient } from '@aws-sdk/client-textract';
 import { SFNClient, StartSyncExecutionCommand } from '@aws-sdk/client-sfn';
-import { DeleteCommand, GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
+import { DeleteCommand, GetCommand, PutCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
 import { DEMO_PLAN_OPTIONS } from '../../src/data/demo';
 import { isPersonaId, PERSONAS, type PersonaId } from '../../src/data/personas';
 import { claimEventSchema } from '../../src/engine/ledger';
 import type { AdjudicatedLine } from '../../src/engine/types';
-import { compilePlanText } from '../../src/compiler/compile';
+import { approveRules, compilePlanText } from '../../src/compiler/compile';
+import { planRulesSchema } from '../../src/compiler/schema';
+import type { PlanRules } from '../../src/engine/types';
 import { heuristicMatch, type ClaimRecord, type Invoice } from '../../src/engine/reconcile';
 import { classifyDocument } from '../../src/intake/classify';
 import { addDays, todayISO } from '../../src/lib/dates';
@@ -147,7 +149,50 @@ const routes: Record<string, Route> = {
     return json(200, { memberId: p.memberId, name: p.name, employer: p.employer, role: 'member' });
   },
 
-  'GET /plans': async () => json(200, DEMO_PLAN_OPTIONS),
+  // Demo options plus every plan version a Lincoln analyst approved.
+  'GET /plans': async () => {
+    const res = await db.send(
+      new QueryCommand({ TableName: TABLE, KeyConditionExpression: 'pk = :p', ExpressionAttributeValues: { ':p': 'RULES#APPROVED' } }),
+    );
+    const approved = (res.Items ?? []).map((i) => i.rules as PlanRules);
+    return json(200, [...DEMO_PLAN_OPTIONS, ...approved.filter((r) => !DEMO_PLAN_OPTIONS.some((d) => d.id === r.id))]);
+  },
+
+  // Plan rules review: anyone can submit compiled rules with their evidence; only a Lincoln analyst approves.
+  'POST /rules/submit': async (e) => {
+    const body = bodyOf(e);
+    const parsed = planRulesSchema.safeParse(body.rules);
+    if (!parsed.success) throw new HttpError(400, `Rules don't pass the schema: ${parsed.error.issues[0]?.message ?? 'invalid'}`);
+    const id = randomUUID().slice(0, 8);
+    await db.send(
+      new PutCommand({
+        TableName: TABLE,
+        Item: { pk: 'RULES#PENDING', sk: id, rules: parsed.data, evidence: isRec(body.evidence) ? body.evidence : {}, source: String(body.source ?? '').slice(0, 200), submittedAt: new Date().toISOString() },
+      }),
+    );
+    return json(200, { id, status: 'pending' });
+  },
+  'GET /rules/pending': async (e) => {
+    if (callers.get(e)?.group !== 'lincoln_analyst') throw new HttpError(403, 'Lincoln plan analysts only');
+    const res = await db.send(new QueryCommand({ TableName: TABLE, KeyConditionExpression: 'pk = :p', ExpressionAttributeValues: { ':p': 'RULES#PENDING' } }));
+    return json(200, (res.Items ?? []).map((i) => ({ id: i.sk, rules: i.rules, evidence: i.evidence, source: i.source, submittedAt: i.submittedAt })));
+  },
+  'POST /rules/approve': async (e) => {
+    const caller = callers.get(e);
+    if (caller?.group !== 'lincoln_analyst') throw new HttpError(403, 'Lincoln plan analysts only');
+    const id = str(bodyOf(e).id, 'id', 20);
+    const res = await db.send(new DeleteCommand({ TableName: TABLE, Key: { pk: 'RULES#PENDING', sk: id }, ReturnValues: 'ALL_OLD' }));
+    if (!res.Attributes) throw new HttpError(404, 'No such submission');
+    // Same hashing as the app: identical rules always get the same version.
+    const approved = await approveRules(res.Attributes.rules as PlanRules);
+    await db.send(
+      new PutCommand({
+        TableName: TABLE,
+        Item: { pk: 'RULES#APPROVED', sk: approved.rules.version, rules: approved.rules, hash: approved.hash, approvedBy: caller.sub, approvedAt: new Date().toISOString() },
+      }),
+    );
+    return json(200, approved);
+  },
 
   // The persona's starting ledger; claims arrive over the WebSocket (replayed on connect), like a live feed.
   'GET /ledger': async (e) => {
@@ -292,6 +337,9 @@ const routes: Record<string, Route> = {
   },
 
   'POST /share': async (e) => {
+    // Step-up: sharing a member's record with a dentist needs a sign-in from the last 10 minutes.
+    const caller = callers.get(e);
+    if (caller && Date.now() / 1000 - caller.authTime > 600) throw new HttpError(401, 'step_up: sign in again to share your record');
     const body = bodyOf(e);
     const kind = str(body.scheduleKind, 'scheduleKind', 20);
     if (!/^(cheapest|fastest|balanced|custom)$/.test(kind)) throw new HttpError(400, 'Unknown schedule');

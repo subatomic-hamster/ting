@@ -6,6 +6,7 @@ import { PERSONAS } from '../data/personas';
 import { dentistSummary } from '../habits/analytics';
 import { SMILESTREAK } from '../habits/program';
 import { useHabitStore } from '../habits/store';
+import { signIn } from '../auth/auth';
 import { useActive, useAppStore } from '../store';
 import { ShareIcon } from './Icons';
 
@@ -43,6 +44,14 @@ export function ShareWithDentist({ compact = false }: { compact?: boolean }) {
       <button type="button" className={compact ? 'btn-secondary' : 'btn-primary'} onClick={() => share.mutate()} disabled={share.isPending}>
         <ShareIcon /> {share.isPending ? 'Creating link…' : 'Share with my dentist'}
       </button>
+      {share.error && /step_up/.test(share.error.message) && (
+        <p className="mt-2 text-xs text-muted">
+          For your security, sign in again before sharing your record.{' '}
+          <button type="button" className="font-medium text-brand-700 underline" onClick={() => void signIn({ prompt: 'login', returnTo: window.location.pathname })}>
+            Sign in again
+          </button>
+        </p>
+      )}
       {share.data && (
         <div className="mt-2 flex flex-wrap items-center gap-2 rounded-xl border border-line bg-brand-50 p-2 text-xs">
           <a href={share.data.url} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate font-mono text-brand-700 underline">

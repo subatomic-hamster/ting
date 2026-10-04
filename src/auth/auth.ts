@@ -86,13 +86,14 @@ export function currentIdToken(): string | undefined {
 
 const redirectUri = () => `${window.location.origin}/auth/callback`;
 
-export async function signIn(): Promise<void> {
+/** `prompt: 'login'` forces a fresh sign-in (step-up before sharing); `returnTo` is where to land afterwards. */
+export async function signIn(opts: { prompt?: 'login'; returnTo?: string } = {}): Promise<void> {
   const cfg = authConfig();
   if (!cfg) throw new Error('Sign-in is not configured');
   const verifier = b64url(crypto.getRandomValues(new Uint8Array(32)));
   const state = b64url(crypto.getRandomValues(new Uint8Array(16)));
   const challenge = b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)));
-  sessionStorage.setItem(PKCE, JSON.stringify({ verifier, state }));
+  sessionStorage.setItem(PKCE, JSON.stringify({ verifier, state, returnTo: opts.returnTo }));
   const q = new URLSearchParams({
     response_type: 'code',
     client_id: cfg.clientId,
@@ -102,14 +103,15 @@ export async function signIn(): Promise<void> {
     code_challenge: challenge,
     code_challenge_method: 'S256',
     state,
+    ...(opts.prompt ? { prompt: opts.prompt } : {}),
   });
   window.location.assign(`${cfg.domain}/oauth2/authorize?${q}`);
 }
 
-export async function completeSignIn(code: string, state: string): Promise<Claims> {
+export async function completeSignIn(code: string, state: string): Promise<Claims & { returnTo?: string }> {
   const cfg = authConfig();
   if (!cfg) throw new Error('Sign-in is not configured');
-  const saved = JSON.parse(sessionStorage.getItem(PKCE) ?? '{}') as { verifier?: string; state?: string };
+  const saved = JSON.parse(sessionStorage.getItem(PKCE) ?? '{}') as { verifier?: string; state?: string; returnTo?: string };
   sessionStorage.removeItem(PKCE);
   if (!saved.verifier || saved.state !== state) throw new Error('This sign-in link is stale. Start again.');
   const res = await fetch(`${cfg.domain}/oauth2/token`, {
@@ -120,7 +122,7 @@ export async function completeSignIn(code: string, state: string): Promise<Claim
   if (!res.ok) throw new Error(`Sign-in failed (${res.status})`);
   const tokens = (await res.json()) as { id_token: string; refresh_token?: string };
   useAuth.getState().set({ idToken: tokens.id_token, refreshToken: tokens.refresh_token });
-  return decodeClaims(tokens.id_token);
+  return { ...decodeClaims(tokens.id_token), returnTo: saved.returnTo?.startsWith('/') ? saved.returnTo : undefined };
 }
 
 export async function signOut(): Promise<void> {

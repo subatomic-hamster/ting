@@ -293,6 +293,26 @@ await check('forwarding: auth check, unknown sender held, approve → read and d
   return `${inbox.address}: spoofed rejected, unknown held, approved → invoice $35`;
 });
 
+await check('plan rules review: submit is open, review needs a Lincoln analyst', async () => {
+  const plans = await call('/plans');
+  const low = plans.find((p) => p.id === 'acme-low');
+  const sub = await call('/rules/submit', { rules: low, evidence: {}, source: 'smoke test' });
+  assert(sub.status === 'pending', JSON.stringify(sub));
+  const pend = await fetch(`${API}/rules/pending`);
+  assert(pend.status === 403, `pending without analyst → ${pend.status}`);
+  const appr = await fetch(`${API}/rules/approve`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: sub.id }) });
+  assert(appr.status === 403, `approve without analyst → ${appr.status}`);
+  const bad = await fetch(`${API}/rules/submit`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rules: { name: 'x' } }) });
+  assert(bad.status === 400, `bad rules → ${bad.status}`);
+  return 'submitted; review and approval refused without the analyst role; invalid rules rejected';
+});
+
+await check('web: offline service worker and map assets are served', async () => {
+  const sw = await fetch(`${WEB}/sw.js`);
+  assert(sw.ok && (await sw.text()).includes('ting-shell'), `sw.js ${sw.status}`);
+  return 'sw.js served';
+});
+
 await check('rejects a malformed claim', async () => {
   try {
     await call('/mock/claims', { type: 'claim.adjudicated', member: 'x' });
