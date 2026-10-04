@@ -230,24 +230,6 @@ await check('EOB appeal draft keeps the EOB and estimate amounts', async () => {
   return `${r.source}: "${r.text.split('\n').find((l) => l.includes('$')).slice(0, 80)}…"`;
 });
 
-await check('Spanish explanations keep the engine amounts', async () => {
-  const line = {
-    id: 'rc', cdt: 'D3330', tooth: 19, date: '2026-10-14', year: 2026, inNetwork: true, serviceClass: 'basic', billed: 1180, allowed: 1000,
-    benefitBase: 1000, coinsuranceRate: 0.8, deductibleApplied: 0, planShare: 800, planPaid: 800, capReduction: 0, memberOwes: 200,
-    balanceBill: 0, maxRemainingBefore: 1200, rulesVersion: 'PLAN-ACME-LOW-v3',
-    waterfall: [
-      { key: 'fee', label: 'Fee', delta: 1180, running: 1180 },
-      { key: 'networkDiscount', label: 'Network', delta: -180, running: 1000 },
-      { key: 'coinsurance', label: 'Plan pays', delta: -800, running: 200 },
-      { key: 'youPay', label: 'You pay', delta: 200, running: 200 },
-    ],
-  };
-  const steps = await call('/explain', { line, language: 'es' });
-  const es = steps.filter((s) => s.source === 'model');
-  assert(es.length >= 2, `only ${es.length} Spanish sentences survived the number check`);
-  return `${es.length}/4 in Spanish; "${es[es.length - 1].text}"`;
-});
-
 await check('digest: preferences, engine digest, private send', async () => {
   const saved = await call('/preferences', { cadence: 'weekly', detail: 'private' });
   assert(saved.cadence === 'weekly', JSON.stringify(saved));

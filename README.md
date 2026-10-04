@@ -83,7 +83,7 @@ Engine entry points for Lambda: `optimize(profile, { nextPlan, horizon })`, `eva
 
 The live site (`infra/outputs.json` → `WebUrl`) runs the same app against the AWS backend. `/try` shows a QR code for judges. On top of the mock-mode features it adds:
 
-- **Bedrock** for intake translation (including Spanish), plan-compiler gap filling (verified quotes only), plain explanations (EN/ES), digests and EOB appeal drafts. Every amount is checked against the engine.
+- **Bedrock** for intake translation (including Spanish), plan-compiler gap filling (verified quotes only), plain explanations, digests and EOB appeal drafts. Every amount is checked against the engine.
 - **Automated Reasoning:** a "Proved" badge when the engine's plan-pays amount is proved against rules built from the benefits summary.
 - **Winnow decision layer:**
   - **Where it runs:** Winnow-12B on the team's 24 GB Mac (`infra/scripts/winnow-local.sh`), reached through an SQS queue, so no tunnel or open port is needed. When it's off, a labelled Claude simulation takes over.

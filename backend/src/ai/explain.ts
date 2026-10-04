@@ -8,8 +8,7 @@ const SYSTEM = `You rewrite sentences that explain a dental insurance estimate s
 Rules:
 - One sentence per input sentence, same order, same meaning.
 - Keep every dollar amount exactly as written (same digits, cents and $ sign). Do not add, remove, compute or round any amount.
-- Plain words, at most 30 words per sentence, no jargon unless the input uses it, no advice.
-- Write in the requested language.`;
+- Plain words, at most 30 words per sentence, no jargon unless the input uses it, no advice.`;
 
 const TOOL = {
   name: 'plain_sentences',
@@ -24,7 +23,6 @@ const TOOL = {
 export async function explainWithModel(
   line: AdjudicatedLine,
   call: CallModel,
-  language: 'en' | 'es' = 'en',
 ): Promise<(ExplainedStep & { source: 'model' | 'template' })[]> {
   const steps = explainLine(line);
   let sentences: unknown[] = [];
@@ -32,7 +30,7 @@ export async function explainWithModel(
     const out = await call({
       model: 'fast',
       system: SYSTEM,
-      prompt: `Language: ${language === 'es' ? 'Spanish' : 'English'}\n\n${steps.map((s, i) => `${i + 1}. ${s.text}`).join('\n')}`,
+      prompt: steps.map((s, i) => `${i + 1}. ${s.text}`).join('\n'),
       tool: TOOL,
       maxTokens: 1200,
     });

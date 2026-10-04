@@ -65,7 +65,7 @@ export const httpApi: TingApi = {
   parseDescription: (text) => http('/intake/parse', post({ text })),
   readDocument,
   compilePlan: (text) => http('/rules/compile', post({ text })),
-  explain: (line, rules, language = 'en') => http('/explain', post({ line, rules, language })),
+  explain: (line, rules) => http('/explain', post({ line, rules })),
 
   /** Live claims over WebSocket. On connect the backend replays this member's earlier claims; applying them is idempotent. */
   subscribeLedger: (onEvent) => {

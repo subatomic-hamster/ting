@@ -7,7 +7,6 @@ import { formatMoney } from '../lib/format';
 import { isTotal, waterfallBars } from '../lib/geometry';
 import { GlossaryTerm } from './GlossaryTerm';
 import { ProofBadge, VerifiedBadge, VerifiedMark, type Verification } from './VerifiedBadge';
-import { useLanguage } from '../lib/language';
 
 const TONE: Record<string, string> = {
   total: 'bg-muted',
@@ -29,10 +28,9 @@ export function Waterfall({ line, rules, name }: { line: AdjudicatedLine; rules:
   const steps = line.waterfall;
   // Words come from the API (Bedrock in AWS); every dollar in them must match the engine before it's shown.
   const signature = `${line.id}|${line.rulesVersion}|${steps.map((s) => `${s.key}:${s.delta}:${s.running}`).join('|')}`;
-  const language = useLanguage((s) => s.language);
   const explained = useQuery({
-    queryKey: ['explain', signature, language],
-    queryFn: () => api.explain(line, rules, language),
+    queryKey: ['explain', signature],
+    queryFn: () => api.explain(line, rules),
     placeholderData: keepPreviousData,
   });
   const fresh = explained.data && !explained.isPlaceholderData;

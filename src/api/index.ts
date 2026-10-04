@@ -226,7 +226,7 @@ export interface TingApi {
   /** Benefits summary text → draft plan rules, the evidence for each, and questions for what it doesn't say (Bedrock in AWS). */
   compilePlan(text: string): Promise<CompiledPlan>;
   /** One plain sentence per waterfall step; the caller checks every dollar with verifyNumbers before showing it. */
-  explain(line: AdjudicatedLine, rules: PlanRules, language?: 'en' | 'es'): Promise<ExplainedStep[]>;
+  explain(line: AdjudicatedLine, rules: PlanRules): Promise<ExplainedStep[]>;
   /** Live "claim adjudicated" events (WebSocket in AWS); the store validates and applies them. */
   subscribeLedger(onEvent: (event: unknown) => void): () => void;
   /** Demo control: Lincoln's mock claims feed emits an EOB for the next planned procedure. */
