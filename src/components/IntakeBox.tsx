@@ -25,10 +25,10 @@ interface Extra {
 }
 
 /** Text, voice and photo all end up as the same items; Ting only asks when a wrong guess would change the bill. */
-export function IntakeBox() {
+export function IntakeBox({ initialText = "" }: { initialText?: string } = {}) {
   const profile = useProfile();
   const addProcedures = useAppStore((s) => s.addProcedures);
-  const [text, setText] = useState("");
+  const [text, setText] = useState(initialText);
   const [listening, setListening] = useState(false);
   const [viaVoice, setViaVoice] = useState(false);
   const [note, setNote] = useState("");

@@ -175,3 +175,5 @@ Like a safe-driving app for teeth, but **rewards only**: sharing data can lower 
 ## Mobile rebuild validation
 
 The Section 0 application requirements in `design.md` govern this rebuild. See [implementation and test report](docs/revamp-validation.md), [independent UX review](docs/mobile-revamp-review.md) and [pricing/procedure handoff](docs/pricing-procedure-handoff.md). Run `npm test`, `npm run lint`, `npm run build` and `npm run e2e:local`. The local end-to-end suite builds the production bundle in mock API mode; it does not certify live AWS, carrier contracts, physical microphones/cameras/brushes or native calendar import.
+
+See [plan rules and survey release](docs/plan-rules-release.md) for the latest overview, restored survey, moving preference and PDF-worker fix. Run the targeted live journeys with `npx playwright test e2e/plan-updates.spec.ts e2e/release.spec.ts`.

@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { api, type CompiledPlan } from "../api";
 import {
   applyAnswers,
@@ -10,13 +11,11 @@ import {
 } from "../compiler/compile";
 import { PlanPicker } from "../components/PlanPicker";
 import { PageHeader, Section } from "../components/Section";
-import type { PlanRules as Rules, ServiceClass } from "../engine/types";
+import type { PlanRules as Rules } from "../engine/types";
 import { parseInsuranceCard, plansForGroup } from "../intake/insuranceCard";
-import { formatMoney, formatPercent } from "../lib/format";
+import { PlanCoverage } from "../components/PlanCoverage";
 import { useAppStore } from "../store";
 
-const CLASSES: ServiceClass[] = ["preventive", "basic", "major", "ortho"];
-const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
 const field =
   "mt-1 w-full rounded-lg border border-line bg-white px-2 py-1.5 text-sm";
 
@@ -30,12 +29,20 @@ export default function PlanRules() {
     {},
   );
   const [status, setStatus] = useState("");
+  const [readError, setReadError] = useState(false);
   const [approved, setApproved] = useState<{ rules: Rules; hash: string }>();
 
   const compile = useMutation({
     mutationFn: async (file: File) =>
       api.compilePlan((await api.readDocument(file)).text),
-    onMutate: (file) => setStatus(`Reading ${file.name}…`),
+    onMutate: (file) => {
+      setReadError(false);
+      setResult(undefined);
+      setApproved(undefined);
+      setAnswers({});
+      submit.reset();
+      setStatus(`Reading ${file.name}…`);
+    },
     onSuccess: (r, file) => {
       setResult(r);
       setAnswers({});
@@ -52,16 +59,21 @@ export default function PlanRules() {
           guarded,
       );
     },
-    onError: (err, file) =>
+    onError: (err, file) => {
+      setReadError(true);
       setStatus(
         `Couldn't read ${file.name}: ${err instanceof Error ? err.message : String(err)}.`,
-      ),
+      );
+    },
   });
 
   const card = useMutation({
     mutationFn: async (file: File) =>
       parseInsuranceCard((await api.readDocument(file)).text),
-    onMutate: (file) => setStatus(`Reading ${file.name}…`),
+    onMutate: (file) => {
+      setReadError(false);
+      setStatus(`Reading ${file.name}…`);
+    },
     onSuccess: (info) => {
       const ids = info.groupNumber ? plansForGroup(info.groupNumber) : [];
       const names = plans.filter((p) => ids.includes(p.id)).map((p) => p.name);
@@ -75,10 +87,12 @@ export default function PlanRules() {
           : "No group number found on the card. Try a sharper photo of the front.",
       );
     },
-    onError: (err, file) =>
+    onError: (err, file) => {
+      setReadError(true);
       setStatus(
         `Couldn't read ${file.name}: ${err instanceof Error ? err.message : String(err)}.`,
-      ),
+      );
+    },
   });
 
   const draft = result ? applyAnswers(result.draft, answers) : undefined;
@@ -120,6 +134,7 @@ export default function PlanRules() {
       <input
         type="file"
         accept={accept}
+        disabled={compile.isPending || card.isPending}
         className="sr-only"
         onChange={(e) => {
           const f = e.target.files?.[0];
@@ -139,9 +154,10 @@ export default function PlanRules() {
         <label className="flex min-w-0 flex-col items-start gap-2 text-sm text-muted">
           Your plan this year <PlanPicker />
         </label>
+        <Link to="/onboarding" className="btn-secondary">Take or update the plan survey</Link>
       </PageHeader>
 
-      <RulesView rules={currentPlan} title="Your plan's rules" />
+      <PlanCoverage rules={currentPlan} title="Your plan's rules" />
 
       <Section title="Load a plan document" id="load">
         <p className="text-sm text-muted">
@@ -163,8 +179,9 @@ export default function PlanRules() {
           >
             Sample benefits summary (PDF)
           </a>
+          <a className="text-sm text-brand-700 underline" href="/samples/insurance-card.png" download>Sample insurance card</a>
         </div>
-        <p className="mt-2 min-h-5 text-sm text-muted" role="status">
+        <p className={`mt-3 min-h-5 text-sm ${readError ? "text-cost" : "text-muted"}`} role={readError ? "alert" : "status"}>
           {status}
         </p>
 
@@ -326,7 +343,7 @@ export default function PlanRules() {
               </div>
             )}
             {final?.ok && (
-              <RulesView
+              <PlanCoverage
                 rules={final.rules}
                 title="Rules read from the document"
               />
@@ -335,105 +352,5 @@ export default function PlanRules() {
         )}
       </Section>
     </div>
-  );
-}
-
-function RulesView({ rules, title }: { rules: Rules; title: string }) {
-  const s = rules.sections;
-  if (rules.kind !== "insurance")
-    return (
-      <Section title={title}>
-        <p className="text-sm">{rules.name}</p>
-      </Section>
-    );
-  return (
-    <Section title={title} eyebrow={<>Rules version {rules.version}</>}>
-      <p className="text-sm text-muted">{rules.name}</p>
-      <dl className="mt-4 divide-y divide-line">
-        {CLASSES.map((c) => (
-          <div key={c} className="py-4">
-            <dt className="font-medium">
-              {c === "ortho" ? "Orthodontics" : cap(c)}: plan pays
-            </dt>
-            <dd className="mt-2 flex flex-wrap justify-between gap-3">
-              <span>
-                In-network {formatPercent(rules.coinsurance.inNetwork[c])}
-              </span>
-              <span>
-                Out-of-network{" "}
-                {formatPercent(rules.coinsurance.outOfNetwork[c])}
-              </span>
-            </dd>
-          </div>
-        ))}
-      </dl>
-      <p className="mt-4">
-        Orthodontic lifetime maximum: {formatMoney(rules.orthoLifetimeMax)}.
-        Confirm age eligibility and any installment rules in your plan document.
-      </p>
-      <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm">
-        <li>
-          Annual max {formatMoney(rules.annualMax)}; deductible{" "}
-          {formatMoney(rules.deductible.amount)} on{" "}
-          {rules.deductible.appliesTo.join(" and ")} care.{" "}
-          <cite className="text-xs not-italic text-muted">{s.annualMax}</cite>
-        </li>
-        <li>
-          Premium {formatMoney(rules.premiumMonthly)} a month
-          {rules.premiumPreTax ? ", pre-tax" : ""}.
-        </li>
-        <li>
-          Out of network:{" "}
-          {rules.outOfNetwork.basis === "mac"
-            ? "maximum allowable charge"
-            : `${rules.outOfNetwork.percentile}th percentile of usual and customary fees`}
-          .{" "}
-          <cite className="text-xs not-italic text-muted">
-            {s.outOfNetwork}
-          </cite>
-        </li>
-        {rules.maxRewards && (
-          <li>
-            Max Rollover: plan payments of{" "}
-            {formatMoney(rules.maxRewards.threshold)} or less in a year add{" "}
-            {formatMoney(rules.maxRewards.rolloverAmount)} (+
-            {formatMoney(rules.maxRewards.inNetworkBonus)} if all in network) to
-            next year's max, deposited on day {rules.maxRewards.depositDay}, up
-            to {formatMoney(rules.maxRewards.accountLimit)}.{" "}
-            <cite className="text-xs not-italic text-muted">
-              {s.maxRewards}
-            </cite>
-          </li>
-        )}
-        {!rules.preventiveCountsTowardMax && (
-          <li>
-            Preventive care doesn't count against the annual max.{" "}
-            <cite className="text-xs not-italic text-muted">
-              {s.preventiveMax}
-            </cite>
-          </li>
-        )}
-        {rules.alternateBenefit && (
-          <li>
-            Back-tooth tooth-colored fillings are paid at the silver-filling
-            rate.{" "}
-            <cite className="text-xs not-italic text-muted">
-              {s.alternateBenefit}
-            </cite>
-          </li>
-        )}
-        {rules.q4DeductibleCarryover && (
-          <li>
-            Deductible paid in October to December also counts toward next year.{" "}
-            <cite className="text-xs not-italic text-muted">
-              {s.q4Carryover}
-            </cite>
-          </li>
-        )}
-        {rules.frequencyLimits.map((f) => (
-          <li key={f.id}>{f.label}</li>
-        ))}
-      </ul>
-    </Section>
   );
 }

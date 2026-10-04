@@ -1,3 +1,4 @@
+import { spaRewriteCode } from "./spa-rewrite";
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { CfnOutput, Duration, RemovalPolicy, Stack, type StackProps } from 'aws-cdk-lib';
@@ -159,7 +160,7 @@ export class TingStack extends Stack {
       runtime: cloudfront.FunctionRuntime.JS_2_0,
       code: cloudfront.FunctionCode.fromInline(
         // App routes (including /share/<persona>.<kind>.<token>, which contains dots) get index.html; real files pass.
-        "function handler(event) { var r = event.request; if (!/\\.(js|css|html|json|png|jpe?g|gif|svg|ico|txt|pdf|map|woff2?|webmanifest)$/i.test(r.uri)) { r.uri = '/index.html'; } return r; }",
+        spaRewriteCode,
       ),
     });
     const distribution = new cloudfront.Distribution(this, 'Web', {
@@ -472,6 +473,8 @@ export class TingStack extends Stack {
         ),
       ],
       destinationBucket: site,
+      // Keep hashed chunks used by browser tabs opened before this release.
+      prune: false,
       distribution,
       distributionPaths: ['/*'],
       memoryLimit: 512,

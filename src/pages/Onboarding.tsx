@@ -6,7 +6,7 @@ export default function Onboarding() {
     <div>
       <PageHeader
         title="Get started"
-        subtitle="Bring your dentist’s recommendations and any quoted fees."
+        subtitle="A short survey about your care, coverage and where you expect to live."
       />
       <OnboardingStepper />
     </div>

@@ -4,6 +4,7 @@ import { explainLine, verifyNumbers } from "../engine/explain";
 import type { AdjudicatedLine, PlanRules } from "../engine/types";
 import { explainQuery } from "../lib/explainQuery";
 import { formatMoney } from "../lib/format";
+import { isTotal, waterfallBars } from "../lib/geometry";
 export function Waterfall({
   line,
   rules,
@@ -15,8 +16,7 @@ export function Waterfall({
 }) {
   const template = explainLine(line);
   const explained = useQuery(explainQuery(line, rules, api));
-  const fee = line.waterfall.find((s) => s.key === "fee")?.running ?? 0;
-  const discount = line.waterfall.find((s) => s.key === "networkDiscount");
+  const bars = waterfallBars(line.waterfall);
   return (
     <figure aria-label={`Estimated cost for ${name}`}>
       <div className="mb-5">
@@ -29,24 +29,42 @@ export function Waterfall({
           {formatMoney(line.memberOwes)}
         </p>
       </div>
-      <dl className="divide-y divide-line text-base">
-        {[
-          ["Dentist’s fee", fee],
-          ["Plan discount", discount ? Math.abs(discount.delta) : 0],
-          ["Plan pays", line.planPaid],
-          ["You pay", line.memberOwes],
-        ].map(([label, value]) => (
-          <div
-            key={label}
-            className="flex items-baseline justify-between gap-4 py-3"
-          >
-            <dt>{label}</dt>
-            <dd className="tabular shrink-0 font-medium">
-              {formatMoney(value as number)}
-            </dd>
-          </div>
+      <ol
+        aria-label="Horizontal cost waterfall"
+        className="divide-y divide-line text-base"
+      >
+        {line.waterfall.map((step, i) => (
+          <li key={step.key} className="py-3">
+            <div className="flex items-baseline justify-between gap-4">
+              <span className={step.key === "youPay" ? "font-medium" : ""}>
+                {step.label}
+              </span>
+              <span className="tabular shrink-0 font-medium">
+                {formatMoney(isTotal(step) ? step.running : step.delta, {
+                  signed: !isTotal(step),
+                })}
+              </span>
+            </div>
+            <div
+              className="relative mt-2 h-4 w-full rounded-sm bg-paper"
+              aria-hidden="true"
+            >
+              <div
+                className={`absolute inset-y-0 rounded-sm ${step.key === "youPay" ? "bg-ink" : bars[i].tone === "down" ? "bg-plan" : bars[i].tone === "up" ? "bg-cost" : bars[i].tone === "flat" ? "bg-line" : "bg-muted"}`}
+                style={{
+                  left: `${bars[i].leftPct}%`,
+                  width: `${Math.max(bars[i].widthPct, bars[i].tone === "flat" ? 0.6 : 0)}%`,
+                }}
+              />
+            </div>
+            {!isTotal(step) && (
+              <p className="mt-1 text-sm text-muted">
+                Running total {formatMoney(step.running)}
+              </p>
+            )}
+          </li>
         ))}
-      </dl>
+      </ol>
       <details className="mt-4 border-t border-line">
         <summary className="text-brand-700">Cost breakdown</summary>
         <ol className="divide-y divide-line">

@@ -4,14 +4,14 @@ import { formatMoney } from "../lib/format";
 import { useComparison, useProfile } from "../store";
 
 export function ComparisonTable() {
-  const { options, best, insights } = useComparison();
+  const { options, best, lowestCost, portability, insights } = useComparison();
   const { currentPlan } = useProfile();
   const why = (o: OptionResult) =>
-    o === best
+    o === lowestCost
       ? "Lowest expected total."
-      : `${formatMoney(round2(o.total - best.total))} more than ${best.plan.name} in an expected year${
-          o.badYearTotal < best.badYearTotal
-            ? `, but ${formatMoney(round2(best.badYearTotal - o.badYearTotal))} less if every "maybe" happens`
+      : `${formatMoney(round2(o.total - lowestCost.total))} more than ${lowestCost.plan.name} in an expected year${
+          o.badYearTotal < lowestCost.badYearTotal
+            ? `, but ${formatMoney(round2(lowestCost.badYearTotal - o.badYearTotal))} less if every "maybe" happens`
             : ""
         }.`;
   const current = (o: OptionResult) => o.plan.id === currentPlan.id;
@@ -34,7 +34,7 @@ export function ComparisonTable() {
                   </span>
                 )}
               </span>
-              {o === best && <RecommendedTag />}
+              {o === best && <RecommendedTag moving={!!portability} />}
             </div>
             <dl className="mt-2 grid grid-cols-2 gap-y-1 text-sm">
               <dt className="text-muted">Premiums after tax</dt>
@@ -98,7 +98,7 @@ export function ComparisonTable() {
                       current
                     </span>
                   )}
-                  {o === best && <RecommendedTag />}
+                  {o === best && <RecommendedTag moving={!!portability} />}
                 </th>
                 <td className="tabular py-3 pr-3 text-right">
                   {formatMoney(o.premiumCost)}
@@ -138,10 +138,10 @@ export function ComparisonTable() {
   );
 }
 
-function RecommendedTag() {
+function RecommendedTag({ moving }: { moving: boolean }) {
   return (
     <span className="block text-xs font-medium text-brand-700">
-      Lowest expected cost
+      {moving ? "Good if moving cities frequently" : "Lowest expected cost"}
     </span>
   );
 }

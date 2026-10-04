@@ -1,6 +1,6 @@
 // Offline shell (spec F7 "works offline"): the app's own files are cached so it loads with no network.
 // The engine runs in the browser; the API seam falls back to its in-browser implementation when offline.
-const CACHE = 'ting-shell-v2';
+const CACHE = 'ting-shell-v3';
 
 // Pre-cache the shell and every asset index.html references (the hashed JS and CSS), so an offline reload works.
 self.addEventListener('install', (event) => {

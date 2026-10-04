@@ -189,6 +189,14 @@ export interface FeeEntry {
 }
 export type FeeTable = Record<string, FeeEntry>;
 
+export interface PlanPreferences {
+  plannedWork?: string;
+  lastCleaning?: "recent" | "sixToTwelveMonths" | "overAYear" | "unknown";
+  covered?: "self" | "partner" | "children" | "family";
+  movesFrequently?: boolean;
+  surveyCompleted?: boolean;
+}
+
 /** Everything the engine needs about one covered person. */
 export interface Profile {
   asOf: ISODate;
@@ -197,6 +205,7 @@ export interface Profile {
   procedures: PlannedProcedure[];
   money: Money;
   fees: FeeTable;
+  preferences?: PlanPreferences;
 }
 
 export interface Placement {

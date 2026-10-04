@@ -1,0 +1,5 @@
+Sample insurance card
+Lincoln DentalConnect
+Group number: 00412345
+Member ID: SAMPLE12345
+Not valid for care.

@@ -23,7 +23,7 @@ export function EnrollmentCard({
 }: {
   variant?: "compact" | "full";
 }) {
-  const { card, options } = useComparison();
+  const { card, options, portability, lowestCost } = useComparison();
   const incomplete = options.some((o) =>
     o.schedule.lines.some((l) => l.pricingWarning),
   );
@@ -35,7 +35,7 @@ export function EnrollmentCard({
   const actions: Action[] = [
     {
       headline: `${incomplete ? "Compare" : "Choose"} ${choice.plan.name}`,
-      reason: `Lowest expected cost for this year and ${fsa.year}: ${formatMoney(choice.total)} in premiums and care after tax${
+      reason: `${portability ? "Prioritizes out-of-network coverage" : "Lowest expected cost"} for this year and ${fsa.year}: ${formatMoney(choice.total)} in premiums and care after tax${
         choice.switching ? ", including the switch from your current plan" : ""
       }.`,
     },
@@ -90,9 +90,25 @@ export function EnrollmentCard({
       aria-labelledby="enroll-card-title"
     >
       <p className="mb-2 text-base">
-        {incomplete ? "Lowest modeled cost for" : "Recommended plan for"}{" "}
+        {portability
+          ? "Plan to review for frequent moves in"
+          : incomplete
+            ? "Lowest modeled cost for"
+            : "Recommended plan for"}{" "}
         {fsa.year}
       </p>
+      {portability && (
+        <div className="mt-4 rounded-lg border border-line p-4">
+          <h3 className="font-medium">Good if moving cities frequently</h3>
+          <p className="mt-2 text-sm text-muted">{portability.reason}</p>
+          <p className="mt-3 text-sm">
+            Lowest modeled cost: {lowestCost.plan.name},{" "}
+            {formatMoney(lowestCost.total)}. Your preferred option’s total still
+            uses your listed treatment and network settings; future moving costs
+            are not assumed.
+          </p>
+        </div>
+      )}
       <h2
         id="enroll-card-title"
         className="text-lg leading-snug font-semibold sm:text-xl"

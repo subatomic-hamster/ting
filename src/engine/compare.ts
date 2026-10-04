@@ -120,7 +120,7 @@ export function recommendFsa(profile: Profile, option: OptionResult): FsaRecomme
 }
 
 export interface Insight {
-  id: 'hitMax' | 'lowUse' | 'waitingPeriod' | 'maybe' | 'smallYear' | 'outOfNetwork';
+  id: 'hitMax' | 'lowUse' | 'waitingPeriod' | 'maybe' | 'smallYear' | 'outOfNetwork' | 'mobility';
   text: string;
 }
 
@@ -193,6 +193,8 @@ export interface EnrollmentCard {
 export interface Comparison {
   options: OptionResult[];
   best: OptionResult;
+  lowestCost: OptionResult;
+  portability?: { option: OptionResult; reason: string };
   tipping: TippingPoint[];
   insights: Insight[];
   card: EnrollmentCard;
@@ -200,14 +202,42 @@ export interface Comparison {
 
 export const DISCLAIMER = 'Educational estimate — not insurance or tax advice.';
 
+/** Prioritize documented out-of-network coverage, then cost. No future fees or network reach are invented. */
+export function portabilityOption(profile: Profile, options: OptionResult[]): Comparison['portability'] {
+  const categories = [...new Set(profile.procedures.filter(p => (p.likelihood ?? 1) > 0).map(p => CDT[p.cdt]?.category).filter(c => c !== undefined))];
+  const relevant = categories.length ? categories : ['preventive', 'restorative', 'majorRestorative'] as const;
+  const rates = (plan: PlanRules) => relevant.map(category => {
+    const c = plan.categoryClass[category];
+    return c === 'excluded' || (c === 'ortho' && plan.orthoLifetimeMax === 0) ? 0 : plan.coinsurance.outOfNetwork[c];
+  });
+  const candidates = options.filter(o => o.plan.kind === 'insurance' && rates(o.plan).some(r => r > 0));
+  if (!candidates.length) return undefined;
+  const coveredCount = (o: OptionResult) => rates(o.plan).filter(r => r > 0).length;
+  const coverageSum = (o: OptionResult) => rates(o.plan).reduce((sum, rate) => sum + rate, 0);
+  const mostCovered = Math.max(...candidates.map(coveredCount));
+  const coveragePeers = candidates.filter(o => coveredCount(o) === mostCovered);
+  const strongestCoverage = Math.max(...coveragePeers.map(coverageSum));
+  const peers = coveragePeers.filter(o => Math.abs(coverageSum(o) - strongestCoverage) < 0.00001);
+  // First keep the strongest UCR percentile within that method. Compare its
+  // cost against MAC peers without inventing a cross-method allowance ranking.
+  const highestUcr = Math.max(0, ...peers.map(o => o.plan.outOfNetwork.basis === 'ucr' ? o.plan.outOfNetwork.percentile : 0));
+  const finalists = peers.filter(o => o.plan.outOfNetwork.basis === 'mac' || o.plan.outOfNetwork.percentile === highestUcr);
+  const option = bestOf(finalists);
+  return { option, reason: 'Prioritizes coverage for the listed care outside the plan’s network, then comparable UCR allowance percentiles, then modeled cost. Confirm participating offices in your next city; out-of-network balance billing may still apply.' };
+}
+
 export function compare(profile: Profile, plans: PlanRules[]): Comparison {
   const options = plans.map((p) => priceOption(profile, p));
-  const best = bestOf(options);
+  const lowestCost = bestOf(options);
+  const portability = profile.preferences?.movesFrequently ? portabilityOption(profile, options) : undefined;
+  const best = portability?.option ?? lowestCost;
   const tipping = profile.procedures
     .filter((p) => (p.likelihood ?? 1) < 1)
     .map((p) => tippingPoint(profile, plans, p.id))
     .filter((t): t is TippingPoint => t !== undefined);
-  return { options, best, tipping, insights: insights(profile, options, tipping), card: enrollmentCard(profile, best) };
+  const notes = insights(profile, options, tipping);
+  if (profile.preferences?.movesFrequently) notes.push({ id: 'mobility', text: portability ? `Your moving preference selects ${best.plan.name} for out-of-network flexibility. ${portability.reason}` : 'None of these options lists an out-of-network insurance benefit for your care. Ask your employer for a plan that covers care outside its network.' });
+  return { options, best, lowestCost, portability, tipping, insights: notes, card: enrollmentCard(profile, best) };
 }
 
 export function enrollmentCard(profile: Profile, choice: OptionResult): EnrollmentCard {

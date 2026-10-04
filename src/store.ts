@@ -24,6 +24,7 @@ import type {
   Placement,
   PlannedProcedure,
   PlanRules,
+  PlanPreferences,
   Profile,
   ServiceRecord,
 } from "./engine/types";
@@ -83,6 +84,7 @@ export interface AppState {
   setLedger: (ledger: Ledger) => void;
   setNetwork: (network: Network) => void;
   setCurrentPlan: (planId: string) => void;
+  setPlanPreferences: (preferences: PlanPreferences) => void;
   addPlan: (rules: PlanRules, asCurrent: boolean) => void;
   setAsOf: (asOf: string) => void;
   simulateDec1: () => void;
@@ -230,6 +232,10 @@ export const useAppStore = create<AppState>()((set, get) => {
       const asOf = todayISO();
       configureApi({ personaId: id, asOf });
       set({ ...personaState(id, asOf), trace: [] });
+    },
+
+    setPlanPreferences: (preferences) => {
+      setProfile({ ...get().profile, preferences });
     },
 
     setPlans: (plans) => {
@@ -541,6 +547,7 @@ export const useAppStore = create<AppState>()((set, get) => {
       // The server's profile comes without claims; the ones this browser already received are replayed onto it.
       let profile: Profile = {
         ...server,
+        preferences: s.profile.preferences ?? server.preferences,
         asOf: s.profile.asOf,
         procedures: withNetwork(
           [
