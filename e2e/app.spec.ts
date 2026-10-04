@@ -67,13 +67,12 @@ test("a dentist's bill above the EOB is flagged", async ({ page }) => {
   await expect(flag).toBeVisible();
 });
 
-test('explanations show at once and are proved by Automated Reasoning', async ({ page }) => {
+test('explanations show at once, without verification badges', async ({ page }) => {
   await page.goto('/treatment');
   await page.getByRole('button', { name: /Root canal \(molar\) on #19/ }).first().click();
   // The engine's sentence is there immediately; no loading state.
   await expect(page.locator('#waterfall').getByText(/\$1,180/).first()).toBeVisible({ timeout: 2_000 });
-  await expect(page.getByText('Proved').first()).toBeVisible({ timeout: 30_000 });
-  await expect(page.getByText(/Checking|Verified/)).toHaveCount(0);
+  await expect(page.locator('main').getByText(/Checking|Verified|Proved/)).toHaveCount(0);
 });
 
 test('dentist map shows every practice on OpenStreetMap', async ({ page }) => {

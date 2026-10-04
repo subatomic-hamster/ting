@@ -97,6 +97,9 @@ test("typed repeated fillings retain one visit and can be moved by date without 
       .locator("#items")
       .getByText("3 × Tooth-colored filling", { exact: true }),
   ).toBeVisible();
+  // The visual timeline leads on desktop; typing dates is one tap away (open by default on phones).
+  const typing = page.locator("details", { has: page.getByText("Change dates by typing them") });
+  if (!(await typing.evaluate((d: HTMLDetailsElement) => d.open))) await typing.locator("summary").click();
   const input = page.getByLabel("Date for 3 × Tooth-colored filling", {
     exact: true,
   });
@@ -298,13 +301,12 @@ test("recommended calendar and handoff use the displayed enrollment dates after 
     page.getByRole("heading", { name: /Dale’s treatment plan/ }),
   ).toBeVisible();
 });
-test("cost explanations stay optional without verification badges", async ({
+test("cost explanations are shown in plain words without verification badges", async ({
   page,
 }) => {
   await page.goto("/treatment");
   const cost = page.locator("#waterfall");
   await expect(cost.getByText("Estimated amount you pay")).toBeVisible();
-  await cost.getByText("Cost breakdown", { exact: true }).click();
   await expect(cost.getByText(/^The demo fee for/)).toBeVisible();
   await expect(
     page.locator("main").getByText(/Verified|Proved|question type|Winnow/),

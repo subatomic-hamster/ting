@@ -1,5 +1,6 @@
 import { useId, useRef, useState, type ReactNode } from "react";
 import glossary from "../fixtures/glossary.json";
+import { InfoIcon } from "./Icons";
 type Key = keyof typeof glossary;
 export function GlossaryTerm({
   term,
@@ -26,11 +27,12 @@ export function GlossaryTerm({
     setOpen(true);
   };
   return (
-    <span className="inline-block">
+    <span className="inline">
       <button
         ref={ref}
         type="button"
-        className="cursor-help border-b border-dotted border-current"
+        // Inline in the sentence; the ::after box keeps a 48px tap target without pushing the text apart.
+        className="relative inline-flex min-h-0 min-w-0 cursor-help items-baseline gap-0.5 p-0 align-baseline [font:inherit] text-inherit underline decoration-dotted underline-offset-4 after:absolute after:-inset-x-1 after:-inset-y-3 after:content-['']"
         aria-describedby={open ? id : undefined}
         aria-expanded={open}
         onClick={() => (open ? setOpen(false) : show())}
@@ -43,6 +45,7 @@ export function GlossaryTerm({
         }}
       >
         {children ?? entry.term}
+        <InfoIcon width={12} height={12} className="shrink-0 self-center text-muted" aria-hidden />
       </button>
       {open && (
         <span

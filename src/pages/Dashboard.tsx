@@ -4,15 +4,17 @@ import { LeftOnTableBanner } from "../components/LeftOnTableBanner";
 import { ActivityFeed } from "../components/ActivityFeed";
 import { AskTing } from "../components/AskTing";
 import { DeductibleBar } from "../components/DeductibleBar";
+import { EnrollmentCard } from "../components/EnrollmentCard";
 import { FsaCountdown } from "../components/FsaCountdown";
 import { MaxGauge } from "../components/MaxGauge";
 import { PlanPicker } from "../components/PlanPicker";
 import { RemindersCard } from "../components/RemindersCard";
+import { Timeline } from "../components/Timeline";
 import { PageHeader, Section } from "../components/Section";
 import { maxGauges } from "../engine/helpers";
 import { PERSONAS } from "../data/personas";
 import { formatDate, formatMoney } from "../lib/format";
-import { yearOf } from "../lib/dates";
+import { isEnrollmentWindow, yearOf } from "../lib/dates";
 import { useActive, useAppStore, useProfile } from "../store";
 export default function Dashboard() {
   const persona = useAppStore((s) => PERSONAS[s.personaId]);
@@ -56,7 +58,19 @@ export default function Dashboard() {
             : "Add your treatment"}
         </Link>
       </section>
+      {isEnrollmentWindow(profile.asOf) && <EnrollmentCard variant="compact" />}
       <LeftOnTableBanner />
+      <Section
+        title="Treatment timeline"
+        id="timeline"
+        actions={
+          <Link to="/treatment" className="btn-ghost">
+            Details
+          </Link>
+        }
+      >
+        <Timeline compact />
+      </Section>
       <div className="grid gap-8 lg:grid-cols-2">
         <Section title="Benefits this year" id="max">
           <p className="mb-4 text-base">

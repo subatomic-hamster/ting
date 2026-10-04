@@ -40,10 +40,7 @@ for (const width of [320, 375, 390, 430, 768]) {
         .evaluate((el) => getComputedStyle(el).fontSize);
       expect(parseFloat(type), route).toBeGreaterThanOrEqual(32);
       if (route === "/treatment") {
-        await page
-          .locator("#waterfall")
-          .getByText("Cost breakdown", { exact: true })
-          .click();
+        // Explanations are shown inline; the price editor is the remaining disclosure.
         await page
           .locator("#waterfall")
           .getByText("Update dentist fee and insurer allowance", {
