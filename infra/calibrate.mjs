@@ -57,7 +57,8 @@ let best = { T: 1, nll: nll(1) };
 if (wrong >= 3) for (let T = 0.5; T <= 3.001; T += 0.05) if (nll(T) < best.nll) best = { T: Math.round(T * 100) / 100, nll: nll(T) };
 
 function reliability(T) {
-  const bins = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0001].slice(0, -1).map((lo, i, a) => ({ lo, hi: i === a.length - 1 ? 1 : a[i + 1], n: 0, correct: 0, conf: 0 }));
+  const edges = [0, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
+  const bins = edges.slice(0, -1).map((lo, i) => ({ lo, hi: edges[i + 1], n: 0, correct: 0, conf: 0 }));
   let ece = 0;
   let correct = 0;
   for (const r of rows) {
@@ -65,7 +66,7 @@ function reliability(T) {
     const [top, p] = Object.entries(d).reduce((a, b) => (b[1] > a[1] ? b : a));
     const ok = top === r.label;
     correct += ok ? 1 : 0;
-    const bin = bins.find((b) => p >= b.lo && p < b.hi + 1e-9) ?? bins[0];
+    const bin = bins.find((b) => p >= b.lo && (p < b.hi || b.hi === 1)) ?? bins[0];
     bin.n++;
     bin.correct += ok ? 1 : 0;
     bin.conf += p;

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-04T01:50:06.804Z",
+  "generatedAt": "2026-10-04T01:58:13.880Z",
   "model": "Winnow-12B Q8 (local, Apple M5 24 GB, Metal)",
   "examples": 67,
   "byKind": {
@@ -7,7 +7,7 @@
     "document": 12,
     "injection": 10
   },
-  "seconds": 88.848,
+  "seconds": 87.747,
   "temperature": 1,
   "errors": 1,
   "raw": {
@@ -15,10 +15,16 @@
     "ece": 0.024353771918572818,
     "bins": [
       {
-        "range": "50-60%",
+        "range": "0-50%",
         "n": 1,
         "accuracy": 0,
         "confidence": 0.32379619974434115
+      },
+      {
+        "range": "50-60%",
+        "n": 0,
+        "accuracy": null,
+        "confidence": null
       },
       {
         "range": "60-70%",
@@ -51,10 +57,16 @@
     "ece": 0.024353771918572818,
     "bins": [
       {
-        "range": "50-60%",
+        "range": "0-50%",
         "n": 1,
         "accuracy": 0,
         "confidence": 0.32379619974434115
+      },
+      {
+        "range": "50-60%",
+        "n": 0,
+        "accuracy": null,
+        "confidence": null
       },
       {
         "range": "60-70%",

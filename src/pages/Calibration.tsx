@@ -36,7 +36,7 @@ export default function CalibrationPage() {
       ) : (
         <Section title={`${c.examples} labelled examples · ${Math.round(c.calibrated.accuracy * 100)}% top-answer accuracy`} id="chart">
           <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-md" role="img" aria-label="Reliability diagram">
-            <line x1={x(0.5)} y1={y(0.5)} x2={x(1)} y2={y(1)} stroke="#94a3b8" strokeDasharray="4 3" />
+            <line x1={x(0)} y1={y(0)} x2={x(1)} y2={y(1)} stroke="#94a3b8" strokeDasharray="4 3" />
             <line x1={PAD} y1={y(0)} x2={W - 8} y2={y(0)} stroke="#cbd5e1" />
             <line x1={PAD} y1={y(0)} x2={PAD} y2={8} stroke="#cbd5e1" />
             {[0, 0.5, 1].map((t) => (
@@ -44,7 +44,7 @@ export default function CalibrationPage() {
                 {t * 100}%
               </text>
             ))}
-            {[0.5, 0.75, 1].map((t) => (
+            {[0, 0.5, 1].map((t) => (
               <text key={`x${t}`} x={x(t)} y={H - PAD + 14} textAnchor="middle" fontSize="10" fill="#64748b">
                 {t * 100}%
               </text>
