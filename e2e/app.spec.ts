@@ -65,13 +65,11 @@ test("a dentist's bill above the EOB is flagged", async ({ page }) => {
   await expect(flag).toBeVisible();
 });
 
-test('explanations are verified, proved by Automated Reasoning, and switch to Spanish', async ({ page }) => {
+test('explanations are verified and proved by Automated Reasoning', async ({ page }) => {
   await page.goto('/treatment');
   await page.getByRole('button', { name: /Root canal \(molar\) on #19/ }).first().click();
   await expect(page.getByText('Proved').first()).toBeVisible({ timeout: 30_000 });
   await expect(page.getByText('Verified').first()).toBeVisible();
-  await page.getByRole('radio', { name: 'es' }).click();
-  await expect(page.getByText(/\b(paga|pagas|usted|su plan|tu plan|el plan|dentista|seguro|deducible)\b/i).first()).toBeVisible({ timeout: 45_000 });
 });
 
 test('dentist map shows every practice on OpenStreetMap', async ({ page }) => {

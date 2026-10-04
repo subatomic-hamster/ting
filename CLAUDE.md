@@ -20,6 +20,7 @@ npm run build        # tsc -b && vite build into dist/
 npm ci               # infra has its own package.json (CDK)
 npm run deploy       # builds the web app, then cdk deploy; writes infra/outputs.json
 npm run e2e         # (repo root) Playwright on the live site: desktop Chrome + iPhone WebKit; needs AWS_PROFILE for test tokens
+npm run e2e:local   # (repo root) Playwright on a local production build with the mock API (no AWS); same two devices
 node scripts/seed-e2e.mjs    # test users for e2e (admin-API sign-in only); credentials in infra/e2e-users.local.json (gitignored)
 node smoke.mjs       # prod smoke test (23 checks): every route, Bedrock, Textract, reasoning, Winnow, claims, reminders, inbox
 node eval.mjs        # intake accuracy on evals/intake.json against the live API → docs/accuracy.md
@@ -84,7 +85,6 @@ Stack: React 18, Vite, Tailwind 4, Zustand, React Query and zod.
   - **Share links** store a snapshot of the member's plan in DynamoDB (30-day expiry, 410 once expired); `/share/:token` renders it on any device.
   - **Reminders and digests:** a daily EventBridge rule (`reminders.ts`) sends them. Email is content-free unless the member opts into detail.
   - **EOB appeal draft** (`engine/eobAppeal.ts`), **invoice reconciliation and the overbilling check** (`engine/reconcile.ts`), and the **forwarding inbox** (`engine/inbox.ts`, simulated SES inbound).
-  - **Spanish explanations** (EN/ES switch) go through the same amount checks.
   - **Maps:** Leaflet with OpenStreetMap tiles (`components/DentistMap.tsx`). Location Service is denied in event accounts.
   - **Offline:** `public/sw.js` caches the app shell. `withOfflineFallback` in `api/index.ts` answers compute calls with the in-browser `mockApi` when the network is gone.
   - **Plan rules review:**

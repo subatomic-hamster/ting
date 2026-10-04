@@ -368,7 +368,7 @@ const routes: Record<string, Route> = {
     const line = body.line as AdjudicatedLine | undefined;
     if (!isRec(line) || !Array.isArray(line.waterfall)) throw new HttpError(400, 'line is required');
     const [steps, reasoning] = await Promise.all([
-      explainWithModel(line, callBedrock, body.language === 'es' ? 'es' : 'en'),
+      explainWithModel(line, callBedrock),
       checkLine(line).catch((err: unknown) => {
         console.warn('automated reasoning failed', err);
         return undefined;
