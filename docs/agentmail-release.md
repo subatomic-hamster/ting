@@ -19,12 +19,14 @@ The live test creates an owned temporary AgentMail inbox, briefly links Jordan's
 
 ## Verification
 
-- Unit suite: **221 passed across 33 files**. AgentMail cases cover sending, threaded replies, delivery failures retained in the outbox, unconfigured secrets, tampering, wrong signing secrets, rotated signatures, unsupported versions, missing headers, malformed timestamps and the five-minute replay window.
+- Unit suite: **225 passed across 35 files**. AgentMail cases cover sending, threaded replies, delivery failures retained in the outbox, unconfigured secrets, tampering, wrong signing secrets, rotated signatures, unsupported versions, missing headers, malformed timestamps and the five-minute replay window.
 - Lint and production TypeScript/build checks passed.
 - Local browser suite: **55 passed**, with 5 intentional duplicate WebKit viewport-matrix skips. Runs desktop Chromium and iPhone WebKit, including the wordmark/absence of global notices, surveys, quotes, dates, persistence, PDF intake, insurance-card OCR and sharing.
 - Docker browser suite: **12 passed**, including PDF-worker MIME, card OCR, client routes and zero attempted external requests. Offline artifacts refreshed; source and artifact hashes verified.
-- Live AgentMail exchange: **9 checks passed**, including welcome receipt, inbound delivery, actual provider webhook processing, appointment recording, successful application delivery, reply receipt and original-thread preservation. Temporary inbox/member fixtures removed and original contact restored.
+- Live AgentMail exchange: **12 checks passed**, including welcome receipt, inbound delivery, actual provider webhook processing, appointment recording, successful application delivery, reply receipt and original-thread preservation. Malformed and expired timestamps and unsupported signature versions are rejected in the deployed API. Temporary inbox/member fixtures removed and original contact restored.
 
 Webhook checking now rejects malformed timestamps and unsupported signature versions. Provider failure logs retain method/status rather than response bodies or mailbox identifiers.
 
 These tests use synthetic appointment content. They do not certify external carrier data, all attachment formats, external email-provider deliverability or production member authentication. The Docker submission uses its local outbox; live AgentMail runs in the AWS backend.
+
+The live iPhone regression run found a custom-date reset when replayed claims completed other work. Completed placements are now removed without discarding dates for remaining treatment. Member pages wait until the fetched profile has been merged before accepting edits. Four regression tests cover these behaviors and a complete schedule when new work is added. The PDF journey handles a fully extracted endodontic classification or a required follow-up, and verifies 80% root-canal coverage against the supplied sample.

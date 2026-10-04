@@ -81,6 +81,7 @@ test("published provider reference retains source and unknown allowance", async 
     .locator("#items")
     .getByRole("button", { name: /Crown \(porcelain\).*Fee \$900/ });
   await row.click();
+  await expect(row).toHaveAttribute("aria-pressed", "true");
   await page
     .locator("#waterfall")
     .getByText("Price sources", { exact: true })

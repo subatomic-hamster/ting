@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api, onApiTrace, USE_MOCKS } from "../api";
 import { useAuth } from "../auth/auth";
 import { useAppStore } from "../store";
@@ -42,14 +42,19 @@ export function useBootstrap() {
   });
   // Live: the member's profile as the server builds it from the insurer's records and the email agent's corpus.
   const merge = useAppStore((s) => s.mergeServerProfile);
+  const profileScope = `${personaId}:${authSub ?? ""}`;
+  const [loadedScope, setLoadedScope] = useState<string>();
   const live = useQuery({
     queryKey: ["profile", personaId, authSub],
     queryFn: () => loadLiveProfile(personaId, () => api.getProfile()),
     enabled: !USE_MOCKS,
   });
   useEffect(() => {
-    if (live.data) merge(live.data);
-  }, [live.data, merge]);
+    if (live.data) {
+      merge(live.data);
+      setLoadedScope(profileScope);
+    }
+  }, [live.data, merge, profileScope]);
   const queryClient = useQueryClient();
   useEffect(() => {
     if (USE_MOCKS) return undefined;
@@ -95,7 +100,7 @@ export function useBootstrap() {
     session: session.data,
     profileStatus: USE_MOCKS
       ? "ready"
-      : live.isPending
+      : live.isPending || (!live.isError && loadedScope !== profileScope)
         ? "loading"
         : live.isError || !live.data
           ? "error"

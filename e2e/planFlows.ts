@@ -176,8 +176,19 @@ export function registerPlanFlows() {
     const answer = page.getByLabel(
       "Is endodontics basic or major on your plan?",
     );
-    await expect(answer).toBeVisible();
-    await answer.selectOption("basic");
+    // The local reader asks this question; the live reader can find the answer in the PDF.
+    if (await answer.isVisible()) await answer.selectOption("basic");
+    await expect(
+      page.getByRole("button", { name: "Confirm extracted coverage", exact: true }),
+    ).toBeEnabled();
+    const extracted = page.locator("section").filter({
+      has: page.getByRole("heading", { name: "Rules read from the document", exact: true }),
+    }).last();
+    await extracted.getByText("Show more plan details", { exact: true }).click();
+    const rootCanal = extracted.locator("article").filter({
+      has: page.getByRole("heading", { name: "Root canals", exact: true }),
+    });
+    await expect(rootCanal.locator("dd").first()).toHaveText("80%");
     await page
       .getByRole("button", { name: "Confirm extracted coverage", exact: true })
       .click();

@@ -506,6 +506,7 @@ export const useAppStore = create<AppState>()((set, get) => {
         if (update.duplicate) return;
         set({
           profile: update.profile,
+          custom: s.custom.filter((placement) => update.profile.procedures.some((p) => p.id === placement.id)),
           liveClaimIds: [...s.liveClaimIds, event.claimId],
           liveClaims: [...s.liveClaims, event],
           claimChecks: [
@@ -587,6 +588,7 @@ export const useAppStore = create<AppState>()((set, get) => {
         ).profile;
       set({
         profile,
+        custom: s.custom.filter((placement) => profile.procedures.some((p) => p.id === placement.id)),
         plans: s.plans.some((p) => p.id === server.currentPlan.id)
           ? s.plans
           : [...s.plans, server.currentPlan],
