@@ -1,6 +1,6 @@
 import additionalCodes from "../data/procedure-catalog.json";
 import demoFees from "../data/demo-fees.json";
-import type { CdtCategory, FeeTable, OutOfNetworkBasis } from "./types";
+import type { CdtCategory, FeeEntry, FeeTable, OutOfNetworkBasis } from "./types";
 
 export interface CdtInfo {
   description: string;
@@ -280,13 +280,19 @@ export const CDT: Record<string, CdtInfo> = {
   },
 };
 
-/** Synthetic worked-example fees. These are not FAIR Health prices or verified ZIP-specific rates. */
+/**
+ * Sample-account fees for ZIP 27401. Codes on NC Medicaid's published dental fee schedule (effective Feb 10, 2022) are
+ * estimated from it: billed ≈ rate ÷ Medicaid's share of dentist charges, in-network ≈ rate ÷ its share of private
+ * allowed amounts (ADA Health Policy Institute, North Carolina, 2024: adults 36.3% / 54.8%, children 34.3% / 52.8%), with
+ * charge percentiles spread around the median (90th ≈ 1.25×). Codes Medicaid doesn't list keep synthetic sample fees.
+ * Estimates, not quotes or contracted rates: see docs/dental-pricing-and-plan-designs.md.
+ */
 export const DEMO_FEES: FeeTable = Object.fromEntries(
-  Object.entries(demoFees).map(([code, fee]) => [
+  Object.entries(demoFees as Record<string, FeeEntry>).map(([code, fee]) => [
     code,
     {
       ...fee,
-      source: { kind: "demo", label: "Synthetic demo fees", zip: "27401" },
+      source: fee.source ?? { kind: "demo", label: "Sample fee: not on NC Medicaid's schedule", zip: "27401" },
     },
   ]),
 );

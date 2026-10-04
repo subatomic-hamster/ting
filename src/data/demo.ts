@@ -1,11 +1,9 @@
 // Seeded demo data, labelled "demo data" on screen. Plan numbers follow the spec's worked example:
 // $1,500 max with $300 used, root canal + buildup + two crowns quoted in October.
 //
-// The plan designs mirror real Lincoln-insured employer plans (docs/dental-pricing-and-plan-designs.md):
-// Low ≈ Iredell County NC Low Plan 2023–24 ($1,500 max, $50 deductible, preventive/basic/major 100/80/50, the common
-// Lincoln split); High ≈ Iredell High / Prosper ISD High 2024–25 ($2,000 max, child braces, 90th-percentile U&C,
-// SmileRewards); Basic ≈ Life School of Dallas Low 2025 ($750 max, $100 deductible, 80/80/50, MAC). MaxRewards
-// rollover tables are Lincoln's published ones. Premiums are illustrative, within the observed employee-only range.
+// The plan designs mirror real employer plans (docs/dental-pricing-and-plan-designs.md); PLAN_BASIS below names them.
+// MaxRewards rollover tables are Lincoln's published ones. Premiums are illustrative, within the observed
+// employee-only range.
 import { DEMO_FEES } from '../engine/cdt';
 import type { CdtCategory, FrequencyLimit, PlanRules, Profile, ServiceClass } from '../engine/types';
 
@@ -146,6 +144,19 @@ export const WAIVE: PlanRules = selfPay('waive', 'Waive coverage and pay yoursel
 export const MEMBERSHIP: PlanRules = selfPay('membership', "Your dentist's membership plan", 'membership', 399, 0.2);
 
 export const DEMO_PLAN_OPTIONS: PlanRules[] = [ACME_BASIC, ACME_LOW, ACME_HIGH, WAIVE, MEMBERSHIP];
+
+/**
+ * The real employer plans each sample plan is modelled on, shown under its name. Employers only, never carriers.
+ * Basic = Life School of Dallas Low ($750 max, $100 deductible, 80/80/50, MAC). Low = Iredell County's $1,500 max and
+ * $50 deductible with the 100/80/50 split and no braces of Prosper ISD's Low and Guilford County Schools' Standard.
+ * High = Iredell County's $2,000 max, braces and 90th-percentile out-of-network pay, with Prosper ISD High's 100/80/50
+ * and SmileRewards; Guilford County's Enhanced plan is the same shape.
+ */
+export const PLAN_BASIS: Partial<Record<string, string>> = {
+  [ACME_BASIC.id]: 'Based on Life School of Dallas, TX (Low, 2025) or Prosper ISD, TX (Standard, 2024–25).',
+  [ACME_LOW.id]: 'Based on Iredell County, NC (Low, 2023–24), Prosper ISD, TX (Low, 2024–25) or Guilford County Schools, NC (Standard, 2026).',
+  [ACME_HIGH.id]: 'Based on Iredell County, NC (High, 2023–24), Prosper ISD, TX (High, 2024–25) or Guilford County, NC (Enhanced, 2025).',
+};
 
 export const DEMO_PROFILE: Profile = {
   asOf: '2026-10-05',

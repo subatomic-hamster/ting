@@ -215,9 +215,9 @@ describe("adjudicator rules", () => {
       },
     ]);
     const l = lineOf(at(p, { f: "2026-10-20" }), "f");
-    expect(l.benefitBase).toBe(160); // D2160 in-network fee
-    expect(l.planPaid).toBe(128); // 160 × 80%, deductible already met
-    expect(l.memberOwes).toBe(87);
+    expect(l.benefitBase).toBe(209); // D2160 in-network fee
+    expect(l.planPaid).toBe(167.2); // 209 × 80%, deductible already met
+    expect(l.memberOwes).toBe(47.8);
     // A front tooth gets no downgrade.
     const front = profile([
       {
@@ -252,13 +252,13 @@ describe("adjudicator rules", () => {
 
   it("8. out of network: plan pays on the 80th-percentile allowance, dentist balance-bills the rest", () => {
     const p = profile([
-      { id: "r", cdt: "D3330", tooth: 19, fee: 1180, inNetwork: false },
+      { id: "r", cdt: "D3330", tooth: 19, fee: 1450, inNetwork: false },
     ]);
     const l = lineOf(at(p, { r: "2026-10-20" }), "r");
-    expect(l.allowed).toBe(1145); // Explicit synthetic 80th-percentile fixture, not observed market data.
-    expect(l.planPaid).toBe(916);
-    expect(l.balanceBill).toBe(35);
-    expect(l.memberOwes).toBe(264);
+    expect(l.allowed).toBe(1368); // Estimated 80th percentile (Medicaid-based median × 1.158), not observed market data.
+    expect(l.planPaid).toBe(1094.4);
+    expect(l.balanceBill).toBe(82);
+    expect(l.memberOwes).toBe(355.6);
   });
 
   it("9. MaxRewards: a low-use year adds $500 to next year, deposited on day 65", () => {

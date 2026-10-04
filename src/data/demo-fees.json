@@ -1,243 +1,363 @@
 {
   "D0120": {
-    "billed": 65,
-    "inNetwork": 45,
-    "ucr": {
-      "50": 53,
-      "70": 60,
-      "80": 63,
-      "90": 68,
-      "95": 73
-    },
-    "mac": 45
-  },
-  "D0140": {
-    "billed": 90,
-    "inNetwork": 60,
+    "billed": 74,
+    "inNetwork": 49,
     "ucr": {
       "50": 74,
-      "70": 83,
-      "80": 87,
-      "90": 95,
-      "95": 101
+      "70": 81,
+      "80": 86,
+      "90": 92,
+      "95": 98
     },
-    "mac": 60
+    "mac": 49,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $26.96 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
+  },
+  "D0140": {
+    "billed": 106,
+    "inNetwork": 70,
+    "ucr": {
+      "50": 106,
+      "70": 116,
+      "80": 123,
+      "90": 132,
+      "95": 141
+    },
+    "mac": 70,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $38.43 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D0150": {
-    "billed": 110,
-    "inNetwork": 75,
-    "ucr": {
-      "50": 90,
-      "70": 101,
-      "80": 107,
-      "90": 116,
-      "95": 123
-    },
-    "mac": 75
-  },
-  "D0210": {
-    "billed": 160,
-    "inNetwork": 110,
-    "ucr": {
-      "50": 131,
-      "70": 147,
-      "80": 155,
-      "90": 168,
-      "95": 179
-    },
-    "mac": 110
-  },
-  "D0220": {
-    "billed": 35,
-    "inNetwork": 25,
-    "ucr": {
-      "50": 29,
-      "70": 32,
-      "80": 34,
-      "90": 37,
-      "95": 39
-    },
-    "mac": 25
-  },
-  "D0274": {
-    "billed": 80,
-    "inNetwork": 55,
-    "ucr": {
-      "50": 66,
-      "70": 74,
-      "80": 78,
-      "90": 84,
-      "95": 90
-    },
-    "mac": 55
-  },
-  "D0330": {
-    "billed": 140,
-    "inNetwork": 95,
-    "ucr": {
-      "50": 115,
-      "70": 129,
-      "80": 136,
-      "90": 147,
-      "95": 157
-    },
-    "mac": 95
-  },
-  "D1110": {
-    "billed": 120,
+    "billed": 129,
     "inNetwork": 85,
     "ucr": {
-      "50": 98,
-      "70": 110,
-      "80": 116,
-      "90": 126,
-      "95": 134
+      "50": 129,
+      "70": 141,
+      "80": 149,
+      "90": 161,
+      "95": 172
     },
-    "mac": 85
+    "mac": 85,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $46.65 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
+  },
+  "D0210": {
+    "billed": 207,
+    "inNetwork": 137,
+    "ucr": {
+      "50": 207,
+      "70": 227,
+      "80": 240,
+      "90": 259,
+      "95": 276
+    },
+    "mac": 137,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $75.08 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
+  },
+  "D0220": {
+    "billed": 43,
+    "inNetwork": 28,
+    "ucr": {
+      "50": 43,
+      "70": 47,
+      "80": 50,
+      "90": 54,
+      "95": 57
+    },
+    "mac": 28,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $15.60 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
+  },
+  "D0274": {
+    "billed": 92,
+    "inNetwork": 61,
+    "ucr": {
+      "50": 92,
+      "70": 101,
+      "80": 107,
+      "90": 115,
+      "95": 122
+    },
+    "mac": 61,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $33.55 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
+  },
+  "D0330": {
+    "billed": 171,
+    "inNetwork": 113,
+    "ucr": {
+      "50": 171,
+      "70": 187,
+      "80": 198,
+      "90": 214,
+      "95": 228
+    },
+    "mac": 113,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $61.95 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
+  },
+  "D1110": {
+    "billed": 110,
+    "inNetwork": 73,
+    "ucr": {
+      "50": 110,
+      "70": 120,
+      "80": 127,
+      "90": 138,
+      "95": 146
+    },
+    "mac": 73,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $39.83 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D1120": {
-    "billed": 85,
-    "inNetwork": 60,
+    "billed": 83,
+    "inNetwork": 54,
     "ucr": {
-      "50": 70,
-      "70": 78,
-      "80": 82,
-      "90": 89,
-      "95": 95
+      "50": 83,
+      "70": 91,
+      "80": 96,
+      "90": 104,
+      "95": 110
     },
-    "mac": 60
+    "mac": 54,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $28.46 ÷ ADA HPI child ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D1206": {
-    "billed": 45,
-    "inNetwork": 30,
-    "ucr": {
-      "50": 37,
-      "70": 41,
-      "80": 44,
-      "90": 47,
-      "95": 50
-    },
-    "mac": 30
-  },
-  "D1351": {
-    "billed": 60,
-    "inNetwork": 40,
+    "billed": 49,
+    "inNetwork": 32,
     "ucr": {
       "50": 49,
-      "70": 55,
-      "80": 58,
-      "90": 63,
-      "95": 67
+      "70": 54,
+      "80": 57,
+      "90": 61,
+      "95": 65
     },
-    "mac": 40
+    "mac": 32,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $16.77 ÷ ADA HPI child ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
+  },
+  "D1351": {
+    "billed": 87,
+    "inNetwork": 57,
+    "ucr": {
+      "50": 87,
+      "70": 95,
+      "80": 101,
+      "90": 109,
+      "95": 116
+    },
+    "mac": 57,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $29.89 ÷ ADA HPI child ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D2140": {
-    "billed": 150,
-    "inNetwork": 105,
+    "billed": 215,
+    "inNetwork": 143,
     "ucr": {
-      "50": 123,
-      "70": 138,
-      "80": 146,
-      "90": 158,
-      "95": 168
-    },
-    "mac": 105
-  },
-  "D2150": {
-    "billed": 190,
-    "inNetwork": 130,
-    "ucr": {
-      "50": 156,
-      "70": 175,
-      "80": 184,
-      "90": 200,
-      "95": 213
-    },
-    "mac": 130
-  },
-  "D2160": {
-    "billed": 230,
-    "inNetwork": 160,
-    "ucr": {
-      "50": 189,
-      "70": 212,
-      "80": 223,
-      "90": 242,
-      "95": 258
-    },
-    "mac": 160
-  },
-  "D2161": {
-    "billed": 280,
-    "inNetwork": 190,
-    "ucr": {
-      "50": 230,
-      "70": 258,
-      "80": 272,
-      "90": 294,
-      "95": 314
-    },
-    "mac": 190
-  },
-  "D2330": {
-    "billed": 170,
-    "inNetwork": 115,
-    "ucr": {
-      "50": 139,
-      "70": 156,
-      "80": 165,
-      "90": 179,
-      "95": 190
-    },
-    "mac": 115
-  },
-  "D2391": {
-    "billed": 200,
-    "inNetwork": 135,
-    "ucr": {
-      "50": 164,
-      "70": 184,
-      "80": 194,
-      "90": 210,
-      "95": 224
-    },
-    "mac": 135
-  },
-  "D2392": {
-    "billed": 255,
-    "inNetwork": 175,
-    "ucr": {
-      "50": 209,
+      "50": 215,
       "70": 235,
-      "80": 247,
-      "90": 268,
+      "80": 249,
+      "90": 269,
       "95": 286
     },
-    "mac": 175
+    "mac": 143,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $78.12 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
+  },
+  "D2150": {
+    "billed": 273,
+    "inNetwork": 181,
+    "ucr": {
+      "50": 273,
+      "70": 299,
+      "80": 316,
+      "90": 341,
+      "95": 363
+    },
+    "mac": 181,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $98.99 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
+  },
+  "D2160": {
+    "billed": 316,
+    "inNetwork": 209,
+    "ucr": {
+      "50": 316,
+      "70": 346,
+      "80": 366,
+      "90": 395,
+      "95": 421
+    },
+    "mac": 209,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $114.61 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
+  },
+  "D2161": {
+    "billed": 348,
+    "inNetwork": 230,
+    "ucr": {
+      "50": 348,
+      "70": 381,
+      "80": 403,
+      "90": 435,
+      "95": 463
+    },
+    "mac": 230,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $126.16 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
+  },
+  "D2330": {
+    "billed": 190,
+    "inNetwork": 126,
+    "ucr": {
+      "50": 190,
+      "70": 208,
+      "80": 220,
+      "90": 238,
+      "95": 253
+    },
+    "mac": 126,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $68.90 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
+  },
+  "D2391": {
+    "billed": 230,
+    "inNetwork": 153,
+    "ucr": {
+      "50": 230,
+      "70": 252,
+      "80": 266,
+      "90": 288,
+      "95": 306
+    },
+    "mac": 153,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $83.60 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
+  },
+  "D2392": {
+    "billed": 306,
+    "inNetwork": 202,
+    "ucr": {
+      "50": 306,
+      "70": 335,
+      "80": 354,
+      "90": 382,
+      "95": 407
+    },
+    "mac": 202,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $110.92 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D2393": {
-    "billed": 310,
-    "inNetwork": 215,
+    "billed": 372,
+    "inNetwork": 246,
     "ucr": {
-      "50": 254,
-      "70": 285,
-      "80": 301,
-      "90": 326,
-      "95": 347
+      "50": 372,
+      "70": 407,
+      "80": 431,
+      "90": 465,
+      "95": 495
     },
-    "mac": 215
+    "mac": 246,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $134.90 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D2394": {
-    "billed": 370,
-    "inNetwork": 255,
+    "billed": 450,
+    "inNetwork": 298,
     "ucr": {
-      "50": 303,
-      "70": 340,
-      "80": 359,
-      "90": 389,
-      "95": 414
+      "50": 450,
+      "70": 493,
+      "80": 521,
+      "90": 562,
+      "95": 599
     },
-    "mac": 255
+    "mac": 298,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $163.46 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D2740": {
     "billed": 1450,
@@ -288,16 +408,22 @@
     "mac": 90
   },
   "D2950": {
-    "billed": 330,
-    "inNetwork": 250,
+    "billed": 283,
+    "inNetwork": 187,
     "ucr": {
-      "50": 271,
-      "70": 304,
-      "80": 320,
-      "90": 347,
-      "95": 370
+      "50": 283,
+      "70": 310,
+      "80": 328,
+      "90": 354,
+      "95": 377
     },
-    "mac": 250
+    "mac": 187,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $102.73 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D2954": {
     "billed": 420,
@@ -312,112 +438,166 @@
     "mac": 310
   },
   "D3220": {
-    "billed": 220,
-    "inNetwork": 160,
+    "billed": 234,
+    "inNetwork": 155,
     "ucr": {
-      "50": 180,
-      "70": 202,
-      "80": 213,
-      "90": 231,
-      "95": 246
+      "50": 234,
+      "70": 256,
+      "80": 271,
+      "90": 292,
+      "95": 311
     },
-    "mac": 160
+    "mac": 155,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $84.80 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D3310": {
-    "billed": 950,
-    "inNetwork": 750,
+    "billed": 817,
+    "inNetwork": 541,
     "ucr": {
-      "50": 779,
-      "70": 874,
-      "80": 922,
-      "90": 998,
-      "95": 1064
+      "50": 817,
+      "70": 895,
+      "80": 946,
+      "90": 1021,
+      "95": 1087
     },
-    "mac": 750
+    "mac": 541,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $296.52 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D3320": {
-    "billed": 1100,
-    "inNetwork": 850,
+    "billed": 965,
+    "inNetwork": 639,
     "ucr": {
-      "50": 902,
-      "70": 1012,
-      "80": 1067,
-      "90": 1155,
-      "95": 1232
+      "50": 965,
+      "70": 1057,
+      "80": 1117,
+      "90": 1206,
+      "95": 1284
     },
-    "mac": 850
+    "mac": 639,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $350.44 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D3330": {
-    "billed": 1180,
-    "inNetwork": 1000,
+    "billed": 1181,
+    "inNetwork": 782,
     "ucr": {
-      "50": 968,
-      "70": 1086,
-      "80": 1145,
-      "90": 1239,
-      "95": 1322
+      "50": 1181,
+      "70": 1293,
+      "80": 1368,
+      "90": 1476,
+      "95": 1572
     },
-    "mac": 1000
+    "mac": 782,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $428.62 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D4341": {
-    "billed": 300,
-    "inNetwork": 210,
+    "billed": 290,
+    "inNetwork": 192,
     "ucr": {
-      "50": 246,
-      "70": 276,
-      "80": 291,
-      "90": 315,
-      "95": 336
+      "50": 290,
+      "70": 318,
+      "80": 336,
+      "90": 362,
+      "95": 386
     },
-    "mac": 210
+    "mac": 192,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $105.13 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D4342": {
-    "billed": 210,
-    "inNetwork": 150,
+    "billed": 168,
+    "inNetwork": 112,
     "ucr": {
-      "50": 172,
-      "70": 193,
-      "80": 204,
-      "90": 221,
-      "95": 235
+      "50": 168,
+      "70": 184,
+      "80": 195,
+      "90": 210,
+      "95": 224
     },
-    "mac": 150
+    "mac": 112,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $61.15 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D4355": {
-    "billed": 190,
-    "inNetwork": 130,
+    "billed": 194,
+    "inNetwork": 129,
     "ucr": {
-      "50": 156,
-      "70": 175,
-      "80": 184,
-      "90": 200,
-      "95": 213
+      "50": 194,
+      "70": 212,
+      "80": 225,
+      "90": 242,
+      "95": 258
     },
-    "mac": 130
+    "mac": 129,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $70.44 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D4910": {
-    "billed": 160,
-    "inNetwork": 115,
+    "billed": 143,
+    "inNetwork": 95,
     "ucr": {
-      "50": 131,
-      "70": 147,
-      "80": 155,
-      "90": 168,
-      "95": 179
+      "50": 143,
+      "70": 157,
+      "80": 166,
+      "90": 179,
+      "95": 190
     },
-    "mac": 115
+    "mac": 95,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $51.85 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D5110": {
-    "billed": 2100,
-    "inNetwork": 1600,
+    "billed": 1685,
+    "inNetwork": 1116,
     "ucr": {
-      "50": 1722,
-      "70": 1932,
-      "80": 2037,
-      "90": 2205,
-      "95": 2352
+      "50": 1685,
+      "70": 1845,
+      "80": 1951,
+      "90": 2106,
+      "95": 2243
     },
-    "mac": 1600
+    "mac": 1116,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $611.52 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D5213": {
     "billed": 2300,
@@ -480,40 +660,58 @@
     "mac": 1100
   },
   "D7140": {
-    "billed": 210,
-    "inNetwork": 150,
+    "billed": 183,
+    "inNetwork": 121,
     "ucr": {
-      "50": 172,
-      "70": 193,
-      "80": 204,
-      "90": 221,
-      "95": 235
+      "50": 183,
+      "70": 200,
+      "80": 212,
+      "90": 229,
+      "95": 244
     },
-    "mac": 150
+    "mac": 121,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $66.44 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D7210": {
-    "billed": 330,
-    "inNetwork": 240,
+    "billed": 315,
+    "inNetwork": 208,
     "ucr": {
-      "50": 271,
-      "70": 304,
-      "80": 320,
-      "90": 347,
-      "95": 370
+      "50": 315,
+      "70": 345,
+      "80": 365,
+      "90": 394,
+      "95": 419
     },
-    "mac": 240
+    "mac": 208,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $114.21 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D7240": {
-    "billed": 560,
-    "inNetwork": 410,
+    "billed": 557,
+    "inNetwork": 369,
     "ucr": {
-      "50": 459,
-      "70": 515,
-      "80": 543,
-      "90": 588,
-      "95": 627
+      "50": 557,
+      "70": 610,
+      "80": 645,
+      "90": 696,
+      "95": 741
     },
-    "mac": 410
+    "mac": 369,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $202.18 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D8080": {
     "billed": 6000,
@@ -525,7 +723,12 @@
       "90": 6300,
       "95": 6720
     },
-    "mac": 5200
+    "mac": 5200,
+    "source": {
+      "kind": "demo",
+      "label": "Sample fee: NC Medicaid's braces rate is far below commercial fees",
+      "zip": "27401"
+    }
   },
   "D8090": {
     "billed": 6500,
@@ -540,52 +743,76 @@
     "mac": 5600
   },
   "D9110": {
-    "billed": 110,
-    "inNetwork": 75,
+    "billed": 123,
+    "inNetwork": 81,
     "ucr": {
-      "50": 90,
-      "70": 101,
-      "80": 107,
-      "90": 116,
-      "95": 123
+      "50": 123,
+      "70": 135,
+      "80": 142,
+      "90": 154,
+      "95": 164
     },
-    "mac": 75
+    "mac": 81,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $44.52 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D9230": {
-    "billed": 90,
-    "inNetwork": 65,
+    "billed": 124,
+    "inNetwork": 82,
     "ucr": {
-      "50": 74,
-      "70": 83,
-      "80": 87,
-      "90": 95,
-      "95": 101
+      "50": 124,
+      "70": 136,
+      "80": 144,
+      "90": 155,
+      "95": 165
     },
-    "mac": 65
+    "mac": 82,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $44.94 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D9239": {
-    "billed": 280,
-    "inNetwork": 200,
+    "billed": 208,
+    "inNetwork": 138,
     "ucr": {
-      "50": 230,
-      "70": 258,
-      "80": 272,
-      "90": 294,
-      "95": 314
+      "50": 208,
+      "70": 228,
+      "80": 241,
+      "90": 260,
+      "95": 277
     },
-    "mac": 200
+    "mac": 138,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $75.36 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D9243": {
-    "billed": 230,
-    "inNetwork": 165,
+    "billed": 208,
+    "inNetwork": 138,
     "ucr": {
-      "50": 189,
-      "70": 212,
-      "80": 223,
-      "90": 242,
-      "95": 258
+      "50": 208,
+      "70": 228,
+      "80": 241,
+      "90": 260,
+      "95": 277
     },
-    "mac": 165
+    "mac": 138,
+    "source": {
+      "kind": "demo",
+      "label": "Estimate: NC Medicaid fee $75.36 ÷ ADA HPI adult ratio",
+      "zip": "27401",
+      "url": "https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+    }
   },
   "D9944": {
     "billed": 650,

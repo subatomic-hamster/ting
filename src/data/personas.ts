@@ -51,7 +51,14 @@ export const PERSONAS: Record<PersonaId, Persona> = {
           ],
         },
         procedures: [
-          proc('rc19', 'D3330', { tooth: 19, fee: 1180, deadline: addDays(asOf, 41), locked: true }),
+          // The dentist's quote on the sample treatment plan (public/samples/treatment-plan.png).
+          proc('rc19', 'D3330', {
+            tooth: 19,
+            fee: 1180,
+            feeSource: { kind: 'demo', label: "Sample dentist's quote (treatment plan)", zip: '27401' },
+            deadline: addDays(asOf, 41),
+            locked: true,
+          }),
           proc('bu19', 'D2950', { tooth: 19, deadline: spring, dependsOn: ['rc19'] }),
           proc('cr19', 'D2740', { tooth: 19, deadline: spring, dependsOn: ['bu19'] }),
           proc('cr30', 'D2740', { tooth: 30, deadline: spring }),
