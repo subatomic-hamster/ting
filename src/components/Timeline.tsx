@@ -8,7 +8,7 @@ import {
   type DragMoveEvent,
   type Modifier,
 } from "@dnd-kit/core";
-import { motion, useAnimationControls } from "framer-motion";
+import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { maxGauges } from "../engine/helpers";
 import type { PlannedProcedure } from "../engine/types";
@@ -66,6 +66,7 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
   const profile = useAppStore((s) => s.profile);
   const moveProcedure = useAppStore((s) => s.moveProcedure);
   const today = useAppStore((s) => s.today);
+  const lastChange = useAppStore((s) => s.lastChange);
   const { asOf } = profile;
 
   const year = yearOf(asOf);
@@ -168,19 +169,7 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
 
   return (
     <div>
-      <ul className="divide-y divide-line">
-        {visits.map((v) => (
-          <DateRow
-            key={v.procedure.id + v.date}
-            visit={v}
-            min={asOf}
-            max={end}
-            onApply={(date) => attempt(v, date)}
-          />
-        ))}
-      </ul>
-      <details className="mt-5 border-t border-line">
-        <summary className="text-brand-700">Visual timeline (optional)</summary>
+      <div>
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <p className="text-xs text-muted">
             {compact
@@ -188,6 +177,7 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
               : "Drag a visit, or focus it and use ← → (a week) or Shift + ← → (a month)."}{" "}
             The bold line is Dec 31, when your annual max resets.
           </p>
+          <DeltaPill change={lastChange} />
         </div>
 
         {visits.length === 0 ? (
@@ -288,7 +278,24 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
             </div>
           </div>
         )}
-      </details>
+      </div>
+      {!compact && visits.length > 0 && (
+        // Typing a date is the accessible alternative to dragging; it's open by default on phones.
+        <details className="mt-5 border-t border-line" open={narrowScreen()}>
+          <summary className="text-brand-700">Change dates by typing them</summary>
+          <ul className="divide-y divide-line">
+            {visits.map((v) => (
+              <DateRow
+                key={v.procedure.id + v.date}
+                visit={v}
+                min={asOf}
+                max={end}
+                onApply={(date) => attempt(v, date)}
+              />
+            ))}
+          </ul>
+        </details>
+      )}
       <p className="sr-only" aria-live="polite">
         {message}
       </p>
@@ -450,5 +457,38 @@ function DateRow({
         </p>
       )}
     </li>
+  );
+}
+
+const narrowScreen = () => typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches;
+
+/** The re-priced total after a move, and how long the engine took: the "tested code decides" moment. */
+function DeltaPill({ change }: { change: { id: number; delta: number; ms: number } | null }) {
+  const [visible, setVisible] = useState<number | null>(null);
+  useEffect(() => {
+    if (!change) return;
+    setVisible(change.id);
+    const t = setTimeout(() => setVisible(null), 2500);
+    return () => clearTimeout(t);
+  }, [change]);
+
+  return (
+    <AnimatePresence>
+      {change && visible === change.id && change.delta !== 0 && (
+        <motion.span
+          key={change.id}
+          initial={{ opacity: 0, y: 6, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -6 }}
+          className={`tabular rounded-full px-3 py-1 text-sm font-semibold ${
+            change.delta > 0 ? "bg-cost/10 text-cost ring-1 ring-cost/30" : "bg-save/10 text-save ring-1 ring-save/30"
+          }`}
+          aria-hidden
+        >
+          {formatMoney(change.delta, { signed: true })}
+          <span className="ml-1.5 text-xs font-normal text-muted">recomputed in {change.ms.toFixed(1)} ms</span>
+        </motion.span>
+      )}
+    </AnimatePresence>
   );
 }

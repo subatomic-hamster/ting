@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShareWithDentist } from "../components/DentistQuestions";
+import { DentistQuestions, ShareWithDentist } from "../components/DentistQuestions";
 import { IntakeBox } from "../components/IntakeBox";
 import { ProcedureCatalog } from "../components/ProcedureCatalog";
 import { ProcedureList } from "../components/ProcedureList";
@@ -119,6 +119,9 @@ export default function Treatment() {
             >
               <Timeline />
             </div>
+          </Section>
+          <Section title="Questions for your dentist" id="questions">
+            <DentistQuestions />
             <div className="mt-6">
               <ShareWithDentist compact />
             </div>

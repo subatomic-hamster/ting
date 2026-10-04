@@ -233,13 +233,12 @@ export function registerPlanFlows() {
     });
     await expect(waterfall).toBeVisible();
     await expect(waterfall.locator("li").first()).toContainText("$1,180");
-    const bars = waterfall.locator('[aria-hidden="true"]');
+    const bars = waterfall.locator('li > div[aria-hidden="true"]');
     expect(await bars.count()).toBeGreaterThan(2);
     for (const bar of await bars.all()) {
       await expect(bar).toBeVisible();
       expect((await bar.boundingBox())!.width).toBeGreaterThan(100);
     }
-    await page.getByText("Cost breakdown", { exact: true }).click();
     await expect(page.getByText(/Plan rule:/).first()).toBeVisible();
     expect(
       await page.evaluate(
