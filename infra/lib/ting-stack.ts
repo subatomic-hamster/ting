@@ -243,12 +243,19 @@ export class TingStack extends Stack {
     // Year-end reminders: a daily rule (EventBridge Scheduler isn't available in event accounts) sends the due ones.
     const remindersFn = fn('RemindersFn', 'reminders.ts', {
       timeout: Duration.seconds(60),
-      environment: { TABLE_NAME: table.tableName, WS_ENDPOINT: wsStage.callbackUrl, WEB_ORIGIN: webOrigin, REMINDER_EMAIL: reminderEmail },
+      environment: { TABLE_NAME: table.tableName, WS_ENDPOINT: wsStage.callbackUrl, WEB_ORIGIN: webOrigin, REMINDER_EMAIL: reminderEmail, MODEL_FAST },
     });
     table.grantReadWriteData(remindersFn);
     wsApi.grantManageConnections(remindersFn);
     const sesSend = new PolicyStatement({ actions: ['ses:SendEmail'], resources: ['*'] });
     remindersFn.addToRolePolicy(sesSend);
+    // Digests are reworded by the fast model (amounts checked), same as the API's explanations.
+    remindersFn.addToRolePolicy(
+      new PolicyStatement({
+        actions: ['bedrock:InvokeModel', 'aws-marketplace:ViewSubscriptions', 'aws-marketplace:Subscribe'],
+        resources: [`arn:aws:bedrock:${this.region}:${this.account}:inference-profile/${MODEL_FAST}`, 'arn:aws:bedrock:*::foundation-model/anthropic.*', '*'],
+      }),
+    );
     apiFn.addToRolePolicy(sesSend);
     new Rule(this, 'DailyReminders', {
       schedule: Schedule.cron({ minute: '0', hour: '13' }), // 9am Eastern

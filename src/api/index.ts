@@ -5,6 +5,8 @@
 // engine in Lambda and returns the same types.
 
 import type { CompileResult } from '../compiler/compile';
+import type { Cadence, Detail, Digest } from '../engine/digest';
+import type { EobDiscrepancy } from '../engine/eobAppeal';
 import type { ExplainedStep } from '../engine/explain';
 import type { Reminder } from '../engine/reminders';
 import type { AdjudicatedLine, Ledger, PlannedProcedure, PlanRules, Profile } from '../engine/types';
@@ -61,6 +63,11 @@ export interface ShareSnapshot {
   expiresAt: string;
 }
 
+export interface NotificationPrefs {
+  cadence: Cadence;
+  detail: Detail;
+}
+
 export interface AdminInsights {
   employer: string;
   groups: { id: string; title: string; metric: string; detail: string; n: number }[];
@@ -94,11 +101,13 @@ export interface TingApi {
   /** Benefits summary text → draft plan rules, the evidence for each, and questions for what it doesn't say (Bedrock in AWS). */
   compilePlan(text: string): Promise<CompiledPlan>;
   /** One plain sentence per waterfall step; the caller checks every dollar with verifyNumbers before showing it. */
-  explain(line: AdjudicatedLine, rules: PlanRules): Promise<ExplainedStep[]>;
+  explain(line: AdjudicatedLine, rules: PlanRules, language?: 'en' | 'es'): Promise<ExplainedStep[]>;
   /** Live "claim adjudicated" events (WebSocket in AWS); the store validates and applies them. */
   subscribeLedger(onEvent: (event: unknown) => void): () => void;
   /** Demo control: Lincoln's mock claims feed emits an EOB for the next planned procedure. */
-  fireMockClaim(profile: Profile): Promise<void>;
+  fireMockClaim(profile: Profile, opts?: { underpay?: number }): Promise<void>;
+  /** F7: a factual message to Lincoln about an EOB that differs from the estimate. */
+  draftAppeal(discrepancy: EobDiscrepancy, plan: Pick<PlanRules, 'name' | 'sections'>): Promise<{ text: string; source: 'model' | 'template' }>;
   /** A signed, expiring link for the dentist. The snapshot is what the link shows on any device. */
   createShareLink(scheduleKind: string, snapshot?: Omit<ShareSnapshot, 'sharedAt' | 'expiresAt'>): Promise<{ url: string; expiresAt: string }>;
   /** The snapshot behind a link, or null when it's unknown or expired. */
@@ -106,6 +115,13 @@ export interface TingApi {
   /** Employer view: aggregates only. The server drops groups under 20 and requires the employer_admin role. */
   getAdminInsights(): Promise<AdminInsights>;
   getConsent(): Promise<{ version?: string; at?: string }>;
+  /** F6 notification settings. */
+  getPreferences(): Promise<NotificationPrefs>;
+  savePreferences(prefs: NotificationPrefs): Promise<NotificationPrefs>;
+  /** The engine's digest for this member (reworded by Bedrock in AWS, amounts checked). */
+  getDigest(): Promise<Digest & { source?: string }>;
+  /** Demo control: send this member's digest now, with their privacy preference applied. */
+  sendTestDigest(): Promise<{ emailed: boolean; pushedTo: number; private: boolean }>;
   giveConsent(version: string): Promise<void>;
   /** Signed-in member: delete claims, reminders and consent. */
   deleteMyData(): Promise<void>;

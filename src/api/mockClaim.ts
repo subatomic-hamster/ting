@@ -2,8 +2,11 @@ import { topoOrder, evaluateSchedule } from '../engine/schedule';
 import type { ClaimEvent } from '../engine/ledger';
 import type { Profile } from '../engine/types';
 
-/** Lincoln adjudicates the next certain procedure today, exactly as the engine estimated it. */
-export function mockClaimEvent(profile: Profile, member: string): ClaimEvent {
+/**
+ * Lincoln adjudicates the next certain procedure today, exactly as the engine estimated it.
+ * `underpay` makes Lincoln pay less than estimated, to demo the EOB check.
+ */
+export function mockClaimEvent(profile: Profile, member: string, underpay = 0): ClaimEvent {
   const next = topoOrder(profile.procedures).find((p) => (p.likelihood ?? 1) >= 1);
   if (!next) throw new Error('No planned procedure to claim');
   const [line] = evaluateSchedule({ ...profile, procedures: [next] }, [{ id: next.id, date: profile.asOf }]).lines;
@@ -13,7 +16,16 @@ export function mockClaimEvent(profile: Profile, member: string): ClaimEvent {
     claimId: `CLM-${Date.now().toString(36).toUpperCase()}`,
     serviceDate: profile.asOf,
     provider: { npi: 'demo-0042', inNetwork: next.inNetwork },
-    lines: [{ cdt: line.cdt, tooth: line.tooth, billed: line.billed, allowed: line.allowed, planPaid: line.planPaid, memberOwes: line.memberOwes }],
+    lines: [
+      {
+        cdt: line.cdt,
+        tooth: line.tooth,
+        billed: line.billed,
+        allowed: line.allowed,
+        planPaid: Math.max(0, line.planPaid - underpay),
+        memberOwes: line.memberOwes + Math.min(underpay, line.planPaid),
+      },
+    ],
     rulesVersion: line.rulesVersion,
   };
 }

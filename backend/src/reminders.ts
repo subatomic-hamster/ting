@@ -1,8 +1,11 @@
-// Daily EventBridge rule target: send the year-end reminders that are due today.
+// Daily EventBridge rule target: send the year-end reminders and the digests that are due today.
+import { deliverDigests } from './lib/digest';
 import { deliverDue } from './lib/reminders';
 
 export async function handler() {
-  const delivered = await deliverDue(new Date().toISOString().slice(0, 10));
-  console.log(JSON.stringify({ delivered }));
-  return { delivered: delivered.length };
+  const today = new Date().toISOString().slice(0, 10);
+  const delivered = await deliverDue(today);
+  const digests = await deliverDigests(today);
+  console.log(JSON.stringify({ delivered, digests: digests.map((d) => ({ member: d.member, emailed: d.emailed, pushedTo: d.pushedTo })) }));
+  return { delivered: delivered.length, digests: digests.length };
 }

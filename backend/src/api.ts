@@ -16,6 +16,8 @@ import { addDays, todayISO } from '../../src/lib/dates';
 import { compileWithModel } from './ai/compile';
 import { describeWithModel } from './ai/describe';
 import { explainWithModel } from './ai/explain';
+import { polish } from './ai/polish';
+import { appealAmounts, appealDraft, type EobDiscrepancy } from '../../src/engine/eobAppeal';
 import { isRec } from './ai/model';
 import { liveWinnow, simulatedWinnow, triageDocument, type Decide, type Triage } from './ai/winnow';
 import { callBedrock } from './lib/bedrock';
@@ -24,6 +26,7 @@ import { db, deleteClaims, getShare, putShare } from './lib/db';
 import admin from '../../src/fixtures/admin.json';
 import { rowsToText } from './lib/layout';
 import { checkLine } from './lib/reasoning';
+import { digestFor, getPrefs, prefsSchema, putPrefs, sendDigest } from './lib/digest';
 import { cancelReminder, deliverDue, reminderSchema, scheduleReminder } from './lib/reminders';
 
 const s3 = new S3Client({});
@@ -224,6 +227,37 @@ const routes: Record<string, Route> = {
 
   // Demo control: send the reminders due on the demo's "as of" date, the way the daily rule does.
   'POST /demo/reminders/run': async (e) => json(200, { delivered: await deliverDue(context(e).asOf) }),
+
+  // F7: the engine drafts the message from the EOB and the estimate; the model may only reword it.
+  'POST /eob/appeal': async (e) => {
+    const body = bodyOf(e);
+    const d = body.discrepancy as EobDiscrepancy | undefined;
+    const plan = body.plan as { name?: unknown; sections?: unknown } | undefined;
+    if (!isRec(d) || typeof d.claimId !== 'string' || typeof d.estimated !== 'number' || typeof d.actual !== 'number' || typeof d.cdt !== 'string')
+      throw new HttpError(400, 'discrepancy is required');
+    if (!isRec(plan) || typeof plan.name !== 'string') throw new HttpError(400, 'plan is required');
+    const draft = appealDraft(d, { name: plan.name, sections: isRec(plan.sections) ? (plan.sections as Record<string, string>) : {} });
+    return json(200, await polish(draft, appealAmounts(d), callBedrock, 'message to an insurance company'));
+  },
+
+  'GET /preferences': async (e) => json(200, await getPrefs(PERSONAS[context(e).personaId].memberId)),
+  'POST /preferences': async (e) => {
+    const parsed = prefsSchema.safeParse(bodyOf(e));
+    if (!parsed.success) throw new HttpError(400, 'cadence must be weekly, monthly or off; detail private or detailed');
+    const { personaId } = context(e);
+    return json(200, await putPrefs(PERSONAS[personaId].memberId, personaId, parsed.data));
+  },
+  'GET /digest': async (e) => {
+    const { personaId, asOf } = context(e);
+    return json(200, await digestFor(personaId, asOf));
+  },
+  // Demo control: send this member's digest now (on stage), with their privacy preference applied.
+  'POST /demo/digest/send': async (e) => {
+    const { personaId, asOf } = context(e);
+    const member = PERSONAS[personaId].memberId;
+    const r = await sendDigest(member, personaId, await getPrefs(member), asOf);
+    return json(200, { emailed: r.emailed, pushedTo: r.pushedTo, private: r.private, digest: r.digest });
+  },
 
   // Employer view: aggregates only, and groups under 20 never leave the server.
   'GET /admin/insights': async (e) => {

@@ -7,6 +7,7 @@ import { FsaCountdown } from '../components/FsaCountdown';
 import { LeftOnTableBanner } from '../components/LeftOnTableBanner';
 import { MaxGauge } from '../components/MaxGauge';
 import { SamplePlanNote } from '../components/SamplePlanNote';
+import { NotificationSettings } from '../components/NotificationSettings';
 import { RemindersCard } from '../components/RemindersCard';
 import { PageHeader, Section } from '../components/Section';
 import { Timeline } from '../components/Timeline';
@@ -77,6 +78,7 @@ export default function Dashboard() {
       </Section>
 
       <RemindersCard />
+      <NotificationSettings />
 
       <Section title="Activity" id="activity" actions={<DemoDataPill label="Demo claims feed" />}>
         <ActivityFeed />

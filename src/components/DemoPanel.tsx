@@ -26,6 +26,7 @@ export function DemoPanel() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const fire = useMutation({ mutationFn: () => api.fireMockClaim(useAppStore.getState().profile) });
+  const underpaid = useMutation({ mutationFn: () => api.fireMockClaim(useAppStore.getState().profile, { underpay: 90 }) });
   const brushNow = useHabitStore((s) => s.brushNow);
   const brushing = useHabitStore((s) => s.live?.state === 'running');
 
@@ -92,6 +93,15 @@ export function DemoPanel() {
           onClick={() => fire.mutate()}
         >
           {fire.isPending ? 'Sending…' : fire.isError ? 'Nothing left to claim' : 'Fire mock claim'}
+        </button>
+        <button
+          type="button"
+          className="btn-secondary px-2 py-1.5 text-xs"
+          disabled={underpaid.isPending}
+          onClick={() => underpaid.mutate()}
+          title="Lincoln pays $90 less than Ting estimated, to show the EOB check"
+        >
+          {underpaid.isPending ? 'Sending…' : 'Underpaid EOB'}
         </button>
         <button type="button" className="btn-secondary px-2 py-1.5 text-xs" disabled={brushing} onClick={brushNow}>
           {brushing ? 'Brushing…' : 'Brush now'}

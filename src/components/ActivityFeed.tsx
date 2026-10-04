@@ -1,8 +1,40 @@
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
+import { api } from '../api';
 import { cdtLabel } from '../engine/cdt';
+import type { EobDiscrepancy } from '../engine/eobAppeal';
 import { yearOf } from '../lib/dates';
 import { formatDate, formatMoney } from '../lib/format';
 import { useAppStore } from '../store';
 import { DemoDataPill } from './DemoDataPill';
+
+/** F7: a factual message to Lincoln, drafted from the EOB and the engine's estimate. */
+function AppealDraft({ discrepancy }: { discrepancy: EobDiscrepancy }) {
+  const plan = useAppStore((s) => s.profile.currentPlan);
+  const [copied, setCopied] = useState(false);
+  const draft = useMutation({ mutationFn: () => api.draftAppeal(discrepancy, plan) });
+  if (!draft.data)
+    return (
+      <button type="button" className="btn-secondary mt-1.5 px-2 py-1 text-xs" onClick={() => draft.mutate()} disabled={draft.isPending}>
+        {draft.isPending ? 'Drafting…' : 'Draft a message to Lincoln'}
+      </button>
+    );
+  return (
+    <div className="mt-2 rounded-xl border border-line bg-white p-2">
+      <pre className="text-xs whitespace-pre-wrap text-ink">{draft.data.text}</pre>
+      <div className="mt-1.5 flex items-center gap-2">
+        <button
+          type="button"
+          className="btn-secondary px-2 py-1 text-xs"
+          onClick={() => void navigator.clipboard?.writeText(draft.data.text).then(() => setCopied(true))}
+        >
+          {copied ? 'Copied' : 'Copy'}
+        </button>
+        <span className="text-[11px] text-muted">Every amount is from the EOB or Ting's estimate. You send it; Ting never contacts Lincoln for you.</span>
+      </div>
+    </div>
+  );
+}
 
 export function ActivityFeed() {
   const profile = useAppStore((s) => s.profile);
@@ -30,9 +62,14 @@ export function ActivityFeed() {
               {check && (
                 <span className={`mt-0.5 block text-xs ${check.mismatch ? 'font-medium text-cost' : 'text-save'}`}>
                   {check.mismatch
-                    ? `EOB says you owe ${formatMoney(check.actual)}; Ting estimated ${formatMoney(check.estimated)}. Worth a call to Lincoln.`
+                    ? `EOB says you owe ${formatMoney(check.actual)}; Ting estimated ${formatMoney(check.estimated)}. Worth a message to Lincoln.`
                     : `Matches Ting's estimate of ${formatMoney(check.estimated)}.`}
                 </span>
+              )}
+              {check?.mismatch && e.claimId && (
+                <AppealDraft
+                  discrepancy={{ claimId: e.claimId, cdt: e.cdt, tooth: e.tooth, serviceDate: e.date, estimated: check.estimated, actual: check.actual }}
+                />
               )}
             </span>
             <span className="tabular text-xs text-muted">

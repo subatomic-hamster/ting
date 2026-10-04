@@ -3,6 +3,7 @@
 import { currentIdToken } from '../auth/auth';
 import { PERSONAS } from '../data/personas';
 import { classifyDocument } from '../intake/classify';
+import { notify } from '../lib/notify';
 import { pdfText } from '../services/pdf';
 import { apiContext } from './context';
 import type { ReadDocument, ShareSnapshot, TingApi } from './index';
@@ -61,7 +62,7 @@ export const httpApi: TingApi = {
   parseDescription: (text) => http('/intake/parse', post({ text })),
   readDocument,
   compilePlan: (text) => http('/rules/compile', post({ text })),
-  explain: (line, rules) => http('/explain', post({ line, rules })),
+  explain: (line, rules, language = 'en') => http('/explain', post({ line, rules, language })),
 
   /** Live claims over WebSocket. On connect the backend replays this member's earlier claims; applying them is idempotent. */
   subscribeLedger: (onEvent) => {
@@ -75,9 +76,10 @@ export const httpApi: TingApi = {
       ws.onopen = () => ws?.send(JSON.stringify({ action: 'replay', member }));
       ws.onmessage = (msg) => {
         try {
-          const frame: unknown = JSON.parse(String(msg.data));
-          // The socket also carries reminder.due pushes; the ledger only takes claims.
-          if (typeof frame === 'object' && frame !== null && (frame as { type?: unknown }).type === 'claim.adjudicated') onEvent(frame);
+          const frame = JSON.parse(String(msg.data)) as { type?: unknown; title?: unknown };
+          if (frame.type === 'claim.adjudicated') onEvent(frame);
+          // Digests and reminders arrive content-free; a system notification only says there's an update.
+          else if (frame.type === 'digest' || frame.type === 'reminder.due') notify('You have a dental benefits update', 'Open Ting to see it.', String(frame.type));
         } catch {
           /* ignore malformed frames */
         }
@@ -95,9 +97,10 @@ export const httpApi: TingApi = {
     };
   },
 
-  fireMockClaim: async (profile) => {
-    await http('/mock/claims', post(mockClaimEvent(profile, PERSONAS[apiContext.personaId].memberId)));
+  fireMockClaim: async (profile, opts) => {
+    await http('/mock/claims', post(mockClaimEvent(profile, PERSONAS[apiContext.personaId].memberId, opts?.underpay)));
   },
+  draftAppeal: (discrepancy, plan) => http('/eob/appeal', post({ discrepancy, plan: { name: plan.name, sections: plan.sections } })),
   createShareLink: (scheduleKind, snapshot) => http('/share', post({ scheduleKind, origin: window.location.origin, snapshot })),
   getShare: async (token) => {
     if (!API_URL) return null;
@@ -109,6 +112,10 @@ export const httpApi: TingApi = {
   resetDemo: () => http('/demo/reset', post({})),
   getAdminInsights: () => http('/admin/insights'),
   getConsent: () => http('/consent'),
+  getPreferences: () => http('/preferences'),
+  savePreferences: (prefs) => http('/preferences', post(prefs)),
+  getDigest: () => http('/digest'),
+  sendTestDigest: () => http('/demo/digest/send', post({})),
   giveConsent: async (version) => {
     await http('/consent', post({ version }));
   },

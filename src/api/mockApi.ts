@@ -5,6 +5,9 @@ import { localCompiler } from '../compiler/compile';
 import { DEMO_PLAN_OPTIONS } from '../data/demo';
 import admin from '../fixtures/admin.json';
 import { PERSONAS } from '../data/personas';
+import { buildDigest } from '../engine/digest';
+import { appealDraft } from '../engine/eobAppeal';
+import { optimize } from '../engine/schedule';
 import { localExplainer } from '../engine/explain';
 import { classifyDocument } from '../intake/classify';
 import { parseDescription } from '../intake/describe';
@@ -12,7 +15,7 @@ import { addDays, todayISO } from '../lib/dates';
 import { localOcr } from '../services/ocr';
 import { pdfText } from '../services/pdf';
 import { apiContext as mock } from './context';
-import type { ScheduledReminder, ShareSnapshot, TingApi } from './index';
+import type { NotificationPrefs, ScheduledReminder, ShareSnapshot, TingApi } from './index';
 import { mockClaimEvent } from './mockClaim';
 
 const latency = () => new Promise<void>((r) => setTimeout(r, 300 + Math.random() * 500));
@@ -30,6 +33,7 @@ const ledgerListeners = new Set<(e: unknown) => void>();
 
 /** Shared snapshots, this browser only (the AWS backend keeps them in DynamoDB). */
 const shares = new Map<string, ShareSnapshot>();
+let prefs: NotificationPrefs = { cadence: 'monthly', detail: 'private' };
 
 /** Scheduled reminders, by member. In mock mode the app itself shows them when they come due. */
 const reminders = new Map<string, Map<string, ScheduledReminder>>();
@@ -81,9 +85,9 @@ export const mockApi: TingApi = {
     return () => ledgerListeners.delete(onEvent);
   },
 
-  async fireMockClaim(profile) {
+  async fireMockClaim(profile, opts) {
     await latency();
-    const event = mockClaimEvent(profile, PERSONAS[mock.personaId].memberId);
+    const event = mockClaimEvent(profile, PERSONAS[mock.personaId].memberId, opts?.underpay);
     ledgerListeners.forEach((l) => l(event));
   },
 
@@ -102,6 +106,11 @@ export const mockApi: TingApi = {
 
   async resetDemo() {},
 
+  async draftAppeal(discrepancy, plan) {
+    await latency();
+    return { text: appealDraft(discrepancy, plan), source: 'template' };
+  },
+
   async getAdminInsights() {
     await latency();
     const shown = admin.groups.filter((g) => g.n >= 20);
@@ -111,6 +120,23 @@ export const mockApi: TingApi = {
     return {};
   },
   async giveConsent() {},
+  async getPreferences() {
+    return prefs;
+  },
+  async savePreferences(next) {
+    await latency();
+    prefs = next;
+    return prefs;
+  },
+  async getDigest() {
+    await latency();
+    const profile = PERSONAS[mock.personaId].profile(mock.asOf);
+    return { ...buildDigest(profile, optimize(profile, { horizon: 2 }).cheapest), source: 'template' };
+  },
+  async sendTestDigest() {
+    await latency();
+    return { emailed: false, pushedTo: 0, private: prefs.detail !== 'detailed' };
+  },
   async deleteMyData() {},
 
   async scheduleReminder(reminder) {

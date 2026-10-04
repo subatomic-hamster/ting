@@ -1,6 +1,7 @@
 import type { Session } from '../api';
 import { authConfig, signIn, signOut, useAuth } from '../auth/auth';
 import { PERSONAS } from '../data/personas';
+import { useLanguage } from '../lib/language';
 import { useAppStore } from '../store';
 import { ListIcon, ToothIcon } from './Icons';
 
@@ -22,6 +23,8 @@ export function TopBar({
   // The plan you're on this year; waiving and membership plans are options for next year, not coverage now.
   const plans = allPlans.filter((p) => p.kind === 'insurance');
   const claims = useAuth((s) => s.claims);
+  const language = useLanguage((s) => s.language);
+  const setLanguage = useLanguage((s) => s.setLanguage);
   const canSignIn = !!authConfig();
   const role = claims?.groups.includes('employer_admin') ? 'Benefits admin' : claims?.groups.includes('lincoln_analyst') ? 'Lincoln analyst' : 'Member';
 
@@ -70,6 +73,22 @@ export function TopBar({
                 }`}
               >
                 {n === 'in' ? 'In-network' : 'Out'}
+              </button>
+            ))}
+          </div>
+
+          <div role="radiogroup" aria-label="Explanation language" className="flex rounded-lg bg-white/10 p-0.5 text-sm">
+            {(['en', 'es'] as const).map((l) => (
+              <button
+                key={l}
+                type="button"
+                role="radio"
+                aria-checked={language === l}
+                onClick={() => setLanguage(l)}
+                title={l === 'es' ? 'Explicaciones en español (los importes no cambian)' : 'Explanations in English'}
+                className={`rounded-md px-2 py-1 font-medium uppercase ${language === l ? 'bg-white text-brand-900' : 'text-brand-100 hover:text-white'}`}
+              >
+                {l}
               </button>
             ))}
           </div>
