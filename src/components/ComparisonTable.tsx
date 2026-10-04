@@ -1,3 +1,4 @@
+import { PLAN_BASIS } from "../data/demo";
 import { round2 } from "../engine/adjudicate";
 import type { OptionResult } from "../engine/compare";
 import { formatMoney } from "../lib/format";
@@ -36,6 +37,7 @@ export function ComparisonTable() {
               </span>
               {o === best && <RecommendedTag moving={!!portability} />}
             </div>
+            {PLAN_BASIS[o.plan.id] && <p className="mt-1 text-xs text-muted">{PLAN_BASIS[o.plan.id]}</p>}
             <dl className="mt-2 grid grid-cols-2 gap-y-1 text-sm">
               <dt className="text-muted">Premiums after tax</dt>
               <dd className="tabular text-right">
@@ -99,6 +101,9 @@ export function ComparisonTable() {
                     </span>
                   )}
                   {o === best && <RecommendedTag moving={!!portability} />}
+                  {PLAN_BASIS[o.plan.id] && (
+                    <span className="mt-1 block max-w-56 text-xs font-normal text-muted">{PLAN_BASIS[o.plan.id]}</span>
+                  )}
                 </th>
                 <td className="tabular py-3 pr-3 text-right">
                   {formatMoney(o.premiumCost)}

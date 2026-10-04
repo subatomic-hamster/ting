@@ -67,6 +67,20 @@ export function AppShell() {
             </div>
           )}
         </ErrorBoundary>
+        {/* One source caption for the default prices (DEMO_FEES in src/engine/cdt.ts). */}
+        <p className="mt-10 border-t border-line pt-4 text-xs text-muted">
+          Default prices are estimated from{" "}
+          <a
+            className="inline-reference underline"
+            href="https://medicaid.ncdhhs.gov/providers/fee-schedules/dental-fee-schedules-archive"
+            target="_blank"
+            rel="noreferrer"
+          >
+            NC Medicaid&rsquo;s published dental fees
+          </a>
+          , scaled to commercial rates with ADA Health Policy Institute ratios (2024). Procedures Medicaid doesn&rsquo;t list
+          use sample fees.
+        </p>
       </main>
       <AuditDrawer open={auditOpen} onClose={() => setAuditOpen(false)} />
       <ReminderToast />
