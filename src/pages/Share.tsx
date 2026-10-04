@@ -1,78 +1,86 @@
-import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
-import { api } from '../api';
-import { useParams } from 'react-router-dom';
-import { DemoDataPill } from '../components/DemoDataPill';
-import { EstimateFooter } from '../components/EstimateFooter';
-import { HandoffSheet } from '../components/HandoffSheet';
-import { isPersonaId, PERSONAS, type PersonaId } from '../data/personas';
-import { optimize } from '../engine/schedule';
-import { HomeCareSummary } from '../components/habits/HomeCareSummary';
-import { dentistSummary } from '../habits/analytics';
-import { SMILESTREAK } from '../habits/program';
-import { useHabitStore } from '../habits/store';
-import { todayISO } from '../lib/dates';
-import { formatDate } from '../lib/format';
-import { HORIZON, selectActive, useAppStore, type ActiveSchedule } from '../store';
-
-const PRESETS = ['cheapest', 'fastest', 'balanced'] as const;
-const isPreset = (k?: string): k is (typeof PRESETS)[number] => PRESETS.some((p) => p === k);
-
-/**
- * Public dentist handoff page (no app chrome, printable).
- * Mock tokens look like "<persona>.<scheduleKind>.<random>". With the AWS backend this page
- * fetches the shared schedule by token instead.
- */
+import { useQuery } from "@tanstack/react-query";
+import { useParams, Link } from "react-router-dom";
+import { api, USE_MOCKS } from "../api";
+import { HandoffSheet } from "../components/HandoffSheet";
+import { HomeCareSummary } from "../components/habits/HomeCareSummary";
+import { EstimateFooter } from "../components/EstimateFooter";
+import { formatDate } from "../lib/format";
 export default function Share() {
-  const { token = '' } = useParams();
-  const [personaPart = '', kind] = token.split('.');
-  const personaId: PersonaId = isPersonaId(personaPart) ? personaPart : 'dale';
-  const storePersona = useAppStore((s) => s.personaId);
-  const storeProfile = useAppStore((s) => s.profile);
-  const storeActive = useAppStore(selectActive);
-  const habits = useHabitStore((s) => (s.personaId === personaId && s.consent.shareWithDentist ? s.sessions : null));
-  const asOf = useAppStore((s) => s.profile.asOf);
-  const homeCare = useMemo(() => (habits ? dentistSummary(habits, asOf, SMILESTREAK) : null), [habits, asOf]);
-
-  // A link made through the API carries its own snapshot, so it shows the member's real plan on any device.
-  const shared = useQuery({ queryKey: ['share', token], queryFn: () => api.getShare(token), retry: false });
+  const { token = "" } = useParams();
+  const shared = useQuery({
+    queryKey: ["share", token],
+    queryFn: () => api.getShare(token),
+    retry: false,
+  });
   const snap = shared.data;
-  const care = snap ? snap.homeCare : homeCare;
-
-  const { profile, schedule } = useMemo((): { profile: typeof storeProfile; schedule: ActiveSchedule } => {
-    // Same browser as the member? Use their live plan. Otherwise rebuild it from the demo persona.
-    if (storePersona === personaId) return { profile: storeProfile, schedule: storeActive };
-    const p = PERSONAS[personaId].profile(todayISO());
-    const k = isPreset(kind) ? kind : 'cheapest';
-    return { profile: p, schedule: { ...optimize(p, { horizon: HORIZON })[k], kind: k } };
-  }, [storePersona, personaId, storeProfile, storeActive, kind]);
-
+  if (shared.isPending)
+    return (
+      <main className="page-inset mx-auto max-w-3xl">
+        <h1>Shared treatment plan</h1>
+        <p role="status" className="mt-5">
+          Loading the shared plan…
+        </p>
+      </main>
+    );
+  if (
+    !snap ||
+    shared.isError ||
+    snap.expiresAt < new Date().toISOString().slice(0, 10)
+  )
+    return (
+      <main className="page-inset mx-auto max-w-3xl">
+        <h1>Shared plan unavailable</h1>
+        <p role="alert" className="mt-5">
+          {shared.isError
+            ? "Could not load this shared plan. Try again, or ask the person who shared it for a new link."
+            : !snap
+              ? "This link does not match a shared plan. Ask the person who shared it for a new link."
+              : "This shared link has expired. Ask the person who shared it for a new link."}
+        </p>
+        <button
+          className="btn-secondary mt-5"
+          onClick={() => void shared.refetch()}
+        >
+          Try again
+        </button>
+        <Link className="btn-ghost" to="/">
+          Ting home
+        </Link>
+      </main>
+    );
   return (
-    <div className="min-h-screen bg-paper px-4 py-6 sm:py-10 print:bg-white print:p-0">
-      <div className="no-print mx-auto mb-3 flex max-w-3xl justify-end">
-        <DemoDataPill label="Demo handoff" />
-      </div>
-      {shared.isPending ? (
-        <p className="mx-auto max-w-3xl text-sm text-muted">Loading the shared plan…</p>
-      ) : snap ? (
-        <HandoffSheet patientName={snap.patientName} procedures={snap.procedures} schedule={snap.schedule} rulesVersion={snap.rulesVersion} />
-      ) : (
-        <HandoffSheet patientName={PERSONAS[personaId].name} procedures={profile.procedures} schedule={schedule} rulesVersion={profile.currentPlan.version} />
-      )}
-      {snap && (
-        <p className="mx-auto mt-2 max-w-3xl text-xs text-muted">
-          Shared {formatDate(snap.sharedAt.slice(0, 10), { year: true })}. This link expires {formatDate(snap.expiresAt, { year: true })}.
+    <main className="member-content page-inset mx-auto max-w-3xl">
+      {(USE_MOCKS ||
+        snap.schedule.lines.some(
+          (l) =>
+            l.feeSource?.kind === "demo" || l.allowanceSource?.kind === "demo",
+        )) && (
+        <p className="mb-5 text-xs text-muted">
+          Contains sample estimates.{" "}
+          {USE_MOCKS &&
+            "In this mode, shared links open only in the browser where they were created."}
         </p>
       )}
-      <section className="card mx-auto mt-4 max-w-3xl" aria-labelledby="homecare-title">
-        <h2 id="homecare-title" className="text-lg font-semibold">Home-care summary</h2>
-        {care ? (
-          <HomeCareSummary summary={care} patientName={snap?.patientName ?? PERSONAS[personaId].name} />
-        ) : (
-          <p className="mt-1 text-sm text-muted">The patient hasn’t shared smart-brush data. You can confirm good home care at the visit instead.</p>
-        )}
-      </section>
+      <HandoffSheet
+        patientName={snap.patientName}
+        procedures={snap.procedures}
+        schedule={snap.schedule}
+        rulesVersion={snap.rulesVersion}
+      />
+      <p className="mt-4 text-xs text-muted">
+        Shared {formatDate(snap.sharedAt.slice(0, 10), { year: true })}. Expires{" "}
+        {formatDate(snap.expiresAt, { year: true })}.
+      </p>
+      {snap.homeCare && (
+        <section className="card mt-6">
+          <h2>Home-care summary</h2>
+          <HomeCareSummary
+            summary={snap.homeCare}
+            patientName={snap.patientName}
+          />
+        </section>
+      )}
       <EstimateFooter />
-    </div>
+    </main>
   );
 }

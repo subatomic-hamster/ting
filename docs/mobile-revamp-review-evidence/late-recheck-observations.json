@@ -1,0 +1,23 @@
+{
+  "calendarTop": 598.953125,
+  "dash": false,
+  "homeCareBefore": true,
+  "tables": 0,
+  "homeCareAfter": true,
+  "intakeOpen": false,
+  "catalogOpen": false,
+  "height": 4350,
+  "catalogSelected": "",
+  "catalogForm": 0,
+  "addedCode": "D3330",
+  "mapZoom": [
+    {
+      "w": 48,
+      "h": 48
+    },
+    {
+      "w": 48,
+      "h": 48
+    }
+  ]
+}

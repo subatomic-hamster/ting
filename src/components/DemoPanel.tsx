@@ -1,20 +1,28 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState, type ReactNode } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { api, USE_MOCKS } from '../api';
-import { PERSONA_IDS, PERSONAS } from '../data/personas';
-import { yearOf } from '../lib/dates';
-import { formatDate } from '../lib/format';
-import { useHabitStore } from '../habits/store';
-import { useAppStore } from '../store';
-import { EmailDemoControls } from './demo/EmailDemoControls';
-import { HabitsDemoControls } from './demo/HabitsDemoControls';
-import { CloseIcon } from './Icons';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState, type ReactNode } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { api, USE_MOCKS } from "../api";
+import { PERSONA_IDS, PERSONAS } from "../data/personas";
+import { yearOf } from "../lib/dates";
+import { formatDate } from "../lib/format";
+import { useHabitStore } from "../habits/store";
+import { useAppStore } from "../store";
+import { EmailDemoControls } from "./demo/EmailDemoControls";
+import { HabitsDemoControls } from "./demo/HabitsDemoControls";
+import { CloseIcon } from "./Icons";
 
-const GROUP_TITLE = 'mb-1 text-xs font-semibold text-amber-900';
+const GROUP_TITLE = "mb-1 text-xs font-semibold text-amber-900";
 
 /** A collapsible group of demo controls; open by default on the page it drives. */
-function Group({ title, open, children }: { title: string; open: boolean; children: ReactNode }) {
+function Group({
+  title,
+  open,
+  children,
+}: {
+  title: string;
+  open: boolean;
+  children: ReactNode;
+}) {
   return (
     <details open={open} className="mt-2 border-t border-amber-200 pt-2">
       <summary className={`${GROUP_TITLE} cursor-pointer`}>{title}</summary>
@@ -24,8 +32,8 @@ function Group({ title, open, children }: { title: string; open: boolean; childr
 }
 
 function initiallyOpen() {
-  if (typeof window === 'undefined') return false;
-  return new URLSearchParams(window.location.search).get('demo') === '1';
+  if (typeof window === "undefined") return false;
+  return new URLSearchParams(window.location.search).get("demo") === "1";
 }
 
 export function DemoPanel() {
@@ -40,20 +48,25 @@ export function DemoPanel() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const fire = useMutation({ mutationFn: () => api.fireMockClaim(useAppStore.getState().profile) });
-  const underpaid = useMutation({ mutationFn: () => api.fireMockClaim(useAppStore.getState().profile, { underpay: 90 }) });
+  const fire = useMutation({
+    mutationFn: () => api.fireMockClaim(useAppStore.getState().profile),
+  });
+  const underpaid = useMutation({
+    mutationFn: () =>
+      api.fireMockClaim(useAppStore.getState().profile, { underpay: 90 }),
+  });
   const brushNow = useHabitStore((s) => s.brushNow);
-  const brushing = useHabitStore((s) => s.live?.state === 'running');
+  const brushing = useHabitStore((s) => s.live?.state === "running");
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && (e.key === 'D' || e.key === 'd')) {
+      if (e.ctrlKey && e.shiftKey && (e.key === "D" || e.key === "d")) {
         e.preventDefault();
         setOpen((o) => !o);
       }
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
   if (!open) return null;
@@ -65,13 +78,19 @@ export function DemoPanel() {
     >
       <div className="mb-2 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-amber-900">Demo panel</h2>
-        <button type="button" className="rounded p-1 text-amber-900 hover:bg-amber-100" onClick={() => setOpen(false)} aria-label="Hide demo panel">
+        <button
+          type="button"
+          className="rounded p-1 text-amber-900 hover:bg-amber-100"
+          onClick={() => setOpen(false)}
+          aria-label="Hide demo panel"
+        >
           <CloseIcon />
         </button>
       </div>
       <p className="mb-2 text-xs text-amber-900">
         As of <strong>{formatDate(asOf, { year: true })}</strong>
-        {asOf !== today && ' (simulated)'} · {USE_MOCKS ? 'mock API' : 'live API'}
+        {asOf !== today && " (simulated)"} ·{" "}
+        {USE_MOCKS ? "mock API" : "live API"}
       </p>
 
       <fieldset className="mb-3">
@@ -84,7 +103,9 @@ export function DemoPanel() {
               aria-pressed={personaId === id}
               onClick={() => loadPersona(id)}
               className={`rounded-lg border px-2 py-1.5 text-xs font-medium ${
-                personaId === id ? 'border-amber-600 bg-amber-200 text-amber-950' : 'border-amber-300 bg-white text-amber-900'
+                personaId === id
+                  ? "border-amber-600 bg-amber-200 text-amber-950"
+                  : "border-amber-300 bg-white text-amber-900"
               }`}
               title={PERSONAS[id].blurb}
             >
@@ -96,14 +117,33 @@ export function DemoPanel() {
 
       <p className={GROUP_TITLE}>Time and claims</p>
       <div className="grid grid-cols-2 gap-1.5 text-xs">
-        <button type="button" className="btn-secondary px-2 py-1.5 text-xs" onClick={() => setAsOf(`${yearOf(today)}-11-01`)}>
+        <button
+          type="button"
+          className="btn-secondary px-2 py-1.5 text-xs"
+          onClick={() => setAsOf(`${yearOf(today)}-11-01`)}
+        >
           Simulate Nov 1
         </button>
-        <button type="button" className="btn-secondary px-2 py-1.5 text-xs" onClick={simulateDec1}>
+        <button
+          type="button"
+          className="btn-secondary px-2 py-1.5 text-xs"
+          onClick={simulateDec1}
+        >
           Simulate Dec 1
         </button>
-        <button type="button" className="btn-primary px-2 py-1.5 text-xs" disabled={fire.isPending} onClick={() => fire.mutate()}>
-          {fire.isPending ? 'Sending…' : fire.isError ? 'Nothing left to claim' : USE_MOCKS ? 'Fire mock claim' : 'Dentist visit'}
+        <button
+          type="button"
+          className="btn-primary px-2 py-1.5 text-xs"
+          disabled={fire.isPending}
+          onClick={() => fire.mutate()}
+        >
+          {fire.isPending
+            ? "Sending…"
+            : fire.isError
+              ? "Nothing left to claim"
+              : USE_MOCKS
+                ? "Fire mock claim"
+                : "Dentist visit"}
         </button>
         <button
           type="button"
@@ -112,17 +152,30 @@ export function DemoPanel() {
           onClick={() => underpaid.mutate()}
           title="The insurer pays $90 less than Ting estimated, to show the EOB check"
         >
-          {underpaid.isPending ? 'Sending…' : 'Underpaid EOB'}
+          {underpaid.isPending ? "Sending…" : "Underpaid EOB"}
         </button>
       </div>
 
-      <Group key={`email-${pathname}`} title="Email" open={pathname.startsWith('/email')}>
+      <Group
+        key={`email-${pathname}`}
+        title="Email"
+        open={pathname.startsWith("/email")}
+      >
         <EmailDemoControls />
       </Group>
 
-      <Group key={`habits-${pathname}`} title="SmileStreak" open={pathname.startsWith('/habits')}>
-        <button type="button" className="btn-secondary w-full px-2 py-1.5 text-xs" disabled={brushing} onClick={brushNow}>
-          {brushing ? 'Brushing…' : 'Brush now'}
+      <Group
+        key={`habits-${pathname}`}
+        title="SmileStreak"
+        open={pathname.startsWith("/habits")}
+      >
+        <button
+          type="button"
+          className="btn-secondary w-full px-2 py-1.5 text-xs"
+          disabled={brushing}
+          onClick={brushNow}
+        >
+          {brushing ? "Brushing…" : "Brush now"}
         </button>
         <HabitsDemoControls />
       </Group>
@@ -133,12 +186,14 @@ export function DemoPanel() {
         onClick={() => {
           reset();
           void api.resetDemo().finally(() => queryClient.invalidateQueries());
-          navigate('/');
+          navigate("/");
         }}
       >
         Reset demo
       </button>
-      <p className="mt-2 text-[11px] text-amber-800">Ctrl+Shift+D toggles this panel.</p>
+      <p className="mt-2 text-xs text-amber-800">
+        Ctrl+Shift+D toggles this panel.
+      </p>
     </aside>
   );
 }

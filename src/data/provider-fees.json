@@ -1,0 +1,722 @@
+{
+  "publisher": "Forsyth County Department of Public Health",
+  "provider": "Cleveland Avenue Dental Center",
+  "city": "Winston-Salem, NC",
+  "zip": "27101",
+  "fiscalYear": "2026\u20132027",
+  "effectiveFrom": "2026-07-01",
+  "effectiveThrough": "2027-06-30",
+  "retrievedAt": "2026-10-04",
+  "url": "https://www.forsyth.cc/hhs/assets/documents/Public_Health_Fee_Schedule.pdf",
+  "sourcePage": "https://www.forsyth.cc/hhs/phpublications.aspx",
+  "sha256": "6b571757e312b860484f696d4fc186619206b7389322685666c8bcac663fe9d4",
+  "basis": "Published provider charge. Not a market percentile, contracted PPO fee, UCR or MAC allowance. Sliding-fee eligibility may change charges. Confirm availability and quote with clinic.",
+  "entries": [
+    {
+      "cdt": "D0140",
+      "charge": 68.0,
+      "page": 8,
+      "sourceDescription": "Limited Oral Evaluation (Problem-Focused)"
+    },
+    {
+      "cdt": "D0145",
+      "charge": 63.0,
+      "page": 8,
+      "sourceDescription": "Oral Evaluation for a Patient Under 3 Years of Age & Counseling"
+    },
+    {
+      "cdt": "D0150",
+      "charge": 78.0,
+      "page": 8,
+      "sourceDescription": "Comprehensive Oral Evaluation (New or Established Patient)"
+    },
+    {
+      "cdt": "D0210",
+      "charge": 125.0,
+      "page": 8,
+      "sourceDescription": "Intraoral Complete Series of Radiographic Images (FMX)"
+    },
+    {
+      "cdt": "D0220",
+      "charge": 26.0,
+      "page": 8,
+      "sourceDescription": "Intraoral Periapical Radiographic Image (First Film)"
+    },
+    {
+      "cdt": "D0230",
+      "charge": 21.0,
+      "page": 8,
+      "sourceDescription": "ntraoral Periapical Radiographic Image (Each Additional Film)"
+    },
+    {
+      "cdt": "D0240",
+      "charge": 32.0,
+      "page": 8,
+      "sourceDescription": "Intraoral Occlusal Radiographic Image"
+    },
+    {
+      "cdt": "D0270",
+      "charge": 21.0,
+      "page": 8,
+      "sourceDescription": "Bitewing Radiographic Image (Single Image)"
+    },
+    {
+      "cdt": "D0272",
+      "charge": 39.0,
+      "page": 8,
+      "sourceDescription": "Bitewing Radiographic Images (Two Images)"
+    },
+    {
+      "cdt": "D0273",
+      "charge": 47.0,
+      "page": 8,
+      "sourceDescription": "Bitewing Radiographic Images (Three Images)"
+    },
+    {
+      "cdt": "D0274",
+      "charge": 57.0,
+      "page": 8,
+      "sourceDescription": "Bitewing Radiographic Images (Four Images)"
+    },
+    {
+      "cdt": "D0330",
+      "charge": 104.0,
+      "page": 8,
+      "sourceDescription": "Panoramic Radiographic Image"
+    },
+    {
+      "cdt": "D0470",
+      "charge": 72.0,
+      "page": 8,
+      "sourceDescription": "Diagnostic Casts"
+    },
+    {
+      "cdt": "D1110",
+      "charge": 81.0,
+      "page": 8,
+      "sourceDescription": "Adult Prophylaxis (Dental Cleaning)"
+    },
+    {
+      "cdt": "D1120",
+      "charge": 61.0,
+      "page": 8,
+      "sourceDescription": "Child Prophylaxis (Dental Cleaning)"
+    },
+    {
+      "cdt": "D1206",
+      "charge": 31.0,
+      "page": 8,
+      "sourceDescription": "Topical Application of Fluoride Varnish"
+    },
+    {
+      "cdt": "D1351",
+      "charge": 52.0,
+      "page": 8,
+      "sourceDescription": "Sealant per Tooth"
+    },
+    {
+      "cdt": "D1354",
+      "charge": 31.0,
+      "page": 8,
+      "sourceDescription": "Application Caries Arresting Med per Tooth"
+    },
+    {
+      "cdt": "D1355",
+      "charge": 31.0,
+      "page": 8,
+      "sourceDescription": "Caries Preventive Medicament Application Per-Tooth"
+    },
+    {
+      "cdt": "D1510",
+      "charge": 332.0,
+      "page": 8,
+      "sourceDescription": "Space Maint. Fixed Unilateral"
+    },
+    {
+      "cdt": "D1516",
+      "charge": 522.0,
+      "page": 8,
+      "sourceDescription": "Space Maint. Fixed Bilateral, Maxillary"
+    },
+    {
+      "cdt": "D1517",
+      "charge": 522.0,
+      "page": 8,
+      "sourceDescription": "Space Maint. Fixed Bilateral, Mandibular"
+    },
+    {
+      "cdt": "D1551",
+      "charge": 61.0,
+      "page": 8,
+      "sourceDescription": "Recement Space Maint. Fixed Bilat, Maxilla"
+    },
+    {
+      "cdt": "D1552",
+      "charge": 61.0,
+      "page": 9,
+      "sourceDescription": "Recement Space Maint. Fixed Bilat, Madib"
+    },
+    {
+      "cdt": "D1553",
+      "charge": 61.0,
+      "page": 9,
+      "sourceDescription": "Recement Space Maint., Unilat Quad"
+    },
+    {
+      "cdt": "D1556",
+      "charge": 75.0,
+      "page": 9,
+      "sourceDescription": "Removal Unilat Space Maint, Quad"
+    },
+    {
+      "cdt": "D1557",
+      "charge": 75.0,
+      "page": 9,
+      "sourceDescription": "Removal Bilat Space Maint, Maxillary"
+    },
+    {
+      "cdt": "D1558",
+      "charge": 75.0,
+      "page": 9,
+      "sourceDescription": "Remove Bilat Space Maint, Mandibular"
+    },
+    {
+      "cdt": "D2140",
+      "charge": 114.0,
+      "page": 9,
+      "sourceDescription": "Amalgam Restoration (One Surface, Primary or Permanent Tooth)"
+    },
+    {
+      "cdt": "D2150",
+      "charge": 145.0,
+      "page": 9,
+      "sourceDescription": "Amalgam Restoration (Two Surfaces, Primary or Permanent Tooth)"
+    },
+    {
+      "cdt": "D2160",
+      "charge": 168.0,
+      "page": 9,
+      "sourceDescription": "Amalgam Restoration (Three Surfaces, Primary or Permanent Tooth)"
+    },
+    {
+      "cdt": "D2161",
+      "charge": 201.0,
+      "page": 9,
+      "sourceDescription": "Amalgam Restoration (Four or More Surfaces, Primary or Permanent Tooth)"
+    },
+    {
+      "cdt": "D2330",
+      "charge": 122.0,
+      "page": 9,
+      "sourceDescription": "Resin-Based Composite Restoration (Anterior, One Surface)"
+    },
+    {
+      "cdt": "D2331",
+      "charge": 157.0,
+      "page": 9,
+      "sourceDescription": "Resin-Based Composite Restoration (Anterior, Two Surfaces)"
+    },
+    {
+      "cdt": "D2332",
+      "charge": 190.0,
+      "page": 9,
+      "sourceDescription": "Resin-Based Composite Restoration (Anterior, Three Surfaces)"
+    },
+    {
+      "cdt": "D2335",
+      "charge": 229.0,
+      "page": 9,
+      "sourceDescription": "Resin-Based Composite Restoration (Anterior, Four or More Surfaces)"
+    },
+    {
+      "cdt": "D2391",
+      "charge": 140.0,
+      "page": 9,
+      "sourceDescription": "Resin-Based Composite Restoration (Posterior, One Surface)"
+    },
+    {
+      "cdt": "D2392",
+      "charge": 207.0,
+      "page": 9,
+      "sourceDescription": "Resin-Based Composite Restoration (Posterior, Two Surfaces)"
+    },
+    {
+      "cdt": "D2393",
+      "charge": 254.0,
+      "page": 9,
+      "sourceDescription": "Resin-Based Composite Restoration (Posterior, Three Surfaces)"
+    },
+    {
+      "cdt": "D2394",
+      "charge": 301.0,
+      "page": 9,
+      "sourceDescription": "Resin-Based Composite Restoration (Posterior, Four or More Surfaces)"
+    },
+    {
+      "cdt": "D2740",
+      "charge": 900.0,
+      "page": 9,
+      "sourceDescription": "Crown (Porcelain/Ceramic Substrate)"
+    },
+    {
+      "cdt": "D2750",
+      "charge": 930.0,
+      "page": 9,
+      "sourceDescription": "Crown (Porcelain Fused to High Noble Metal \u2013 PFM)"
+    },
+    {
+      "cdt": "D2790",
+      "charge": 1220.0,
+      "page": 9,
+      "sourceDescription": "Crown (Full Cast High Noble Metal)"
+    },
+    {
+      "cdt": "D2920",
+      "charge": 78.0,
+      "page": 9,
+      "sourceDescription": "Re-cement or Re-bond Crown"
+    },
+    {
+      "cdt": "D2930",
+      "charge": 259.0,
+      "page": 9,
+      "sourceDescription": "Prefabricated Stainless Steel Crown (Primary Tooth)"
+    },
+    {
+      "cdt": "D2931",
+      "charge": 270.0,
+      "page": 9,
+      "sourceDescription": "Prefabricated Stainless Steel Crown (Permanent Tooth)"
+    },
+    {
+      "cdt": "D2940",
+      "charge": 78.0,
+      "page": 9,
+      "sourceDescription": "Protective Restoration"
+    },
+    {
+      "cdt": "D2950",
+      "charge": 180.0,
+      "page": 9,
+      "sourceDescription": "Core Buildup with pin"
+    },
+    {
+      "cdt": "D2951",
+      "charge": 47.0,
+      "page": 9,
+      "sourceDescription": "Pin Retention per Tooth"
+    },
+    {
+      "cdt": "D2976",
+      "charge": 96.0,
+      "page": 9,
+      "sourceDescription": "Band Stabilizer- Per Tooth"
+    },
+    {
+      "cdt": "D3110",
+      "charge": 53.0,
+      "page": 9,
+      "sourceDescription": "Pulp Cap - direct"
+    },
+    {
+      "cdt": "D3220",
+      "charge": 149.0,
+      "page": 9,
+      "sourceDescription": "Pulpotomy"
+    },
+    {
+      "cdt": "D3221",
+      "charge": 170.0,
+      "page": 9,
+      "sourceDescription": "Pulpal Debridement, Primary and permanent teeth"
+    },
+    {
+      "cdt": "D3222",
+      "charge": 219.0,
+      "page": 9,
+      "sourceDescription": "Partial Pulpotomy for Apexogenesis"
+    },
+    {
+      "cdt": "D3230",
+      "charge": 249.0,
+      "page": 9,
+      "sourceDescription": "Pulpal Therapy-Anterior"
+    },
+    {
+      "cdt": "D3240",
+      "charge": 311.0,
+      "page": 10,
+      "sourceDescription": "Pulpal Therapy-Posterior"
+    },
+    {
+      "cdt": "D3310",
+      "charge": 592.0,
+      "page": 10,
+      "sourceDescription": "Endodontic Therapy (Anterior \u2013 Root Canal)"
+    },
+    {
+      "cdt": "D3320",
+      "charge": 693.0,
+      "page": 10,
+      "sourceDescription": "Endodontic Therapy (Premolar \u2013 Root Canal)"
+    },
+    {
+      "cdt": "D3330",
+      "charge": 904.0,
+      "page": 10,
+      "sourceDescription": "Endodontic Therapy (Molar \u2013 Root Canal)"
+    },
+    {
+      "cdt": "D4341",
+      "charge": 176.0,
+      "page": 10,
+      "sourceDescription": "Perio Scale & Root 4+ per quad"
+    },
+    {
+      "cdt": "D4342",
+      "charge": 114.0,
+      "page": 10,
+      "sourceDescription": "Perio Scale & root pln 1-3 quad"
+    },
+    {
+      "cdt": "D4346",
+      "charge": 90.0,
+      "page": 10,
+      "sourceDescription": "Scaling in presence of mod to severe inflammation"
+    },
+    {
+      "cdt": "D4355",
+      "charge": 120.0,
+      "page": 10,
+      "sourceDescription": "Full Mouth Debridement"
+    },
+    {
+      "cdt": "D5110",
+      "charge": 1106.0,
+      "page": 10,
+      "sourceDescription": "Complete Denture (Maxillary / Upper)"
+    },
+    {
+      "cdt": "D5120",
+      "charge": 1106.0,
+      "page": 10,
+      "sourceDescription": "Complete Denture (Mandibular / Lower)"
+    },
+    {
+      "cdt": "D5130",
+      "charge": 1237.0,
+      "page": 10,
+      "sourceDescription": "Immediate Denture, Maxillary"
+    },
+    {
+      "cdt": "D5140",
+      "charge": 1237.0,
+      "page": 10,
+      "sourceDescription": "Immediate Denture, Mandibular"
+    },
+    {
+      "cdt": "D5211",
+      "charge": 772.0,
+      "page": 10,
+      "sourceDescription": "Maxillary Partial Denture (Resin Base, Including Any Conventional Clasps)"
+    },
+    {
+      "cdt": "D5212",
+      "charge": 772.0,
+      "page": 10,
+      "sourceDescription": "Mandibular Partial Denture (Resin Base, Including Any Conventional Clasps)"
+    },
+    {
+      "cdt": "D5213",
+      "charge": 1223.0,
+      "page": 10,
+      "sourceDescription": "Maxillary Partial Denture (Cast Metal Framework with Resin Denture Bases)"
+    },
+    {
+      "cdt": "D5214",
+      "charge": 1223.0,
+      "page": 10,
+      "sourceDescription": "Mandibular Partial Denture (Cast Metal Framework with Resin Denture Bases)"
+    },
+    {
+      "cdt": "D5221",
+      "charge": 772.0,
+      "page": 10,
+      "sourceDescription": "Immediate Partial Denture, Maxillary"
+    },
+    {
+      "cdt": "D5222",
+      "charge": 772.0,
+      "page": 10,
+      "sourceDescription": "Immediate Partial Denture, Mandibular"
+    },
+    {
+      "cdt": "D5225",
+      "charge": 772.0,
+      "page": 10,
+      "sourceDescription": "Maxillary Partial Denture (Flexible Base)"
+    },
+    {
+      "cdt": "D5226",
+      "charge": 772.0,
+      "page": 10,
+      "sourceDescription": "Mandibular Partial Denture (Flexible Base)"
+    },
+    {
+      "cdt": "D5520",
+      "charge": 99.0,
+      "page": 10,
+      "sourceDescription": "Replace Missing or Broken Teeth (Partial Denture)"
+    },
+    {
+      "cdt": "D5611",
+      "charge": 137.0,
+      "page": 10,
+      "sourceDescription": "repair resin partial denture, mandibular;"
+    },
+    {
+      "cdt": "D5612",
+      "charge": 137.0,
+      "page": 10,
+      "sourceDescription": "Repair resin partial, MAXILLARY"
+    },
+    {
+      "cdt": "D5621",
+      "charge": 129.0,
+      "page": 10,
+      "sourceDescription": "repair cast partial framework,"
+    },
+    {
+      "cdt": "D5622",
+      "charge": 129.0,
+      "page": 10,
+      "sourceDescription": "repair cast partial framwork, maxillary."
+    },
+    {
+      "cdt": "D5650",
+      "charge": 156.0,
+      "page": 10,
+      "sourceDescription": "Add tooth to partial"
+    },
+    {
+      "cdt": "D5660",
+      "charge": 161.0,
+      "page": 10,
+      "sourceDescription": "Add clasp to partial"
+    },
+    {
+      "cdt": "D5751",
+      "charge": 311.0,
+      "page": 11,
+      "sourceDescription": "Indirect Reline of Complete Mandibular Denture"
+    },
+    {
+      "cdt": "D5850",
+      "charge": 104.0,
+      "page": 11,
+      "sourceDescription": "Tissue Conditioning, Maxillary"
+    },
+    {
+      "cdt": "D5851",
+      "charge": 104.0,
+      "page": 11,
+      "sourceDescription": "Tissue Conditioning-mand"
+    },
+    {
+      "cdt": "D6057",
+      "charge": 465.0,
+      "page": 11,
+      "sourceDescription": "Custom Abutment (Implant Supported Prosthesis)"
+    },
+    {
+      "cdt": "D6105",
+      "charge": 110.0,
+      "page": 11,
+      "sourceDescription": "Removal of Implant Body"
+    },
+    {
+      "cdt": "D6197",
+      "charge": 114.0,
+      "page": 11,
+      "sourceDescription": "Replacement of Restorative Material Retained by Implant Screw"
+    },
+    {
+      "cdt": "D6545",
+      "charge": 450.0,
+      "page": 11,
+      "sourceDescription": "Retainer Crown, Porcelain/Ceramic (for Resin-Bonded Fixed Partial Denture)"
+    },
+    {
+      "cdt": "D6548",
+      "charge": 663.0,
+      "page": 11,
+      "sourceDescription": "Retainer Crown, Porcelain Fused to Metal (for Resin-Bonded Fixed Partial Denture)"
+    },
+    {
+      "cdt": "D6549",
+      "charge": 235.0,
+      "page": 11,
+      "sourceDescription": "Retainer Crown, Cast Metal (for Resin-Bonded Fixed Partial Denture)"
+    },
+    {
+      "cdt": "D7111",
+      "charge": 125.0,
+      "page": 11,
+      "sourceDescription": "Extraction, Coronal Remnants \u2013 Primary Tooth"
+    },
+    {
+      "cdt": "D7140",
+      "charge": 135.0,
+      "page": 11,
+      "sourceDescription": "Extraction, Erupted Tooth or Exposed Root (Elevation and/or Forceps Removal)"
+    },
+    {
+      "cdt": "D7210",
+      "charge": 206.0,
+      "page": 11,
+      "sourceDescription": "Surgical Extraction, Erupted Tooth Requiring Removal of Bone and/or Sectioning of Tooth"
+    },
+    {
+      "cdt": "D7220",
+      "charge": 251.0,
+      "page": 11,
+      "sourceDescription": "Removal of Impacted Tooth, Soft Tissue"
+    },
+    {
+      "cdt": "D7230",
+      "charge": 318.0,
+      "page": 11,
+      "sourceDescription": "Removal of Impacted Tooth, Partially Bony"
+    },
+    {
+      "cdt": "D7250",
+      "charge": 214.0,
+      "page": 11,
+      "sourceDescription": "Surgical Removal of Residual Tooth Roots (Cutting Procedure)"
+    },
+    {
+      "cdt": "D9110",
+      "charge": 78.0,
+      "page": 11,
+      "sourceDescription": "Emergency Palliative Tx"
+    },
+    {
+      "cdt": "D9230",
+      "charge": 78.0,
+      "page": 11,
+      "sourceDescription": "Nitrous"
+    },
+    {
+      "cdt": "D9910",
+      "charge": 24.0,
+      "page": 11,
+      "sourceDescription": "Application of Desensitizing medicament"
+    },
+    {
+      "cdt": "D9941",
+      "charge": 207.0,
+      "page": 11,
+      "sourceDescription": "Fabrication of Athletic Mouthguard"
+    }
+  ],
+  "quarantined": [
+    {
+      "cdt": "D0120",
+      "charge": 47.0,
+      "page": 8,
+      "sourceDescription": "Intraoral Complete Series of Radiographic Images",
+      "reason": "Published code/description mismatch or local nonstandard code. Requires publisher confirmation."
+    },
+    {
+      "cdt": "D5630",
+      "charge": 192.0,
+      "page": 10,
+      "sourceDescription": "Repair Cast Metal Framework (Removable Partial Denture)",
+      "reason": "Published code/description mismatch or local nonstandard code. Requires publisher confirmation."
+    },
+    {
+      "cdt": "D5640",
+      "charge": 105.0,
+      "page": 10,
+      "sourceDescription": "Replacement of Broken Teeth (Complete Denture)",
+      "reason": "Published code/description mismatch or local nonstandard code. Requires publisher confirmation."
+    },
+    {
+      "cdt": "D5740",
+      "charge": 182.0,
+      "page": 10,
+      "sourceDescription": "Soft Reline of Complete Mandibular Denture (Direct)",
+      "reason": "Published code/description mismatch or local nonstandard code. Requires publisher confirmation."
+    },
+    {
+      "cdt": "D5741",
+      "charge": 182.0,
+      "page": 10,
+      "sourceDescription": "Reline Complete Mandibular Denture (Indirect)",
+      "reason": "Published code/description mismatch or local nonstandard code. Requires publisher confirmation."
+    },
+    {
+      "cdt": "D5750",
+      "charge": 311.0,
+      "page": 10,
+      "sourceDescription": "Rebase Complete Maxillary Denture",
+      "reason": "Published code/description mismatch or local nonstandard code. Requires publisher confirmation."
+    },
+    {
+      "cdt": "D5760",
+      "charge": 285.0,
+      "page": 11,
+      "sourceDescription": "Soft Reline of Complete Maxillary Denture (Direct)",
+      "reason": "Published code/description mismatch or local nonstandard code. Requires publisher confirmation."
+    },
+    {
+      "cdt": "D5761",
+      "charge": 285.0,
+      "page": 11,
+      "sourceDescription": "Soft Reline of Complete Mandibular Denture (Direct)",
+      "reason": "Published code/description mismatch or local nonstandard code. Requires publisher confirmation."
+    },
+    {
+      "cdt": "D5820",
+      "charge": 414.0,
+      "page": 11,
+      "sourceDescription": "Interim Complete Denture (Maxillary)",
+      "reason": "Published code/description mismatch or local nonstandard code. Requires publisher confirmation."
+    },
+    {
+      "cdt": "D5821",
+      "charge": 414.0,
+      "page": 11,
+      "sourceDescription": "Interim Complete Denture (Mandibular)",
+      "reason": "Published code/description mismatch or local nonstandard code. Requires publisher confirmation."
+    },
+    {
+      "cdt": "D9000",
+      "charge": 15.0,
+      "page": 11,
+      "sourceDescription": "Just Right Toothpaste 1.1% NaF with 10% Xylitol",
+      "reason": "Published code/description mismatch or local nonstandard code. Requires publisher confirmation."
+    },
+    {
+      "cdt": "D9001",
+      "charge": 11.0,
+      "page": 11,
+      "sourceDescription": "Allday Dry Mouth Gel",
+      "reason": "Published code/description mismatch or local nonstandard code. Requires publisher confirmation."
+    },
+    {
+      "cdt": "D9002",
+      "charge": 23.0,
+      "page": 11,
+      "sourceDescription": "Allday 5000 Dry Mouth 1.1% NaF Dentifrice",
+      "reason": "Published code/description mismatch or local nonstandard code. Requires publisher confirmation."
+    },
+    {
+      "cdt": "D9944",
+      "charge": 373.0,
+      "page": 11,
+      "sourceDescription": "Occlusal Guard Adjustment",
+      "reason": "Published code/description mismatch or local nonstandard code. Requires publisher confirmation."
+    }
+  ]
+}

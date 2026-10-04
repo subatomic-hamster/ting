@@ -1,0 +1,215 @@
+{
+  "collectedAt": "2026-10-04T06:55:05.057Z",
+  "zip": "27401",
+  "authorization": "Project owner confirmed hackathon permission on 2026-10-04; no dataset or special access endpoint supplied.",
+  "library": {
+    "url": "https://ohl.go2dental.com/oral-health?cli=lincoln&sm=5",
+    "articles": [
+      {
+        "title": "Dental exams",
+        "url": "https://ohl.go2dental.com/content?a=1&cli=lincoln&sm=24",
+        "codes": [
+          "D0120",
+          "D0140",
+          "D0150"
+        ],
+        "hasDollarAmounts": false
+      },
+      {
+        "title": "Professional tooth cleaning",
+        "url": "https://ohl.go2dental.com/content?a=2&cli=lincoln&sm=24",
+        "codes": [
+          "D1110",
+          "D1120"
+        ],
+        "hasDollarAmounts": false
+      },
+      {
+        "title": "Dental X-rays and imaging",
+        "url": "https://ohl.go2dental.com/content?a=3&cli=lincoln&sm=24",
+        "codes": [
+          "D0210",
+          "D0220",
+          "D0274",
+          "D0330"
+        ],
+        "hasDollarAmounts": false
+      },
+      {
+        "title": "Fillings",
+        "url": "https://ohl.go2dental.com/content?a=8&cli=lincoln&sm=24",
+        "codes": [
+          "D2140",
+          "D2150",
+          "D2160",
+          "D2161",
+          "D2330",
+          "D2391",
+          "D2392",
+          "D2393",
+          "D2394"
+        ],
+        "hasDollarAmounts": false
+      },
+      {
+        "title": "Crowns",
+        "url": "https://ohl.go2dental.com/content?a=9&cli=lincoln&sm=24",
+        "codes": [
+          "D2740",
+          "D2750",
+          "D2790",
+          "D2920",
+          "D2950",
+          "D2954"
+        ],
+        "hasDollarAmounts": false
+      },
+      {
+        "title": "Tooth removal",
+        "url": "https://ohl.go2dental.com/content?a=10&cli=lincoln&sm=24",
+        "codes": [
+          "D7140",
+          "D7210",
+          "D7240"
+        ],
+        "hasDollarAmounts": false
+      },
+      {
+        "title": "Dental implants",
+        "url": "https://ohl.go2dental.com/content?a=13&cli=lincoln&sm=24",
+        "codes": [
+          "D6010",
+          "D6065"
+        ],
+        "hasDollarAmounts": false
+      },
+      {
+        "title": "Scaling and root planing",
+        "url": "https://ohl.go2dental.com/content?a=16&cli=lincoln&sm=24",
+        "codes": [
+          "D4341",
+          "D4342",
+          "D4355"
+        ],
+        "hasDollarAmounts": false
+      },
+      {
+        "title": "Periodontal maintenance",
+        "url": "https://ohl.go2dental.com/content?a=17&cli=lincoln&sm=24",
+        "codes": [
+          "D4910"
+        ],
+        "hasDollarAmounts": false
+      },
+      {
+        "title": "Root canal therapy",
+        "url": "https://ohl.go2dental.com/content?a=19&cli=lincoln&sm=24",
+        "codes": [
+          "D3220",
+          "D3310",
+          "D3320",
+          "D3330"
+        ],
+        "hasDollarAmounts": false
+      },
+      {
+        "title": "Orthodontic treatment",
+        "url": "https://ohl.go2dental.com/content?a=20&cli=lincoln&sm=24",
+        "codes": [
+          "D8080",
+          "D8090"
+        ],
+        "hasDollarAmounts": false
+      }
+    ],
+    "status": "reviewed",
+    "method": "Public web retrieval",
+    "directAutomationStatus": "challenge",
+    "costDataAvailable": false
+  },
+  "fairHealth": {
+    "url": "https://www.fairhealthconsumer.org/dental/category",
+    "status": "access-limited",
+    "estimates": [],
+    "uncollectedCodes": [
+      "D2740",
+      "D0120",
+      "D0140",
+      "D0150",
+      "D0210",
+      "D0220",
+      "D0274",
+      "D0330",
+      "D1110",
+      "D1120",
+      "D1206",
+      "D1351",
+      "D2140",
+      "D2150",
+      "D2160",
+      "D2161",
+      "D2330",
+      "D2391",
+      "D2392",
+      "D2393",
+      "D2394",
+      "D2750",
+      "D2790",
+      "D2920",
+      "D2950",
+      "D2954",
+      "D3220",
+      "D3310",
+      "D3320",
+      "D3330",
+      "D4341",
+      "D4342",
+      "D4355",
+      "D4910",
+      "D5110",
+      "D5213",
+      "D6010",
+      "D6065",
+      "D6240",
+      "D6750",
+      "D7140",
+      "D7210",
+      "D7240",
+      "D8080",
+      "D8090",
+      "D9110",
+      "D9230",
+      "D9239",
+      "D9243",
+      "D9944"
+    ],
+    "evidence": "Search Limit Exceeded. Calculator showed N/A for provider billed charge and combined allowed amount; no numeric estimates could be verified. Stopped collection at the access-limit message.",
+    "attemptedCodes": [
+      "D2740",
+      "D0120",
+      "D0140",
+      "D0150",
+      "D0210",
+      "D0220",
+      "D0274",
+      "D0330",
+      "D1110",
+      "D1120",
+      "D1206",
+      "D1351",
+      "D2140",
+      "D2150",
+      "D2160",
+      "D2161",
+      "D2330",
+      "D2391",
+      "D2392",
+      "D2393",
+      "D2394"
+    ],
+    "resultLabels": [
+      "Provider Billed Charge",
+      "Allowed Amount (Includes Both In-Network and Out-of-Network Amounts)"
+    ]
+  }
+}

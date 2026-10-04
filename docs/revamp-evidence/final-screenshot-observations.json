@@ -1,0 +1,98 @@
+{
+  "captured": "2026-10-04T08:35:05.800Z",
+  "url": "http://127.0.0.1:5173",
+  "mode": "local mock UI",
+  "textStress": "Snapshot computed HTML font sizes and line heights, then double at fixed viewport",
+  "observations": [
+    {
+      "route": "/",
+      "width": 320,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "route": "/treatment",
+      "width": 320,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "route": "/enroll",
+      "width": 320,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "route": "/email",
+      "width": 320,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "route": "/habits",
+      "width": 320,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "route": "/",
+      "width": 390,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "route": "/treatment",
+      "width": 390,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "route": "/enroll",
+      "width": 390,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "route": "/email",
+      "width": 390,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "route": "/habits",
+      "width": 390,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "route": "/",
+      "width": 768,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "route": "/treatment",
+      "width": 768,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "route": "/enroll",
+      "width": 768,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "route": "/email",
+      "width": 768,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "route": "/habits",
+      "width": 768,
+      "overflow": 0,
+      "errors": []
+    }
+  ]
+}

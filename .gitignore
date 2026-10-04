@@ -7,3 +7,4 @@ dist
 .DS_Store
 .playwright-mcp
 e2e-report-local
+e2e-report

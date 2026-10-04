@@ -1,69 +1,171 @@
-@import 'tailwindcss';
-
+@import "@fontsource/roboto/latin-400.css";
+@import "@fontsource/roboto/latin-500.css";
+@import "@fontsource/roboto/latin-700.css";
+@import "@fontsource/source-serif-4/latin-300.css";
+@import "tailwindcss";
 @theme {
-  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --color-paper: #faf7f6;
-  --color-ink: #2a1c1e;
-  --color-muted: #6e5c5e;
-  --color-line: #ecdfdd;
-  --color-brand-50: #fdf2f3;
-  --color-brand-100: #fadfe2;
-  --color-brand-200: #f2b8be;
-  --color-brand-500: #c8283a;
-  --color-brand-600: #ad1f2d;
-  --color-brand-700: #8f1925;
-  --color-brand-900: #5c1018;
-  --color-accent-red: #fe242a;
-  --color-accent-orange: #f15a23;
-  --color-accent-amber: #f9a61a;
-  --color-plan: #ad1f2d;       /* plan pays */
-  --color-sched: #f9a61a;      /* scheduled against the max */
-  --color-roll: #f6b48f;       /* rollover */
-  --color-save: #1c7c4d;       /* money saved */
-  --color-cost: #d9481b;       /* money added */
-  --color-warn: #b45309;
+  --font-sans: "Roboto", Arial, sans-serif;
+  --font-serif: "Source Serif 4", Georgia, serif;
+  --text-xs: 0.875rem;
+  --text-xs--line-height: 1.25rem;
+  --text-sm: 1rem;
+  --text-sm--line-height: 1.5rem;
+  --color-paper: #f2f4f6;
+  --color-ink: #222222;
+  --color-muted: #5a5a5a;
+  --color-line: #dcdee0;
+  --color-brand-50: #faf5f7;
+  --color-brand-100: #eee1e7;
+  --color-brand-200: #d0b2bf;
+  --color-brand-500: #650030;
+  --color-brand-600: #650030;
+  --color-brand-700: #4e0025;
+  --color-brand-900: #39001c;
+  --color-accent-red: #650030;
+  --color-accent-orange: #ea5a21;
+  --color-accent-amber: #db7a26;
+  --color-plan: #650030;
+  --color-sched: #db7a26;
+  --color-roll: #dfba9e;
+  --color-save: #276545;
+  --color-cost: #a7351d;
+  --color-warn: #85420c;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
+  --radius-2xl: 2px;
 }
-
 html {
   -webkit-text-size-adjust: 100%;
 }
-
 body {
-  @apply bg-paper text-ink antialiased;
+  @apply bg-white text-ink antialiased;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0;
 }
-
-/* Visible keyboard focus everywhere. */
 :focus-visible {
-  outline: 3px solid var(--color-brand-500);
-  outline-offset: 2px;
-  border-radius: 6px;
+  outline: 3px solid #036d9b;
+  outline-offset: 3px;
 }
-
 @utility card {
-  @apply rounded-2xl border border-line bg-white p-4 shadow-[0_1px_2px_rgba(60,16,20,0.05)] sm:p-5;
+  @apply border-t border-line bg-white py-5;
 }
-
 @utility btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+  @apply inline-flex max-w-full min-h-12 items-center justify-center gap-2 rounded-sm px-4 py-3 text-base font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
 }
 @utility btn-primary {
   @apply btn bg-brand-600 text-white hover:bg-brand-700;
 }
 @utility btn-secondary {
-  @apply btn border border-line bg-white text-ink hover:bg-brand-50;
+  @apply btn border border-line bg-white text-brand-700 hover:bg-brand-50;
 }
 @utility btn-ghost {
   @apply btn text-brand-700 hover:bg-brand-50;
 }
-
 @utility eyebrow {
-  @apply text-xs font-semibold tracking-wide text-muted uppercase;
+  @apply text-xs font-medium text-muted;
 }
-
 @utility tabular {
   font-variant-numeric: tabular-nums;
 }
-
+@layer base {
+  button,
+  summary,
+  select {
+    min-height: 48px;
+  }
+  button {
+    min-width: 48px;
+    white-space: normal;
+  }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  select,
+  textarea {
+    font-size: 1rem;
+    min-height: 48px;
+    max-width: 100%;
+    border-radius: 2px;
+  }
+  label:has(input[type="checkbox"]),
+  label:has(input[type="radio"]) {
+    min-height: 48px;
+  }
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  summary {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  h1 {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    font-weight: 300;
+    line-height: 1.1875;
+  }
+  h2 {
+    font-size: 1.375rem;
+    font-weight: 500;
+    line-height: 1.2727;
+  }
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+  a {
+    overflow-wrap: anywhere;
+  }
+}
+/* Member surfaces use one restrained visual language; diagrams keep semantic colors. */
+.member-content [class*="shadow"] {
+  box-shadow: none;
+}
+.member-content [class*="text-[10px]"],
+.member-content [class*="text-[11px]"] {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.member-content > div > .space-y-5 > * + *,
+.member-content .space-y-5 > * + * {
+  margin-top: 32px;
+}
+.member-content a:not(.inline-reference) {
+  min-height: 48px;
+}
+.member-content :where(p, li, dd, dt, div) {
+  overflow-wrap: break-word;
+}
+.member-content .card {
+  min-width: 0;
+}
+.member-content details > summary {
+  gap: 12px;
+}
+.member-content details[open] > summary {
+  margin-bottom: 12px;
+}
+.page-inset {
+  padding: 24px 20px 40px;
+}
+@media (max-width: 375px) {
+  .page-inset {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+@media (min-width: 768px) {
+  .page-inset {
+    padding: 32px 32px 48px;
+  }
+}
 @media print {
   .no-print {
     display: none !important;
@@ -72,7 +174,6 @@ body {
     background: white;
   }
 }
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -80,4 +181,35 @@ body {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+.member-content h2 {
+  font-size: 1.375rem;
+  font-weight: 500;
+  line-height: 1.2727;
+}
+.member-content h3 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.leaflet-control-zoom a {
+  width: 48px !important;
+  height: 48px !important;
+  line-height: 48px !important;
+}
+.leaflet-popup-content {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+main {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.leaflet-container a.leaflet-popup-close-button {
+  width: 48px;
+  height: 48px;
+  line-height: 48px;
 }

@@ -1,0 +1,212 @@
+- navigation:
+  - link "Skip to banner section":
+    - /url: https://www.lincolnfinancial.com/public/professionals#banner-section
+  - link "Skip to main content":
+    - /url: https://www.lincolnfinancial.com/public/professionals#main-content
+  - link "Skip to footer":
+    - /url: https://www.lincolnfinancial.com/public/professionals#footer-content
+  - link "Lincoln Financial":
+    - /url: /public/professionals
+    - img "Lincoln Financial"
+  - generic: 
+  - list:
+    - link "Individuals":
+      - /url: /public/individuals
+    - link "Employers":
+      - /url: /public/employers
+    - link "Professionals":
+      - /url: /public/professionals
+  - list:
+    - link "Careers":
+      - /url: public/aboutus/careers
+    - link "Register":
+      - /url: public/general/registration
+    - link "Log in":
+      - /url: https://www.lincolnfinancial.com/secure/logout
+  - navigation:
+    - list:
+      - listitem "Partner with us":
+        - generic: Partner with us
+      - listitem "Products and insights":
+        - generic: Products and insights
+      - listitem "Service and support":
+        - generic: Service and support
+  - textbox "Search":
+    - /placeholder: Search our site
+  - generic: 
+  - text:  
+- region:
+  - banner:
+    - heading "The list is out. Guess who's in?" [level=1]
+    - paragraph:
+      - emphasis: Barron's
+      - text: named "The 100 Best Annuities"
+    - paragraph:
+      - text: Lincoln Financial showed
+      - strong: 6 times!
+    - generic: Check out the 2026 list
+  - list:
+    - link "Lincoln Financial Distributors Discover wholesale resources to strengthen your professionals and address client needs":
+      - /url: public/professionals/partnerwithus/lincolnfinancialdistributors
+      - heading "Lincoln Financial Distributors" [level=2]
+      - paragraph: Discover wholesale resources to strengthen your professionals and address client needs
+    - link "Lincoln Financial Investments Provide your clients with access to broader investment opportunities with private market funds.":
+      - /url: public/professionals/productsandinsights/lincolnfinancialinvestments
+      - heading "Lincoln Financial Investments" [level=2]
+      - paragraph: Provide your clients with access to broader investment opportunities with private market funds.
+    - link "Market insights Subscribe for timely market intelligence and client-ready content.":
+      - /url: public/professionals/productsandinsights/marketinsights
+      - heading "Market insights" [level=2]
+      - paragraph: Subscribe for timely market intelligence and client-ready content.
+    - link "Workplace Solutions Explore how we can support your clients with integrated employee benefits, retirement plans and wellness solutions":
+      - /url: public/professionals/partnerwithus/workplacesolutions
+      - heading "Workplace Solutions" [level=2]
+      - paragraph: Explore how we can support your clients with integrated employee benefits, retirement plans and wellness solutions
+    - link "Customer service Manage your account, file a claim or find a form":
+      - /url: public/individuals/support/customerservice
+      - heading "Customer service" [level=2]
+      - paragraph: Manage your account, file a claim or find a form
+- img "Powerful. Strategic. Unmatched."
+- heading "Access private market strategies to help you enhance portfolio resilience through market cycles" [level=2]
+- link "Private Market Funds":
+  - /url: public/professionals/productsandinsights/lincolnfinancialinvestments
+- heading "Market insights" [level=2]
+- paragraph: Lincoln is pleased to partner with some of the industry's most respected asset managers.
+- link "Here's the latest from Lincoln and our asset management partners. ":
+  - /url: public/professionals/productsandinsights/marketinsights
+  - text: Here's the latest from Lincoln and our asset management partners.
+  - generic: 
+- heading "New Lincoln Level Advantage® rate center!" [level=2]:
+  - text: New
+  - emphasis: Lincoln Level Advantage
+  - superscript: ®
+  - text: rate center!
+- link "Now available ":
+  - /url: https://www.lincolnfinancial.com/public/microsite/leveladvantage/ratescenter
+  - text: Now available
+  - generic: 
+- heading "Announcements" [level=3]:
+  - generic: Announcements
+- list:
+  - link "Lincoln Financial Reports 2026 Second Quarter Results ":
+    - /url: https://www.businesswire.com/news/home/20260730378915/en/Lincoln-Financial-Reports-2026-Second-Quarter-Results
+    - text: Lincoln Financial Reports 2026 Second Quarter Results
+    - generic: 
+  - link "Lincoln Financial unveils new fixed indexed annuity income solutions with category-first legacy planning ":
+    - /url: public/aboutus/newsroom/pressreleases/Lincoln-New-FIA-Income-Solutions
+    - text: Lincoln Financial unveils new fixed indexed annuity income solutions with category-first legacy planning
+    - generic: 
+  - link "Lincoln Financial introduces first Capital Group ETF strategy for fixed indexed annuities ":
+    - /url: public/aboutus/newsroom/pressreleases/Capital-Group-ETF-strategy
+    - text: Lincoln Financial introduces first Capital Group ETF strategy for fixed indexed annuities
+    - generic: 
+- heading "The informed financial professional blog" [level=2]
+- paragraph: Get ideas and insights to help you solve a range of client income needs through holistic planning.
+- link "Get best practices to help you deliver comprehensive advice. ":
+  - /url: public/professionals/productsandinsights/blogs
+  - text: Get best practices to help you deliver comprehensive advice.
+  - generic: 
+- heading "Meet your clients' evolving needs" [level=2]
+- paragraph: Lincoln Financial’s comprehensive life insurance portfolio helps you choose the best life insurance and life solutions for your clients.
+- link "Individual life insurance ":
+  - /url: public/professionals/productsandinsights/individuallifeinsurance
+  - text: Individual life insurance
+  - generic: 
+- heading "Privacy" [level=2]
+- paragraph: We are committed to keeping personal information confidential and secure, and in compliance with state and federal laws.
+- link "How Lincoln handles your data ":
+  - /url: public/general/privacy
+  - text: How Lincoln handles your data
+  - generic: 
+- contentinfo:
+  - heading "My account" [level=2]
+  - list:
+    - link "Log in":
+      - /url: https://www.lincolnfinancial.com/secure/logout
+    - link "Register":
+      - /url: public/general/registration
+  - heading "About us" [level=2]
+  - list:
+    - link "About us":
+      - /url: public/aboutus/companyoverview
+    - link "Careers":
+      - /url: public/aboutus/careers
+    - link "Corporate governance":
+      - /url: public/aboutus/companyoverview/corporategovernance
+    - link "Corporate responsibility":
+      - /url: public/aboutus/companyoverview/ourvalues/corporateresponsibility
+    - link "Inclusion and belonging":
+      - /url: public/aboutus/companyoverview/ourvalues/inclusionandbelonging
+    - link "Lincoln Financial Foundation":
+      - /url: public/aboutus/companyoverview/ourimpact/lincolnfinancialfoundation
+    - link "Investor relations":
+      - /url: public/aboutus/investorrelations
+    - link "Newsroom":
+      - /url: public/aboutus/newsroom
+  - heading "Support" [level=2]
+  - list:
+    - link "Find a dentist":
+      - /url: https://clients.go2dental.com/lfg/FindADentist
+    - link "Find a vision care provider":
+      - /url: https://lincolnfinancial.yourvisionplan.com/MWP/Landing
+    - link "Report fraud":
+      - /url: public/general/support/reportfraud
+    - link "Support for you":
+      - /url: public/professionals/professionalresources
+    - link "Support for your clients":
+      - /url: public/professionals/clientresources
+  - heading "Solutions for" [level=2]
+  - list:
+    - link "Dental providers":
+      - /url: https://provider.mylincolnportal.com/dental/login
+    - link "Individuals":
+      - /url: public/individuals
+    - link "Employers":
+      - /url: public/employers
+    - link "Commercial real estate":
+      - /url: public/general/commercialrealestate
+  - heading "Questions?" [level=2]
+  - list:
+    - link "1-877-275-5462":
+      - /url: tel:1-877-275-5462
+  - img "Your tomorrow. Our priority."
+  - generic: LCN-9062853-080626
+  - list:
+    - link "Accessibility":
+      - /url: public/general/accessibility
+    - link "Cybersecurity":
+      - /url: public/general/cybersecurity
+    - link "Glossary":
+      - /url: public/general/glossary
+    - link "Legal":
+      - /url: public/general/legal
+    - link "Privacy":
+      - /url: public/general/privacy
+  - list:
+    - link "":
+      - /url: https://www.facebook.com/lincolnfinancial/
+      - generic: 
+    - link "":
+      - /url: https://www.linkedin.com/company/lincolnfinancial/
+      - generic: 
+    - link "":
+      - /url: https://x.com/LincolnFncl
+      - generic: 
+    - link "":
+      - /url: https://www.youtube.com/@Lincoln_Financial
+      - generic: 
+    - link "":
+      - /url: https://www.instagram.com/lincolnfinancial
+      - generic: 
+  - paragraph: © 2026 Lincoln National Corporation. All rights reserved.
+  - paragraph: Lincoln Financial is the marketing name for Lincoln National Corporation and insurance company affiliates, including The Lincoln National Life Insurance Company, Fort Wayne, IN, and in New York, Lincoln Life & Annuity Company of New York, Syracuse, NY. Variable products distributed by broker-dealer/affiliate Lincoln Financial Distributors, Inc., Radnor, PA. Securities and investment advisory services may be offered through non-affiliated entities.
+  - paragraph: Lincoln products are not a deposit nor FDIC-insured, may go down in value, and are not insured by any federal government agency or guaranteed by any bank or savings association. All guarantees and benefits of the insurance policy are subject to the claims-paying ability of the issuing insurance company. They are not backed by the broker-dealer and/or insurance agency selling the policy, or any affiliates of those entities other than the issuing company affiliates, and none makes any representation or guarantees regarding the claims-paying ability of the issuer.
+  - paragraph:
+    - text: Lincoln
+    - emphasis: MoneyGuard
+    - superscript: ®
+    - text: solutions are universal and variable universal life insurance policies with a long-term care rider. The policies and riders have exclusions, limitations, and/or reductions. Please contact your Lincoln representative or the insurance company for costs and complete details.
+  - paragraph: "Life insurance policies: It is possible coverage will expire when either no premiums are paid following the initial premium, or subsequent premiums are insufficient to continue coverage."
+  - paragraph: “Lincoln Financial Group,” “Lincoln Financial,” “Your tomorrow. Our priority,” “Plan Protect Retire,” “This is financial security,” and the Lincoln Financial Logo and Artisan Mark are service marks of the Lincoln National Corporation.
+- text: 
+- alert

@@ -1,0 +1,42 @@
+# Pricing and procedure implementation brief
+
+Research date: October 4, 2026. User confirms hackathon permission to use provided resources. This brief and the implementation are in the shared Ting checkout. Destination developer chat is awaiting identification; no message has been sent to an unrelated chat.
+
+## What is implemented
+
+- Searchable catalog including adult/teen comprehensive braces, limited orthodontic treatment, mixed-dentition treatment, adjustment visits, retention, replacement retainers, space maintainers, expanded X-ray variants, pediatric crowns/pulp therapy, front filling variants, root canal retreatment, gum surgery, lower/immediate/flexible dentures, repairs, implant abutments and extraction variants.
+- Dentist fee and insurer allowance entered separately. Member-confirmed allowances are scoped to the plan ID/version and network. Actual quotes with unknown allowances budget the full fee without borrowing synthetic PPO/UCR/MAC values or consuming deductible/maximum. Explicit zero allowances remain distinct from missing allowances.
+- Published provider charges have an explicit, opt-in reference workflow. They never silently replace the member's dentist quote or become contracted rates.
+- Existing 50-code synthetic fees remain only as the labeled sample account. New codes do not get fabricated numeric defaults. Intake requires a fee for every recognized item instead of silently omitting an unpriced item.
+- Braces use a full-course quote, not monthly installments. The current engine adjudicates that fee at the start date and uses its orthodontic lifetime maximum. The UI explicitly states the limitation concerning installments, eligibility and treatment in progress.
+- A replacement crown needs its actual previous placement date or a full-fee budget pending insurer confirmation. No fabricated three-year history remains.
+
+## Actual source research
+
+[Current Forsyth County publications page](https://www.forsyth.cc/hhs/phpublications.aspx) links to the [FY2026–27 official fee schedule](https://www.forsyth.cc/hhs/assets/documents/Public_Health_Fee_Schedule.pdf). The dated search-result URL returned 404; the official current link worked. Dental rows span PDF pages 8–11. The source PDF was downloaded, text extracted and pages rendered for visual inspection. Source page images are in `docs/pricing-evidence/forsyth-fees-page-8.png` through `-11.png`. `scripts/extract-provider-fees.py` reproduces the grid extraction, retains publisher descriptions and stops if the reviewed SHA256 or rows change. `src/data/provider-fees.json` retains publisher, clinic, ZIP27101, FY scope, retrieval date, URL, page per charge and SHA256. This clinic is in Winston-Salem, not Greensboro ZIP27401; charges are not ZIP market statistics. [Clinic details](https://www.forsyth.cc/hhs/cadc/) say sliding fees depend on eligibility and the clinic accepts Medicaid, one named commercial insurer and self-pay. That is not proof of participation in the member's particular network.
+
+Extraction includes provider charges, not insurance rates. Representative figures: adult cleaning $81; porcelain crown $900; molar root canal $904; scaling/root planing $176 per quadrant with four or more teeth and $114 with one to three teeth; upper complete denture $1,106; surgical extraction $206. Units must not be combined or treated as whole-mouth packages. D7210 occupied a separate line and was manually verified. Several rows contain code/description inconsistencies: D0120 is mislabeled as a radiographic series, D9944 as guard adjustment, and some denture repair/reline entries conflict with their codes. These and local D9000–D9002 product codes are quarantined rather than displayed as trustworthy references.
+
+[Orange County commissioner-approved FY2025–26 schedule](https://www.orangecountync.gov/DocumentCenter/View/32168/FY2025-26-Commissioner-Approved-Fee-Schedule), pages16–17, is a useful cross-check. It lists adult cleaning $109 and molar root canal $1,258. Its fiscal year has ended; no current-year applicability was verified. The older `DocumentCenter/View/28625` file is a draft/old schedule with confusing extra columns. Neither file is used as a current/default PPO fee. Differences between clinics are not national percentile ranges.
+
+[ADA's dental care market page](https://www.ada.org/resources/research/health-policy-institute/dental-care-market) says its fee survey was discontinued in 2023 and downloads removed. Do not cite a fabricated current ADA fee survey.
+
+[FAIR Health glossary](https://www.fairhealthconsumer.org/glossary) distinguishes billed charges, negotiated allowed amounts and out-of-network bases. Its consumer calculator was access-limited in the earlier authorized session; we did not bypass the limit. No numeric consumer results were successfully collected. The visible combined allowed estimate was labeled as including both in-network and out-of-network amounts. It cannot be treated as this employer plan's negotiated contract or a specific UCR percentile. [FAIR Health's allowed benchmarks product sheet](https://s3.amazonaws.com/media2.fairhealth.org/resource/asset/FH%20Product%20Sheet%20-%20Allowed%20Benchmarks.pdf) describes a suitable licensed data product. Ask the hackathon organizer for an export/API entitlement or a usable licensed account; written permission alone does not remove the site's technical limit.
+
+[Hackathon oral-health library](https://ohl.go2dental.com/oral-health?cli=lincoln&sm=5) supplies procedure education, not verified numeric fees or provider network contracts. Existing collected article links remain in `src/data/dental-resources.json`.
+
+## Orthodontic findings and next engine work
+
+[AAO braces guidance](https://aaoinfo.org/treatments/braces/) and [AAO fee/coverage FAQs](https://aaoinfo.org/resources/faqs/page/10/) support asking about full-course scope, retainers, payment plans and coverage limits. [A Greensboro orthodontic practice's financing page](https://smilegreensboro.com/financing-and-discounts/) lists included treatment components and monthly-payment promotions but no total fee. A monthly payment is not a treatment price and must not be multiplied by an assumed number of months.
+
+The next production pricing milestone needs a dentist/plan-specific pretreatment estimate or contract dataset with CDT, units, tooth/quadrant, provider, network/product, date, geography and version. Store billed charges, network contracts, UCR percentiles and MAC amounts independently. No multiplier can derive these from one another. Actual filling quotes also require a separately confirmed alternate-benefit base when applicable; they cannot borrow the sample silver-filling rate. Bind each allowance to its plan/provider/network scope; edits/toggling network invalidate that confirmation.
+
+Full orthodontic payment modeling still requires the actual plan document: age eligibility, remaining lifetime benefit, waiting period, down-payment proportion, installment dates, continuing eligibility, treatment-in-progress rules, retainer inclusion and separate adult/child provisions. Existing annual/cash-flow/FSA scheduling is not an insurer's orthodontic installment schedule. Add explicit benefit/payment events before claiming monthly accuracy. Do not double count bundled visits or retainers. Confirm codes with the dentist rather than classifying metal/ceramic/aligners as separate reimbursement guarantees.
+
+## Validation
+
+Unit coverage checks actual quotes versus demo allowances, missing fees/allowances, exact UCR/MAC lookup, balance billing, alternate benefits and unknown crown history. Browser tests cover adding a full-course brace quote, missing allowance budgeting, saving/reloading, selecting a real clinic reference, editing a confirmed allowance, dates, shares, recommendation/calendar consistency, deletion and mobile layout.
+
+Validation: 191 unit tests pass; local production E2E has 45 passing tests and five intentional duplicate WebKit matrix skips. See `docs/revamp-validation.md` for exact tested scope and unsupported integrations.
+
+Current catalog count: 137 (50 existing plus 87 additions). Source extraction retained 101 provider-charge rows and quarantined14 suspect/local-code rows. Only matching catalog entries can be selected in the reference UI. No orthodontic total price was published by the reviewed local practice, so braces require an explicit full-course quote.

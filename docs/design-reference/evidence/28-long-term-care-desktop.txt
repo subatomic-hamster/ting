@@ -1,0 +1,195 @@
+- navigation:
+  - link "Skip to banner section":
+    - /url: https://www.lincolnfinancial.com/public/individuals/products/longtermcareplanning#banner-section
+  - link "Skip to main content":
+    - /url: https://www.lincolnfinancial.com/public/individuals/products/longtermcareplanning#main-content
+  - link "Skip to footer":
+    - /url: https://www.lincolnfinancial.com/public/individuals/products/longtermcareplanning#footer-content
+  - link "Lincoln Financial":
+    - /url: /public/individuals
+    - img "Lincoln Financial"
+  - generic: 
+  - list:
+    - link "Individuals":
+      - /url: /public/individuals
+    - link "Employers":
+      - /url: /public/employers
+    - link "Professionals":
+      - /url: /public/professionals
+  - list:
+    - link "Careers":
+      - /url: public/aboutus/careers
+    - link "Register":
+      - /url: public/general/registration
+    - link "Log in":
+      - /url: https://www.lincolnfinancial.com/secure/logout
+  - navigation:
+    - list:
+      - listitem "Products":
+        - generic: Products
+      - listitem "Planning":
+        - generic: Planning
+      - listitem "Service and support":
+        - generic: Service and support
+  - textbox "Search":
+    - /placeholder: Search our site
+  - generic: 
+  - text:  
+- region:
+  - banner:
+    - heading "Face the future with confidence" [level=1]
+    - generic: Long-term care planning
+- navigation:
+  - list:
+    - link "Learn the basics":
+      - /url: public/individuals/products/longtermcareplanning/learnthebasics
+    - link "When to plan":
+      - /url: public/individuals/products/longtermcareplanning/whentoplan
+    - link "MoneyGuard® solutions":
+      - /url: public/individuals/products/longtermcareplanning/moneyguardsolutions
+      - emphasis: MoneyGuard
+      - superscript: ®
+      - text: solutions
+    - link "Lincoln Concierge Care Coordination":
+      - /url: public/individuals/support/customerservice/longtermcareresources/ltcclaimlearningcenter/lincolnconciergecare
+    - link "Resources":
+      - /url: public/individuals/products/longtermcareplanning/resources
+    - link "Bill payment center":
+      - /url: public/individuals/products/lifeinsurance/billpayment
+- heading "Long-term care events happen to a family, not just a person." [level=2]
+- paragraph: As people live longer and healthcare expenses continue to rise, the need for long-term care planning becomes more of a “when” than an “if” situation. By having a long-term care strategy in place earlier, you’ll be better prepared for the financial, emotional and administrative decisions you and your loved ones may need to make.
+- paragraph:
+  - text: The average life expectancy at birth is expected to increase from 78.9 years in 2025 to 82.3 years by 2055.
+  - superscript: "1"
+  - text: As longevity continues to rise, 96% of consumers feel it is important to plan for long-term care in advance of needing it.
+  - superscript: "2"
+- heading "Understand the impact" [level=2]
+- paragraph: Learn about long-term care coverage, cost of care and the benefits of planning ahead.
+- link "Learn the basics ":
+  - /url: public/individuals/products/longtermcareplanning/learnthebasics
+  - text: Learn the basics
+  - generic: 
+- heading "Tailor to your needs" [level=2]
+- paragraph: Customize a strategy to plan according to your personal preferences and life stage.
+- link "Know when to plan ":
+  - /url: public/individuals/products/longtermcareplanning/whentoplan
+  - text: Know when to plan
+  - generic: 
+- heading "Protection in action" [level=2]
+- paragraph: Have a comprehensive strategy to help protect you and your loved ones from the unexpected.
+- link "Explore our solutions ":
+  - /url: public/individuals/products/longtermcareplanning/moneyguardsolutions
+  - text: Explore our solutions
+  - generic: 
+- paragraph: "Issuer: The Lincoln National Life Insurance Company. Not available in New York."
+- paragraph: The Lincoln National Life Insurance Company does not solicit business in the state of New York, nor is it authorized to do so.
+- heading "Start the conversation" [level=2]
+- paragraph: Our videos, guides and tools are designed with you and your loved ones in mind. Because the more you talk, the better you can plan.
+- link "Explore our resources ":
+  - /url: public/individuals/products/longtermcareplanning/resources
+  - text: Explore our resources
+  - generic: 
+- article:
+  - paragraph:
+    - superscript: "1"
+    - text: "Congressional Budget Office, \"The Demographic Outlook: 2025 to 2055\", January 2025. https://www.cbo.gov/publication/61164"
+  - paragraph:
+    - superscript: "2"
+    - text: Lincoln Financial Group and Versta Research, "Planning for long-term care", August 2023. https://visit.lfg.com/MG-LTC-PPT004 (slide 38)
+  - paragraph:
+    - strong: The purpose of this communication is the solicitation of insurance. An insurance producer or insurance company will contact you.
+  - paragraph: Hybrid policies are universal life policies with optional long-term care benefit riders. The policies and riders have exclusions, limitations, and/or reductions. Please contact your Lincoln representative or the insurance company for costs and complete details.
+- contentinfo:
+  - heading "My account" [level=2]
+  - list:
+    - link "Log in":
+      - /url: https://www.lincolnfinancial.com/secure/logout
+    - link "Register":
+      - /url: public/general/registration
+  - heading "Company overview" [level=2]
+  - list:
+    - link "About us":
+      - /url: public/aboutus/companyoverview
+    - link "Careers":
+      - /url: public/aboutus/careers
+    - link "Corporate governance":
+      - /url: public/aboutus/companyoverview/corporategovernance
+    - link "Corporate responsibility":
+      - /url: public/aboutus/companyoverview/ourvalues/corporateresponsibility
+    - link "Inclusion and belonging":
+      - /url: public/aboutus/companyoverview/ourvalues/inclusionandbelonging
+    - link "Lincoln Financial Foundation":
+      - /url: public/aboutus/companyoverview/ourimpact/lincolnfinancialfoundation
+    - link "Investor relations":
+      - /url: public/aboutus/investorrelations
+    - link "Newsroom":
+      - /url: public/aboutus/newsroom
+  - heading "Support" [level=2]
+  - list:
+    - link "Customer service":
+      - /url: public/individuals/support/customerservice
+    - link "File a claim":
+      - /url: public/general/fileaclaimtool
+    - link "Find a dentist":
+      - /url: https://clients.go2dental.com/lfg/FindADentist
+    - link "Find a financial professional":
+      - /url: public/individuals/support/findafinancialprofessional
+    - link "Find a form":
+      - /url: public/individuals/support/customerservice
+    - link "Find a vision care provider":
+      - /url: https://lincolnfinancial.yourvisionplan.com/MWP/Landing
+    - link "Report fraud":
+      - /url: public/general/support/reportfraud
+  - heading "Solutions for" [level=2]
+  - list:
+    - link "Dental providers":
+      - /url: https://provider.mylincolnportal.com/dental/login
+    - link "Employers":
+      - /url: public/employers
+    - link "Professionals":
+      - /url: public/professionals
+  - heading "Questions?" [level=2]
+  - list:
+    - link "1-877-275-5462":
+      - /url: tel:1-877-275-5462
+  - img "Your tomorrow. Our priority."
+  - generic: LCN-7790358-032725
+  - list:
+    - link "Accessibility":
+      - /url: public/general/accessibility
+    - link "Cybersecurity":
+      - /url: public/general/cybersecurity
+    - link "Glossary":
+      - /url: public/general/glossary
+    - link "Legal":
+      - /url: public/general/legal
+    - link "Privacy":
+      - /url: public/general/privacy
+  - list:
+    - link "":
+      - /url: https://www.facebook.com/lincolnfinancial/
+      - generic: 
+    - link "":
+      - /url: https://www.linkedin.com/company/lincolnfinancial/
+      - generic: 
+    - link "":
+      - /url: https://x.com/LincolnFncl
+      - generic: 
+    - link "":
+      - /url: https://www.youtube.com/@Lincoln_Financial
+      - generic: 
+    - link "":
+      - /url: https://www.instagram.com/lincolnfinancial
+      - generic: 
+  - paragraph: © 2026 Lincoln National Corporation. All rights reserved.
+  - paragraph: Lincoln Financial is the marketing name for Lincoln National Corporation and insurance company affiliates, including The Lincoln National Life Insurance Company, Fort Wayne, IN, and in New York, Lincoln Life & Annuity Company of New York, Syracuse, NY. Variable products distributed by broker-dealer/affiliate Lincoln Financial Distributors, Inc., Radnor, PA. Securities and investment advisory services may be offered through non-affiliated entities.
+  - paragraph: Lincoln products are not a deposit nor FDIC-insured, may go down in value, and are not insured by any federal government agency or guaranteed by any bank or savings association. All guarantees and benefits of the insurance policy are subject to the claims-paying ability of the issuing insurance company. They are not backed by the broker-dealer and/or insurance agency selling the policy, or any affiliates of those entities other than the issuing company affiliates, and none makes any representation or guarantees regarding the claims-paying ability of the issuer.
+  - paragraph:
+    - text: Lincoln
+    - emphasis: MoneyGuard
+    - superscript: ®
+    - text: solutions are universal and variable universal life insurance policies with a long-term care rider. The policies and riders have exclusions, limitations, and/or reductions. Please contact your Lincoln representative or the insurance company for costs and complete details.
+  - paragraph: "Life insurance policies: It is possible coverage will expire when either no premiums are paid following the initial premium, or subsequent premiums are insufficient to continue coverage."
+  - paragraph: “Lincoln Financial Group,” “Lincoln Financial,” “Your tomorrow. Our priority,” “Plan Protect Retire,” “This is financial security,” and the Lincoln Financial Logo and Artisan Mark are service marks of the Lincoln National Corporation.
+- text: 
+- alert

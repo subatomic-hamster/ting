@@ -1,10 +1,14 @@
-import type { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
-import { programEconomics, type DentistSummary, type ProgramCohort } from '../../habits/analytics';
-import { QUADRANTS } from '../../habits/program';
-import cohort from '../../habits/programCohort.json';
-import type { RewardSummary } from '../../habits/types';
-import { formatMoney, formatPercent } from '../../lib/format';
+import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
+import {
+  programEconomics,
+  type DentistSummary,
+  type ProgramCohort,
+} from "../../habits/analytics";
+import { QUADRANTS } from "../../habits/program";
+import cohort from "../../habits/programCohort.json";
+import type { RewardSummary } from "../../habits/types";
+import { formatMoney, formatPercent } from "../../lib/format";
 
 const DEFAULT_ATTRIBUTION = 0.5;
 
@@ -29,40 +33,63 @@ export function ValueMap({
     <div className="grid gap-4 md:grid-cols-3">
       <Column title="You" accent="border-t-brand-500">
         <li>
-          <strong>{formatMoney(optedIn ? rewards.earned : rewards.wouldEarn)}</strong> {optedIn ? 'earned' : 'available'} this year, paid
-          to your FSA/HSA or rollover.
+          <strong>
+            {formatMoney(optedIn ? rewards.earned : rewards.wouldEarn)}
+          </strong>{" "}
+          {optedIn ? "earned" : "available"} this year, paid to your FSA/HSA or
+          rollover.
         </li>
-        <li>{optedIn ? `${streak}-day streak, with coaching on the areas you miss.` : 'Live coaching on the areas you miss.'}</li>
-        <li>Your premium never goes up, whatever the data says.</li>
+        <li>
+          {optedIn
+            ? `${streak}-day streak, with coaching on the areas you miss.`
+            : "Live coaching on the areas you miss."}
+        </li>
+        <li>Program credits do not change your premium or claim decisions.</li>
       </Column>
 
       <Column title="Your dentist" accent="border-t-sched">
         {dentist && sharedWithDentist ? (
           <li>
-            Sees your 30-day summary: twice a day on <strong>{formatPercent(dentist.twiceDailyRate)}</strong> of days
+            Sees your 30-day summary: twice a day on{" "}
+            <strong>{formatPercent(dentist.twiceDailyRate)}</strong> of days
             {dentist.weakest && dentist.sectorCount === 4 ? (
               <>
-                , weakest area <strong>{QUADRANTS[dentist.weakest.index].toLowerCase()}</strong>
+                , weakest area{" "}
+                <strong>
+                  {QUADRANTS[dentist.weakest.index].toLowerCase()}
+                </strong>
               </>
             ) : null}
             .
           </li>
         ) : (
-          <li>Can see a 30-day summary before your visit, if you share it (off now).</li>
+          <li>
+            Can see a 30-day summary before your visit, if you share it (off
+            now).
+          </li>
         )}
-        <li>Coaches the spot you miss and catches heavy brushing before gums recede.</li>
+        <li>
+          Can discuss recorded brushing coverage and pressure warnings with you.
+        </li>
         <li>Confirms home care for patients without a smart brush.</li>
       </Column>
 
       <Column title="Insurer" accent="border-t-roll">
         <li>
-          Group counts only (20+ people), never used for pricing, underwriting or claims. Participants complete cleanings{' '}
-          <strong>{formatPercent(c.preventiveCompletion.participants)}</strong> vs{' '}
-          <strong>{formatPercent(c.preventiveCompletion.nonParticipants)}</strong> (demo cohort).
+          Group counts only (20+ people), never used for pricing, underwriting
+          or claims. Participants complete cleanings{" "}
+          <strong>{formatPercent(c.preventiveCompletion.participants)}</strong>{" "}
+          vs{" "}
+          <strong>
+            {formatPercent(c.preventiveCompletion.nonParticipants)}
+          </strong>{" "}
+          (demo cohort).
         </li>
         <li>
-          {econ.restorativeGapPer1000} fewer restorative claims per 1,000; pays for itself if the program causes at least{' '}
-          <strong>{formatPercent(econ.breakEvenAttribution)}</strong> of that gap.{' '}
+          {econ.restorativeGapPer1000} fewer restorative claims per 1,000; pays
+          for itself if the program causes at least{" "}
+          <strong>{formatPercent(econ.breakEvenAttribution)}</strong> of that
+          gap.{" "}
           <Link to="/program" className="font-medium text-brand-700 underline">
             Open the insurer view
           </Link>
@@ -72,9 +99,19 @@ export function ValueMap({
   );
 }
 
-function Column({ title, accent, children }: { title: string; accent: string; children: ReactNode }) {
+function Column({
+  title,
+  accent,
+  children,
+}: {
+  title: string;
+  accent: string;
+  children: ReactNode;
+}) {
   return (
-    <div className={`rounded-2xl border border-t-4 border-line bg-white p-4 ${accent}`}>
+    <div
+      className={`rounded-2xl border border-t-4 border-line bg-white p-4 ${accent}`}
+    >
       <h3 className="font-semibold">{title}</h3>
       <ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm">{children}</ul>
     </div>

@@ -1,85 +1,143 @@
-import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-import { api } from '../api';
-import { ShareWithDentist } from '../components/DentistQuestions';
-import { GlossaryTerm } from '../components/GlossaryTerm';
-import { IntakeBox } from '../components/IntakeBox';
-import { ProcedureList } from '../components/ProcedureList';
-import { SamplePlanNote } from '../components/SamplePlanNote';
-import { ScheduleTabs } from '../components/ScheduleTabs';
-import { PageHeader, Section } from '../components/Section';
-import { Timeline } from '../components/Timeline';
-import { Waterfall } from '../components/Waterfall';
-import { explainQuery } from '../lib/explainQuery';
-import { procedureName } from '../lib/format';
-import { useActive, useAppStore, useProfile } from '../store';
-
+import { useState } from "react";
+import { ShareWithDentist } from "../components/DentistQuestions";
+import { IntakeBox } from "../components/IntakeBox";
+import { ProcedureCatalog } from "../components/ProcedureCatalog";
+import { ProcedureList } from "../components/ProcedureList";
+import { PricingNote } from "../components/PricingNote";
+import { ScheduleTabs } from "../components/ScheduleTabs";
+import { PageHeader, Section, DisclosureSection } from "../components/Section";
+import { Timeline } from "../components/Timeline";
+import { Waterfall } from "../components/Waterfall";
+import { PriceEditor } from "../components/PriceEditor";
+import { formatMoney, procedureName } from "../lib/format";
+import { yearOf } from "../lib/dates";
+import { useActive, useAppStore, useProfile } from "../store";
 export default function Treatment() {
   const profile = useProfile();
-  const network = useAppStore((s) => s.network);
   const active = useActive();
+  const network = useAppStore((s) => s.network);
+  const setNetwork = useAppStore((s) => s.setNetwork);
   const [picked, setPicked] = useState<string>();
-  const selected = profile.procedures.find((p) => p.id === picked) ?? profile.procedures[0];
+  const selected =
+    profile.procedures.find((p) => p.id === picked) ?? profile.procedures[0];
   const line = selected && active.lines.find((l) => l.id === selected.id);
-  // A line is priced under the plan of its year; next year it's the same plan unless you switch at enrollment.
   const rules = profile.currentPlan;
-  const visitSize = selected?.visit ? profile.procedures.filter((p) => p.visit === selected.visit).length : 1;
-  // Explanations for every item load in the background, so picking one shows its words at once.
-  const queryClient = useQueryClient();
-  useEffect(() => {
-    for (const l of active.lines) void queryClient.prefetchQuery(explainQuery(l, rules, api));
-  }, [active.lines, rules, queryClient]);
-
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
       <PageHeader
         title="Your treatment"
-        subtitle={
-          <>
-            What you'll owe, step by step, and the cheapest time to do it. {rules.name} · {network === 'in' ? 'in-network' : 'out-of-network'} dentist.
-          </>
-        }
-      >
-        <SamplePlanNote />
-      </PageHeader>
-
-      <Section title="1. What did your dentist recommend?" id="intake">
-        <IntakeBox />
-      </Section>
-
-      <div className="grid gap-5 lg:grid-cols-5">
-        <Section className="lg:col-span-2" title="2. Your items" id="items">
-          <ProcedureList selectedId={selected?.id} onSelect={setPicked} />
-        </Section>
-
-        <Section
-          className="lg:col-span-3"
-          title={selected ? `3. What you'll pay: ${procedureName(selected)}${visitSize > 1 ? ` (each of ${visitSize})` : ''}` : "3. What you'll pay"}
-          id="waterfall"
-          eyebrow={<>From the engine · rules {line?.rulesVersion ?? rules.version}</>}
-        >
-          {selected && line ? (
-            <>
-              <Waterfall line={line} rules={rules} name={procedureName(selected)} />
-              {!selected.inNetwork && (
-                <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">
-                  Out of network: watch for <GlossaryTerm term="balance billing" /> above the plan's{' '}
-                  <GlossaryTerm term="usual and customary">allowed amount</GlossaryTerm>.
-                </p>
+        subtitle={`${rules.name}. Estimated care across ${yearOf(profile.asOf)} and ${yearOf(profile.asOf) + 1}.`}
+      />
+      {selected && (
+        <>
+          <section className="border-l-2 border-brand-600 pl-5">
+            <p className="text-base">Estimated total you pay</p>
+            <p className="tabular mt-1 text-[32px] leading-[38px] font-medium">
+              {formatMoney(active.expectedOwes)}
+            </p>
+            {active.lines.some((l) => l.pricingWarning) && (
+              <p className="mt-3">
+                Items with missing allowances budget the full fee.
+              </p>
+            )}
+            <a href="#schedule" className="btn-primary mt-4 w-full sm:w-auto">
+              Choose treatment dates
+            </a>
+          </section>
+          <details className="border-t border-line">
+            <summary>Dentist network for this plan</summary>
+            <p className="mb-3 text-base text-muted">
+              This comparison changes all treatment items. Confirm participation
+              with your insurer.
+            </p>
+            <div
+              role="radiogroup"
+              aria-label="Dentist network"
+              className="flex flex-wrap gap-2"
+            >
+              {(["in", "out"] as const).map((n) => (
+                <button
+                  key={n}
+                  role="radio"
+                  aria-checked={network === n}
+                  className={network === n ? "btn-primary" : "btn-secondary"}
+                  onClick={() => setNetwork(n)}
+                >
+                  {n === "in" ? "In-network" : "Out-of-network"}
+                </button>
+              ))}
+            </div>
+          </details>
+          <div className="grid gap-8 lg:grid-cols-5">
+            <Section
+              title="Treatment items"
+              id="items"
+              className="lg:col-span-2"
+            >
+              <ProcedureList
+                selectedId={selected.id}
+                onSelect={(id) => {
+                  setPicked(id);
+                  requestAnimationFrame(() => {
+                    document
+                      .getElementById("waterfall")
+                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  });
+                }}
+              />
+            </Section>
+            <Section
+              title={procedureName(selected)}
+              id="waterfall"
+              className="lg:col-span-3"
+            >
+              {line && (
+                <>
+                  <p className="mb-4 text-xs text-muted">
+                    Selected item.{" "}
+                    {selected.inNetwork ? "In-network" : "Out-of-network"}{" "}
+                    dentist.
+                  </p>
+                  <Waterfall
+                    line={line}
+                    rules={rules}
+                    name={procedureName(selected)}
+                  />
+                  <PricingNote line={line} />
+                  <PriceEditor procedure={selected} />
+                </>
               )}
-            </>
-          ) : (
-            <p className="text-sm text-muted">Add an item to see the cost breakdown.</p>
-          )}
-        </Section>
-      </div>
-
-      <Section title="4. When to do it" id="schedule" actions={<ShareWithDentist />}>
-        <ScheduleTabs panelId="timeline-panel" />
-        <div id="timeline-panel" role="tabpanel" aria-label="Treatment timeline" className="mt-4">
-          <Timeline />
-        </div>
-      </Section>
+            </Section>
+          </div>
+          <Section title="Choose dates" id="schedule">
+            <ScheduleTabs panelId="timeline-panel" />
+            <div
+              id="timeline-panel"
+              role="tabpanel"
+              aria-label="Treatment timeline"
+              className="mt-6"
+            >
+              <Timeline />
+            </div>
+            <div className="mt-6">
+              <ShareWithDentist compact />
+            </div>
+          </Section>
+        </>
+      )}
+      <DisclosureSection
+        title="Add a treatment plan"
+        id="intake"
+        initialOpen={!selected}
+      >
+        <IntakeBox />
+      </DisclosureSection>
+      <DisclosureSection
+        title="Browse procedures, including braces"
+        id="catalog"
+      >
+        <ProcedureCatalog />
+      </DisclosureSection>
     </div>
   );
 }

@@ -1,33 +1,47 @@
 // Mock backend: runs Ting's own intake, OCR and engine in the browser, with 300–800 ms of simulated latency.
 // The AWS backend runs the same code in Lambda; only the transport differs.
 
-import { approveRules, localCompiler, type CompileResult } from '../compiler/compile';
-import { DEMO_PLAN_OPTIONS } from '../data/demo';
-import admin from '../fixtures/admin.json';
-import { PERSONAS } from '../data/personas';
-import { buildDigest } from '../engine/digest';
-import { appealDraft } from '../engine/eobAppeal';
-import { decideInbound, forwardingAddress } from '../engine/inbox';
-import { heuristicMatch } from '../engine/reconcile';
-import { localIntent } from '../engine/answer';
-import { optimize } from '../engine/schedule';
-import type { PlanRules } from '../engine/types';
-import { localExplainer } from '../engine/explain';
-import { classifyDocument } from '../intake/classify';
-import { parseDescription } from '../intake/describe';
-import { addDays, todayISO } from '../lib/dates';
-import { localOcr } from '../services/ocr';
-import { pdfText } from '../services/pdf';
-import { apiContext as mock } from './context';
-import type { Contact, NotificationPrefs, ScheduledReminder, ShareSnapshot, TingApi } from './index';
-import { mockClaimEvent } from './mockClaim';
+import {
+  approveRules,
+  localCompiler,
+  type CompileResult,
+} from "../compiler/compile";
+import { DEMO_PLAN_OPTIONS } from "../data/demo";
+import admin from "../fixtures/admin.json";
+import { PERSONAS } from "../data/personas";
+import { buildDigest } from "../engine/digest";
+import { appealDraft } from "../engine/eobAppeal";
+import { decideInbound, forwardingAddress } from "../engine/inbox";
+import { heuristicMatch } from "../engine/reconcile";
+import { localIntent } from "../engine/answer";
+import { optimize } from "../engine/schedule";
+import type { PlanRules } from "../engine/types";
+import { localExplainer } from "../engine/explain";
+import { classifyDocument } from "../intake/classify";
+import { parseDescription } from "../intake/describe";
+import { addDays, todayISO } from "../lib/dates";
+import { localOcr } from "../services/ocr";
+import { pdfText } from "../services/pdf";
+import { apiContext as mock } from "./context";
+import type {
+  Contact,
+  NotificationPrefs,
+  ScheduledReminder,
+  ShareSnapshot,
+  TingApi,
+} from "./index";
+import { readDraft, saveDraft } from "../lib/drafts";
+import { mockClaimEvent } from "./mockClaim";
 
-const latency = () => new Promise<void>((r) => setTimeout(r, 300 + Math.random() * 500));
+const latency = () =>
+  new Promise<void>((r) => setTimeout(r, 300 + Math.random() * 500));
 const uid = () => Math.random().toString(36).slice(2, 8);
 
 async function fileText(file: File): Promise<string> {
-  if (file.type === 'application/pdf') return (await pdfText(file)).pages.join('\n');
-  if (file.type.startsWith('image/')) return (await localOcr.recognize(file)).text;
+  if (file.type === "application/pdf")
+    return (await pdfText(file)).pages.join("\n");
+  if (file.type.startsWith("image/"))
+    return (await localOcr.recognize(file)).text;
   return file.text();
 }
 
@@ -39,10 +53,25 @@ const firedClaims = new Map<string, unknown[]>();
 
 /** Shared snapshots, this browser only (the AWS backend keeps them in DynamoDB). */
 const shares = new Map<string, ShareSnapshot>();
-const pending: { id: string; rules: PlanRules; evidence: CompileResult['evidence']; source: string; submittedAt: string }[] = [];
-let prefs: NotificationPrefs = { cadence: 'monthly', detail: 'private' };
+const pending: {
+  id: string;
+  rules: PlanRules;
+  evidence: CompileResult["evidence"];
+  source: string;
+  submittedAt: string;
+}[] = [];
+let prefs: NotificationPrefs = { cadence: "monthly", detail: "private" };
 let contact: Contact | null = null;
-const inbox: { senders: string[]; held: { id: string; from: string; subject: string; text: string; receivedAt: string }[] } = { senders: [], held: [] };
+const inbox: {
+  senders: string[];
+  held: {
+    id: string;
+    from: string;
+    subject: string;
+    text: string;
+    receivedAt: string;
+  }[];
+} = { senders: [], held: [] };
 
 /** Scheduled reminders, by member. In mock mode the app itself shows them when they come due. */
 const reminders = new Map<string, Map<string, ScheduledReminder>>();
@@ -56,7 +85,12 @@ export const mockApi: TingApi = {
   async getSession() {
     await latency();
     const p = PERSONAS[mock.personaId];
-    return { memberId: p.memberId, name: p.name, employer: p.employer, role: 'member' };
+    return {
+      memberId: p.memberId,
+      name: p.name,
+      employer: p.employer,
+      role: "member",
+    };
   },
 
   async getPlans() {
@@ -76,7 +110,11 @@ export const mockApi: TingApi = {
 
   async readDocument(file) {
     const text = await fileText(file);
-    return { docId: `doc-${uid()}`, text, ...classifyDocument(text, file.type.startsWith('image/')) };
+    return {
+      docId: `doc-${uid()}`,
+      text,
+      ...classifyDocument(text, file.type.startsWith("image/")),
+    };
   },
 
   async compilePlan(text) {
@@ -98,22 +136,43 @@ export const mockApi: TingApi = {
 
   async fireMockClaim(profile, opts) {
     await latency();
-    const event = mockClaimEvent(profile, PERSONAS[mock.personaId].memberId, opts?.underpay);
-    firedClaims.set(mock.personaId, [...(firedClaims.get(mock.personaId) ?? []), event]);
+    const event = mockClaimEvent(
+      profile,
+      PERSONAS[mock.personaId].memberId,
+      opts?.underpay,
+    );
+    firedClaims.set(mock.personaId, [
+      ...(firedClaims.get(mock.personaId) ?? []),
+      event,
+    ]);
     ledgerListeners.forEach((l) => l(event));
   },
 
   async createShareLink(scheduleKind, snapshot) {
     await latency();
     const token = `${mock.personaId}.${scheduleKind}.${uid()}`;
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://ting.example';
+    const origin =
+      typeof window !== "undefined"
+        ? window.location.origin
+        : "https://ting.example";
     const expiresAt = addDays(todayISO(), 30);
-    if (snapshot) shares.set(token, { ...snapshot, sharedAt: new Date().toISOString(), expiresAt });
+    if (snapshot) {
+      const saved = {
+        ...snapshot,
+        sharedAt: new Date().toISOString(),
+        expiresAt,
+      };
+      shares.set(token, saved);
+      saveDraft("share-" + token, mock.personaId, saved);
+    }
     return { url: `${origin}/share/${token}`, expiresAt };
   },
 
   async getShare(token) {
-    return shares.get(token) ?? null;
+    const snap =
+      shares.get(token) ??
+      readDraft<ShareSnapshot>("share-" + token, token.split(".")[0]);
+    return snap && snap.expiresAt >= todayISO() ? snap : null;
   },
 
   async resetDemo() {
@@ -123,15 +182,21 @@ export const mockApi: TingApi = {
   async submitRules(rules, evidence, source) {
     await latency();
     const id = uid();
-    pending.push({ id, rules, evidence, source, submittedAt: new Date().toISOString() });
-    return { id, status: 'pending' };
+    pending.push({
+      id,
+      rules,
+      evidence,
+      source,
+      submittedAt: new Date().toISOString(),
+    });
+    return { id, status: "pending" };
   },
   async pendingRules() {
     return [...pending];
   },
   async approveSubmittedRules(id) {
     const i = pending.findIndex((p) => p.id === id);
-    if (i < 0) throw new Error('No such submission');
+    if (i < 0) throw new Error("No such submission");
     const [p] = pending.splice(i, 1);
     return approveRules(p.rules);
   },
@@ -139,19 +204,31 @@ export const mockApi: TingApi = {
   async ask(question) {
     await latency();
     const intent = localIntent(question);
-    if (intent === 'medical_advice') return { intent, answer: "That's a question for your dentist. Ting helps with costs and timing, not with what treatment you need." };
-    if (intent === 'out_of_scope') return { intent, answer: 'Ting can answer questions about your dental plan, your costs and when to schedule work.' };
-    return { intent, answerBy: 'engine' };
+    if (intent === "medical_advice")
+      return {
+        intent,
+        answer:
+          "That's a question for your dentist. Ting helps with costs and timing, not with what treatment you need.",
+      };
+    if (intent === "out_of_scope")
+      return {
+        intent,
+        answer:
+          "Ting can answer questions about your dental plan, your costs and when to schedule work.",
+      };
+    return { intent, answerBy: "engine" };
   },
 
   async getProfile() {
     return null; // the store already holds the persona's profile
   },
   async getContact() {
-    return { contact, agent: 'ting-dental@agentmail.to', live: false };
+    contact = readDraft<Contact>("contact", mock.personaId) ?? null;
+    return { contact, agent: "ting-dental@agentmail.to", live: false };
   },
   async setContact(next) {
     contact = next;
+    saveDraft("contact", mock.personaId, next);
     return next;
   },
   async getOutbox() {
@@ -161,10 +238,10 @@ export const mockApi: TingApi = {
     return [];
   },
   async emailAgent() {
-    throw new Error('The email agent needs the live backend');
+    throw new Error("The email agent needs the live backend");
   },
   async sendMonthlyNow() {
-    return { sent: false, reason: 'needs the live backend' };
+    return { sent: false, reason: "needs the live backend" };
   },
   async getCarrierRecord() {
     return null;
@@ -173,19 +250,35 @@ export const mockApi: TingApi = {
 
   async getInbox() {
     await latency();
-    return { address: forwardingAddress(PERSONAS[mock.personaId].memberId), senders: [...inbox.senders], held: inbox.held.map(({ id, from, subject, receivedAt }) => ({ id, from, subject, receivedAt })) };
+    return {
+      address: forwardingAddress(PERSONAS[mock.personaId].memberId),
+      senders: [...inbox.senders],
+      held: inbox.held.map(({ id, from, subject, receivedAt }) => ({
+        id,
+        from,
+        subject,
+        receivedAt,
+      })),
+    };
   },
   async simulateForward(mail) {
     await latency();
-    const d = decideInbound({ ...mail, auth: { spf: true, dkim: true, dmarc: true } }, undefined, inbox.senders);
-    if (d.action === 'reject') return { status: 'rejected', reason: d.reason };
-    if (d.action === 'hold') {
+    const d = decideInbound(
+      { ...mail, auth: { spf: true, dkim: true, dmarc: true } },
+      undefined,
+      inbox.senders,
+    );
+    if (d.action === "reject") return { status: "rejected", reason: d.reason };
+    if (d.action === "hold") {
       const id = uid();
       inbox.held.push({ id, ...mail, receivedAt: new Date().toISOString() });
-      return { status: 'held', reason: d.reason };
+      return { status: "held", reason: d.reason };
     }
     const text = `${mail.subject}\n${mail.text}`;
-    return { status: 'accepted', doc: { docId: `mail-${uid()}`, text, ...classifyDocument(text, false) } };
+    return {
+      status: "accepted",
+      doc: { docId: `mail-${uid()}`, text, ...classifyDocument(text, false) },
+    };
   },
   async approveSender(address, heldId) {
     await latency();
@@ -194,23 +287,31 @@ export const mockApi: TingApi = {
     inbox.held = inbox.held.filter((h) => h.id !== heldId);
     if (!held) return { senders: inbox.senders };
     const text = `${held.subject}\n${held.text}`;
-    return { senders: inbox.senders, doc: { docId: `mail-${uid()}`, text, ...classifyDocument(text, false) } };
+    return {
+      senders: inbox.senders,
+      doc: { docId: `mail-${uid()}`, text, ...classifyDocument(text, false) },
+    };
   },
 
   async matchInvoice(invoice, claims) {
     await latency();
-    return { probs: heuristicMatch(invoice, claims), source: 'heuristic' };
+    return { probs: heuristicMatch(invoice, claims), source: "heuristic" };
   },
 
   async draftAppeal(discrepancy, plan) {
     await latency();
-    return { text: appealDraft(discrepancy, plan), source: 'template' };
+    return { text: appealDraft(discrepancy, plan), source: "template" };
   },
 
   async getAdminInsights() {
     await latency();
     const shown = admin.groups.filter((g) => g.n >= 20);
-    return { employer: admin.employer, groups: shown, hidden: admin.groups.length - shown.length, isDemoData: true };
+    return {
+      employer: admin.employer,
+      groups: shown,
+      hidden: admin.groups.length - shown.length,
+      isDemoData: true,
+    };
   },
   async getConsent() {
     return {};
@@ -227,17 +328,28 @@ export const mockApi: TingApi = {
   async getDigest() {
     await latency();
     const profile = PERSONAS[mock.personaId].profile(mock.asOf);
-    return { ...buildDigest(profile, optimize(profile, { horizon: 2 }).cheapest), source: 'template' };
+    return {
+      ...buildDigest(profile, optimize(profile, { horizon: 2 }).cheapest),
+      source: "template",
+    };
   },
   async sendTestDigest() {
     await latency();
-    return { emailed: false, pushedTo: 0, private: prefs.detail !== 'detailed' };
+    return {
+      emailed: false,
+      pushedTo: 0,
+      private: prefs.detail !== "detailed",
+    };
   },
   async deleteMyData() {},
 
   async scheduleReminder(reminder) {
     await latency();
-    const scheduled: ScheduledReminder = { reminderId: reminder.id, sendOn: reminder.sendOn, channels: ['in_app'] };
+    const scheduled: ScheduledReminder = {
+      reminderId: reminder.id,
+      sendOn: reminder.sendOn,
+      channels: ["in_app"],
+    };
     remindersFor().set(reminder.id, scheduled);
     return scheduled;
   },

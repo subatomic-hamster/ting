@@ -75,7 +75,7 @@ Engine entry points for Lambda: `optimize(profile, { nextPlan, horizon })`, `eva
 ### Known limits
 
 - The 2027 IRS FSA limit isn't published yet; `src/engine/fsa.ts` falls back to the 2026 figures and the UI says so.
-- Fees are demo approximations for ZIP 27401 (`DEMO_FEES` in `src/engine/cdt.ts`), not FAIR Health data.
+- Fees and explicit UCR/MAC amounts are synthetic worked-example fixtures (`src/data/demo-fees.json`), not verified prices for ZIP 27401 or FAIR Health data. The source audit found no fee schedules in the reviewed Lincoln library articles; the FAIR Health calculator returned an access limit and N/A. See [pricing source audit](docs/dental-pricing-sources.md). Published FY2026–27 Forsyth clinic charges are available as opt-in references; they are not network contracts. The catalog now has 137 procedures including braces. Missing insurer allowances produce a full-fee budget pending confirmation. See [pricing and procedure brief](docs/pricing-procedure-handoff.md).
 - Plan years are calendar years; one covered person per profile (family optimizer is roadmap).
 - The optimizer is exhaustive: about 12 procedures × 3 years is the practical ceiling.
 
@@ -84,7 +84,7 @@ Engine entry points for Lambda: `optimize(profile, { nextPlan, horizon })`, `eva
 The live site (`infra/outputs.json` → `WebUrl`) runs the same app against the AWS backend. `/try` shows a QR code for judges. On top of the mock-mode features it adds:
 
 - **Bedrock** for intake translation (including Spanish), plan-compiler gap filling (verified quotes only), plain explanations, digests and EOB appeal drafts. Every amount is checked against the engine.
-- **Automated Reasoning:** a "Proved" badge when the engine's plan-pays amount is proved against rules built from the benefits summary.
+- **Automated Reasoning:** validation remains available in developer evidence; decorative proof/verification badges are removed from member screens.
 - **Winnow decision layer:**
   - **Where it runs:** Winnow-12B on the team's 24 GB Mac (`infra/scripts/winnow-local.sh`), reached through an SQS queue, so no tunnel or open port is needed. When it's off, a labelled Claude simulation takes over.
   - **What it decides:** intake probabilities, document triage, prompt-injection quarantine, and invoice-to-EOB matching.
@@ -96,7 +96,7 @@ The live site (`infra/outputs.json` → `WebUrl`) runs the same app against the 
 - **A simulated forwarding address**, with sender approval.
 - **Scorecard:** `docs/accuracy.md`.
 
-The main nav is the member's journey; employer and insurer screens (Employer insights, Insurer view, Insurer record, Rules review, Winnow calibration) are under **For employers & insurers**. Every demo-only control lives in the demo panel (`?demo=1` or Ctrl+Shift+D), grouped by page.
+The main nav is the member's journey; employer and insurer screens (Employer insights, Insurer view, Insurer record, Rules review, Winnow calibration) are under **Menu → Partner and developer tools**. Every demo-only control lives in the demo panel (`?demo=1` or Ctrl+Shift+D), grouped by page.
 
 Extra demo moments (demo panel):
 - **Underpaid EOB:** an EOB $90 below the estimate. Use **Draft a message to your insurer** on it.
@@ -109,11 +109,11 @@ Extra demo moments (demo panel):
 
 1. Open `/?demo=1` (or press **Ctrl+Shift+D**). Choose persona **Dale, 56**.
 2. Go to **/treatment**. Upload the **sample treatment plan photo**: OCR reads it into items. Type "Crown on a lower back molar, replacing the old one": Ting asks only the question whose answer changes the bill, with the price of each answer. Walk through the root canal waterfall: fee → in-network discount → plan pays 80% → you pay, each sentence verified against the engine's numbers.
-3. In **When to do it**, compare Cheapest / Balanced / Fastest, then drag **Crown (porcelain) on #30** across the bold **Dec 31** line. The floating delta shows the recompute time in milliseconds. The root canal is locked (urgent). The keyboard works too: ← → moves a week, Shift + ← → moves a month.
-4. Flip the **In-network / Out** toggle in the top bar. Every number changes, including the balance bill.
+3. In **When to do it**, compare Cheapest / Balanced / Fastest, then drag **Crown (porcelain) on #30** across the bold **Dec 31** line. Tap a visit’s date and Apply date for the primary mobile workflow; the visual drag timeline is optional. The root canal is locked (urgent). The keyboard works too: ← → moves a week, Shift + ← → moves a month.
+4. Open **Dentist network for this plan** on Treatment and select **In network / Out of network**. Every number changes, including the balance bill.
 5. In the demo panel, click **Fire mock claim**. Lincoln's EOB for the root canal arrives; it's checked against Ting's estimate, and the max gauge, schedule and activity feed update live.
-6. On **Home**, under **Reminders**, click **Remind me**: Nov 1, Dec 1 and (with a grace-period FSA) 10 days before the FSA deadline, each with the engine's amounts. **Add to calendar** downloads them as .ics. Then click **Simulate Dec 1**: the Dec 1 reminder fires in the app (and as a browser notification if allowed), it shows as "Due now", and the "Left on the table" year-end banner appears.
-7. Go to **/enroll** for the Enrollment Card: plan choice, FSA election, what to do before Dec 31 and what waits until January, and expected savings. Try **Add to calendar** (.ics) and **Share with my dentist** (opens the printable `/share/:token` page).
+6. On **Home**, under **Reminders**, click **Remind me**: Nov 1, Dec 1 and (with a grace-period FSA) 10 days before the FSA deadline, each with the engine's amounts. **Download calendar file** downloads them as .ics. Then click **Simulate Dec 1**: the Dec 1 reminder fires in the app (and as a browser notification if allowed), it shows as "Due now", and the "Left on the table" year-end banner appears.
+7. Go to **/enroll** for the Enrollment Card: plan choice, FSA election, what to do before Dec 31 and what waits until January, and expected savings. Try **Download calendar file** (.ics) and **Create dentist share link** (opens the printable `/share/:token` page).
 
 8. Go to **/plan** and upload the **sample benefits summary (PDF)**. The compiler reads it into rules, asks the one thing the document doesn't say, and stamps the approved version.
 
@@ -126,12 +126,12 @@ Other personas: **Jordan, 25**, a new hire whose wisdom teeth are still in, and 
 | `/`             | Dashboard: max gauge, deductible, FSA countdown, timeline, activity feed, year-end banner, Enrollment Card (Oct 15 – Nov 30) |
 | `/treatment`    | Intake (text / voice / photo) → items → waterfall → schedule options → draggable timeline → dentist questions |
 | `/enroll`       | Plan comparison, "maybe" sliders with tipping point, FSA recommendation, Enrollment Card |
-| `/onboarding`   | Three questions, each with a "why we're asking" line                   |
+| `/onboarding`   | One-person scope followed by reviewed treatment intake                   |
 | `/dentists`     | Provider list sorted by your cost, in vs out of network, "Keep my dentist" |
 | `/plan`         | Your plan's rules; benefits summary compiler; insurance card scan      |
 | `/share/:token` | Public, printable dentist handoff (no app chrome)                      |
 | `/admin`        | Employer insights, aggregate only; groups under 20 are hidden          |
-| `/habits`       | SmileStreak: opt-in, live brushing, rewards, streak, habit-informed estimate, dentist preview, privacy controls |
+| `/habits`       | SmileStreak: opt-in, live brushing, rewards, streak, dentist discussion guidance, dentist preview, privacy controls |
 | `/program`      | SmileStreak, Lincoln view: aggregate counts, program economics with an attribution slider |
 
 ## SmileStreak: opt-in brushing data for rewards
@@ -142,10 +142,10 @@ Like a safe-driving app for teeth, but **rewards only**: sharing data can lower 
 - **Reasonable alternative:** no smart brush? A dentist's home-care check earns the same brushing portion.
 - **Devices:** a simulated brush, a real **Oral-B** over Bluetooth, or a **DIY ESP32 clip**, all through the local bridge in `hardware/` (see `hardware/README.md`).
 - **Who benefits:**
-  - *You:* credits, streaks, live coaching, and an optional habit-informed nudge to "maybe" filling odds (±10 points, preventive/basic only, applied only if you choose).
+  - *You:* credits, streaks, live coaching, and discussion guidance that does not predict clinical treatment need.
   - *Your dentist:* a 30-day home-care summary on the handoff page, if you share it: weakest quadrant, pressure warnings, consistency.
   - *Lincoln:* group counts only (20+), and honest economics with a break-even attribution share, because participants self-select.
-- **Privacy:** opt-in, collects from consent onward, delete everything anytime. The employer sees only the credit amount. Never used for pricing, underwriting or claims.
+- **Privacy:** opt-in, collects from consent onward, stop collection and delete sessions stored in this app anytime; previously shared summaries remain in those copies until expiry, and downloaded copies remain with recipients. The employer sees only the credit amount. Never used for pricing, underwriting or claims.
 - **Anti-gaming:** sessions that are too short, stuck in one spot, left running or missing live readings don't count (`verifySession`).
 - **Code:**
   - `src/habits/` holds the pure rules, analytics, simulation, bridge client and store, with tests in `habits.test.ts`.
@@ -155,8 +155,8 @@ Like a safe-driving app for teeth, but **rewards only**: sharing data can lower 
 **Demo:**
 1. Open `/habits` as Dale and click **Brush now** in the demo panel's SmileStreak group: you'll see the live quadrant map, then a verified session.
 2. Switch to **Jordan** to show the opt-in moment: their cleaning already counts.
-3. Switch to **Priya** and click **Use 27% instead** on her maybe root canal.
-4. Open `/share/dale.cheapest.x` for the dentist's view and `/program` for Lincoln's view.
+3. Switch to **Priya** and review dentist-supplied uncertainty in Treatment; brushing does not alter it.
+4. Create a dentist share link from Treatment or Enroll; invalid tokens never display a substitute patient. Open `/program` for insurer program economics.
 
 ## Deploy (AWS Amplify Hosting)
 
@@ -168,6 +168,10 @@ Like a safe-driving app for teeth, but **rewards only**: sharing data can lower 
 
 ## Notes
 
-- No carrier names, logos or brand marks appear in the UI (event rules); the carrier is "your insurer" and plans are "Acme Dental". The crimson/red/orange/amber palette echoes the event host's colours.
-- The site works down to 375 px wide. The timeline scrolls horizontally inside its own card.
+- No carrier names, logos or brand marks appear in the UI (event rules); the carrier is "your insurer" and plans are "Acme Dental". The app uses its own Ting identity, licensed Roboto/Source Serif 4, white surfaces and burgundy emphasis.
+- Member layouts are checked at 320, 375, 390, 430 and 768px, with an explicit 200% text simulation. The timeline scrolls horizontally inside its own card.
 - Accessibility: the timeline works from the keyboard, focus is always visible, and charts have ARIA labels.
+
+## Mobile rebuild validation
+
+The Section 0 application requirements in `design.md` govern this rebuild. See [implementation and test report](docs/revamp-validation.md), [independent UX review](docs/mobile-revamp-review.md) and [pricing/procedure handoff](docs/pricing-procedure-handoff.md). Run `npm test`, `npm run lint`, `npm run build` and `npm run e2e:local`. The local end-to-end suite builds the production bundle in mock API mode; it does not certify live AWS, carrier contracts, physical microphones/cameras/brushes or native calendar import.

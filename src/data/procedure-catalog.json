@@ -1,0 +1,437 @@
+{
+  "D0145": {
+    "short": "Early-childhood exam",
+    "description": "Early-childhood exam",
+    "category": "diagnostic"
+  },
+  "D0170": {
+    "short": "Follow-up problem exam",
+    "description": "Follow-up problem exam",
+    "category": "diagnostic"
+  },
+  "D0230": {
+    "short": "Additional single X-ray",
+    "description": "Additional single X-ray",
+    "category": "diagnostic"
+  },
+  "D0240": {
+    "short": "Occlusal X-ray",
+    "description": "Occlusal X-ray",
+    "category": "diagnostic"
+  },
+  "D0270": {
+    "short": "Bitewing X-ray (1 image)",
+    "description": "Bitewing X-ray (1 image)",
+    "category": "diagnostic"
+  },
+  "D0272": {
+    "short": "Bitewing X-rays (2 images)",
+    "description": "Bitewing X-rays (2 images)",
+    "category": "diagnostic"
+  },
+  "D0273": {
+    "short": "Bitewing X-rays (3 images)",
+    "description": "Bitewing X-rays (3 images)",
+    "category": "diagnostic"
+  },
+  "D0470": {
+    "short": "Diagnostic models",
+    "description": "Diagnostic models",
+    "category": "diagnostic"
+  },
+  "D1208": {
+    "short": "Fluoride treatment",
+    "description": "Fluoride treatment",
+    "category": "preventive"
+  },
+  "D1354": {
+    "short": "Silver diamine fluoride (per tooth)",
+    "description": "Silver diamine fluoride (per tooth)",
+    "category": "preventive"
+  },
+  "D1355": {
+    "short": "Cavity prevention medicine (per tooth)",
+    "description": "Cavity prevention medicine (per tooth)",
+    "category": "preventive"
+  },
+  "D1510": {
+    "short": "Space maintainer (one side)",
+    "description": "Space maintainer (one side)",
+    "category": "preventive"
+  },
+  "D1516": {
+    "short": "Upper fixed space maintainer",
+    "description": "Upper fixed space maintainer",
+    "category": "preventive"
+  },
+  "D1517": {
+    "short": "Lower fixed space maintainer",
+    "description": "Lower fixed space maintainer",
+    "category": "preventive"
+  },
+  "D1551": {
+    "short": "Re-cement upper space maintainer",
+    "description": "Re-cement upper space maintainer",
+    "category": "preventive"
+  },
+  "D1552": {
+    "short": "Re-cement lower space maintainer",
+    "description": "Re-cement lower space maintainer",
+    "category": "preventive"
+  },
+  "D1553": {
+    "short": "Re-cement one-sided space maintainer",
+    "description": "Re-cement one-sided space maintainer",
+    "category": "preventive"
+  },
+  "D1556": {
+    "short": "Remove one-sided space maintainer",
+    "description": "Remove one-sided space maintainer",
+    "category": "preventive"
+  },
+  "D1557": {
+    "short": "Remove upper space maintainer",
+    "description": "Remove upper space maintainer",
+    "category": "preventive"
+  },
+  "D1558": {
+    "short": "Remove lower space maintainer",
+    "description": "Remove lower space maintainer",
+    "category": "preventive"
+  },
+  "D2331": {
+    "short": "Front filling (2 surfaces)",
+    "description": "Front filling (2 surfaces)",
+    "category": "restorative"
+  },
+  "D2332": {
+    "short": "Front filling (3 surfaces)",
+    "description": "Front filling (3 surfaces)",
+    "category": "restorative"
+  },
+  "D2335": {
+    "short": "Front filling (4+ surfaces)",
+    "description": "Front filling (4+ surfaces)",
+    "category": "restorative"
+  },
+  "D2940": {
+    "short": "Protective filling",
+    "description": "Protective filling",
+    "category": "restorative"
+  },
+  "D2951": {
+    "short": "Filling retention pin (per tooth)",
+    "description": "Filling retention pin (per tooth)",
+    "category": "restorative"
+  },
+  "D2930": {
+    "short": "Stainless steel crown (baby tooth)",
+    "description": "Stainless steel crown (baby tooth)",
+    "category": "majorRestorative"
+  },
+  "D2931": {
+    "short": "Stainless steel crown (permanent tooth)",
+    "description": "Stainless steel crown (permanent tooth)",
+    "category": "majorRestorative"
+  },
+  "D3110": {
+    "short": "Direct pulp cap",
+    "description": "Direct pulp cap",
+    "category": "endodontics"
+  },
+  "D3120": {
+    "short": "Indirect pulp cap",
+    "description": "Indirect pulp cap",
+    "category": "endodontics"
+  },
+  "D3221": {
+    "short": "Emergency pulp removal",
+    "description": "Emergency pulp removal",
+    "category": "endodontics"
+  },
+  "D3222": {
+    "short": "Partial pulpotomy",
+    "description": "Partial pulpotomy",
+    "category": "endodontics"
+  },
+  "D3230": {
+    "short": "Baby front tooth pulp therapy",
+    "description": "Baby front tooth pulp therapy",
+    "category": "endodontics"
+  },
+  "D3240": {
+    "short": "Baby back tooth pulp therapy",
+    "description": "Baby back tooth pulp therapy",
+    "category": "endodontics"
+  },
+  "D3346": {
+    "short": "Root canal retreatment (front tooth)",
+    "description": "Root canal retreatment (front tooth)",
+    "category": "endodontics"
+  },
+  "D3347": {
+    "short": "Root canal retreatment (premolar)",
+    "description": "Root canal retreatment (premolar)",
+    "category": "endodontics"
+  },
+  "D3348": {
+    "short": "Root canal retreatment (molar)",
+    "description": "Root canal retreatment (molar)",
+    "category": "endodontics"
+  },
+  "D3410": {
+    "short": "Root-end surgery (front tooth)",
+    "description": "Root-end surgery (front tooth)",
+    "category": "endodontics"
+  },
+  "D4346": {
+    "short": "Cleaning for gum inflammation",
+    "description": "Cleaning for gum inflammation",
+    "category": "periodontics"
+  },
+  "D4260": {
+    "short": "Gum surgery (4+ teeth per quadrant)",
+    "description": "Gum surgery (4+ teeth per quadrant)",
+    "category": "periodontics"
+  },
+  "D4261": {
+    "short": "Gum surgery (1\u20133 teeth per quadrant)",
+    "description": "Gum surgery (1\u20133 teeth per quadrant)",
+    "category": "periodontics"
+  },
+  "D5120": {
+    "short": "Full lower denture",
+    "description": "Full lower denture",
+    "category": "prosthodontics"
+  },
+  "D5130": {
+    "short": "Immediate upper denture",
+    "description": "Immediate upper denture",
+    "category": "prosthodontics"
+  },
+  "D5140": {
+    "short": "Immediate lower denture",
+    "description": "Immediate lower denture",
+    "category": "prosthodontics"
+  },
+  "D5211": {
+    "short": "Upper resin partial denture",
+    "description": "Upper resin partial denture",
+    "category": "prosthodontics"
+  },
+  "D5212": {
+    "short": "Lower resin partial denture",
+    "description": "Lower resin partial denture",
+    "category": "prosthodontics"
+  },
+  "D5214": {
+    "short": "Lower metal partial denture",
+    "description": "Lower metal partial denture",
+    "category": "prosthodontics"
+  },
+  "D5221": {
+    "short": "Immediate upper partial denture",
+    "description": "Immediate upper partial denture",
+    "category": "prosthodontics"
+  },
+  "D5222": {
+    "short": "Immediate lower partial denture",
+    "description": "Immediate lower partial denture",
+    "category": "prosthodontics"
+  },
+  "D5225": {
+    "short": "Upper flexible partial denture",
+    "description": "Upper flexible partial denture",
+    "category": "prosthodontics"
+  },
+  "D5226": {
+    "short": "Lower flexible partial denture",
+    "description": "Lower flexible partial denture",
+    "category": "prosthodontics"
+  },
+  "D5520": {
+    "short": "Replace tooth in partial denture",
+    "description": "Replace tooth in partial denture",
+    "category": "prosthodontics"
+  },
+  "D5611": {
+    "short": "Repair lower resin partial denture",
+    "description": "Repair lower resin partial denture",
+    "category": "prosthodontics"
+  },
+  "D5612": {
+    "short": "Repair upper resin partial denture",
+    "description": "Repair upper resin partial denture",
+    "category": "prosthodontics"
+  },
+  "D5621": {
+    "short": "Repair lower metal partial denture",
+    "description": "Repair lower metal partial denture",
+    "category": "prosthodontics"
+  },
+  "D5622": {
+    "short": "Repair upper metal partial denture",
+    "description": "Repair upper metal partial denture",
+    "category": "prosthodontics"
+  },
+  "D5650": {
+    "short": "Add tooth to partial denture",
+    "description": "Add tooth to partial denture",
+    "category": "prosthodontics"
+  },
+  "D5660": {
+    "short": "Add clasp to partial denture",
+    "description": "Add clasp to partial denture",
+    "category": "prosthodontics"
+  },
+  "D5751": {
+    "short": "Laboratory reline of lower denture",
+    "description": "Laboratory reline of lower denture",
+    "category": "prosthodontics"
+  },
+  "D5850": {
+    "short": "Upper denture tissue conditioning",
+    "description": "Upper denture tissue conditioning",
+    "category": "prosthodontics"
+  },
+  "D5851": {
+    "short": "Lower denture tissue conditioning",
+    "description": "Lower denture tissue conditioning",
+    "category": "prosthodontics"
+  },
+  "D6930": {
+    "short": "Re-cement bridge",
+    "description": "Re-cement bridge",
+    "category": "prosthodontics"
+  },
+  "D6056": {
+    "short": "Standard implant abutment",
+    "description": "Standard implant abutment",
+    "category": "implants"
+  },
+  "D6057": {
+    "short": "Custom implant abutment",
+    "description": "Custom implant abutment",
+    "category": "implants"
+  },
+  "D6100": {
+    "short": "Surgical implant removal",
+    "description": "Surgical implant removal",
+    "category": "implants"
+  },
+  "D6105": {
+    "short": "Remove implant without surgery",
+    "description": "Remove implant without surgery",
+    "category": "implants"
+  },
+  "D6197": {
+    "short": "Replace implant screw access filling",
+    "description": "Replace implant screw access filling",
+    "category": "implants"
+  },
+  "D7111": {
+    "short": "Remove baby tooth remnants",
+    "description": "Remove baby tooth remnants",
+    "category": "oralSurgery"
+  },
+  "D7220": {
+    "short": "Wisdom tooth removal (soft tissue)",
+    "description": "Wisdom tooth removal (soft tissue)",
+    "category": "oralSurgery"
+  },
+  "D7230": {
+    "short": "Wisdom tooth removal (partly bony)",
+    "description": "Wisdom tooth removal (partly bony)",
+    "category": "oralSurgery"
+  },
+  "D7250": {
+    "short": "Surgical removal of tooth roots",
+    "description": "Surgical removal of tooth roots",
+    "category": "oralSurgery"
+  },
+  "D7251": {
+    "short": "Coronectomy (partial tooth removal)",
+    "description": "Coronectomy (partial tooth removal)",
+    "category": "oralSurgery"
+  },
+  "D7321": {
+    "short": "Jawbone smoothing (1\u20133 spaces per quadrant)",
+    "description": "Jawbone smoothing (1\u20133 spaces per quadrant)",
+    "category": "oralSurgery"
+  },
+  "D8010": {
+    "short": "Limited braces (baby teeth)",
+    "description": "Limited braces (baby teeth)",
+    "category": "orthodontics"
+  },
+  "D8020": {
+    "short": "Limited braces (mixed teeth)",
+    "description": "Limited braces (mixed teeth)",
+    "category": "orthodontics"
+  },
+  "D8030": {
+    "short": "Limited braces (teen)",
+    "description": "Limited braces (teen)",
+    "category": "orthodontics"
+  },
+  "D8040": {
+    "short": "Limited braces (adult)",
+    "description": "Limited braces (adult)",
+    "category": "orthodontics"
+  },
+  "D8070": {
+    "short": "Comprehensive braces (mixed teeth)",
+    "description": "Comprehensive braces (mixed teeth)",
+    "category": "orthodontics"
+  },
+  "D8210": {
+    "short": "Removable habit appliance",
+    "description": "Removable habit appliance",
+    "category": "orthodontics"
+  },
+  "D8220": {
+    "short": "Fixed habit appliance",
+    "description": "Fixed habit appliance",
+    "category": "orthodontics"
+  },
+  "D8670": {
+    "short": "Orthodontic adjustment visit",
+    "description": "Orthodontic adjustment visit",
+    "category": "orthodontics"
+  },
+  "D8680": {
+    "short": "Orthodontic retention and retainers",
+    "description": "Orthodontic retention and retainers",
+    "category": "orthodontics"
+  },
+  "D8698": {
+    "short": "Replace removable upper retainer",
+    "description": "Replace removable upper retainer",
+    "category": "orthodontics"
+  },
+  "D8699": {
+    "short": "Replace removable lower retainer",
+    "description": "Replace removable lower retainer",
+    "category": "orthodontics"
+  },
+  "D9910": {
+    "short": "Tooth sensitivity treatment",
+    "description": "Tooth sensitivity treatment",
+    "category": "adjunctive"
+  },
+  "D9941": {
+    "short": "Sports mouthguard",
+    "description": "Sports mouthguard",
+    "category": "adjunctive"
+  },
+  "D9945": {
+    "short": "Soft full-arch night guard",
+    "description": "Soft full-arch night guard",
+    "category": "adjunctive"
+  },
+  "D9946": {
+    "short": "Partial-arch hard night guard",
+    "description": "Partial-arch hard night guard",
+    "category": "adjunctive"
+  }
+}

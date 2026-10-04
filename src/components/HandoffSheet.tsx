@@ -1,16 +1,8 @@
-import type { PlannedProcedure } from '../engine/types';
-import { GENERAL_QUESTIONS } from '../hooks/useDentistQuestions';
-import { formatDate, formatPercent, procedureName } from '../lib/format';
-import type { ActiveSchedule, ScheduleKind } from '../store';
-import { PrintIcon, ToothIcon } from './Icons';
-
-const KIND: Record<ScheduleKind, string> = {
-  cheapest: 'lowest-cost order',
-  fastest: 'fastest order',
-  balanced: 'balanced order',
-  custom: "patient's chosen order",
-};
-
+import type { PlannedProcedure } from "../engine/types";
+import { GENERAL_QUESTIONS } from "../hooks/useDentistQuestions";
+import { formatDate, formatMoney, procedureName } from "../lib/format";
+import type { ActiveSchedule } from "../store";
+import { PrintIcon } from "./Icons";
 export function HandoffSheet({
   patientName,
   procedures,
@@ -23,75 +15,89 @@ export function HandoffSheet({
   rulesVersion: string;
 }) {
   const byId = new Map(procedures.map((p) => [p.id, p]));
+  const lines = new Map(schedule.lines.map((l) => [l.id, l]));
   const questions = [...schedule.questions, ...GENERAL_QUESTIONS].slice(0, 3);
-  const rows = [...schedule.placements].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
-
+  const rows = [...schedule.placements].sort((a, b) =>
+    a.date.localeCompare(b.date),
+  );
   return (
-    <article className="mx-auto max-w-3xl rounded-2xl border border-line bg-white p-5 sm:p-8 print:border-0 print:p-0">
-      <header className="flex flex-wrap items-start justify-between gap-3 border-b border-line pb-4">
-        <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-600 text-white" aria-hidden>
-            <ToothIcon width={22} height={22} />
-          </span>
-          <div>
-            <p className="eyebrow">Treatment handoff for the dental office</p>
-            <h1 className="text-xl font-semibold sm:text-2xl">{patientName}'s treatment plan</h1>
-          </div>
-        </div>
-        <button type="button" className="btn-secondary no-print" onClick={() => window.print()}>
-          <PrintIcon /> Print
+    <article className="bg-white print:p-0">
+      <header className="border-b border-line pb-5">
+        <p className="mb-3 text-xs text-muted">Ting · Shared treatment plan</p>
+        <h1>{patientName}’s treatment plan</h1>
+        <p className="mt-3 text-base">
+          {schedule.kind === "custom"
+            ? "Patient’s edited dates"
+            : `${schedule.kind[0].toUpperCase()}${schedule.kind.slice(1)} schedule`}
+          . Estimated total you pay: {formatMoney(schedule.expectedOwes)}.
+        </p>
+        <button
+          className="btn-primary no-print mt-5"
+          onClick={() => window.print()}
+        >
+          <PrintIcon />
+          Print treatment plan
         </button>
       </header>
-
-      <section className="mt-5">
-        <h2 className="text-sm font-semibold">Recommended order ({KIND[schedule.kind]})</h2>
-        <div className="mt-2 overflow-x-auto">
-          <table className="w-full min-w-[420px] text-sm">
-            <thead>
-              <tr className="border-b border-line text-left text-xs text-muted">
-                <th scope="col" className="py-2 pr-2 font-medium">#</th>
-                <th scope="col" className="py-2 pr-2 font-medium">CDT</th>
-                <th scope="col" className="py-2 pr-2 font-medium">Procedure</th>
-                <th scope="col" className="py-2 pr-2 font-medium">Tooth</th>
-                <th scope="col" className="py-2 font-medium">Target date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((pl, n) => {
-                const p = byId.get(pl.id);
-                return (
-                  <tr key={pl.id} className="border-b border-line">
-                    <td className="py-2 pr-2 text-muted">{n + 1}</td>
-                    <td className="py-2 pr-2 font-mono">{p?.cdt}</td>
-                    <td className="py-2 pr-2">
-                      {p ? procedureName({ ...p, tooth: undefined }) : pl.id}
-                      {p?.locked && <span className="ml-1.5 text-xs text-muted">(urgent, date set by dentist)</span>}
-                      {p?.likelihood !== undefined && p.likelihood < 1 && (
-                        <span className="ml-1.5 text-xs text-muted">(only if needed, {formatPercent(p.likelihood)} likely)</span>
-                      )}
-                    </td>
-                    <td className="py-2 pr-2">{p?.tooth ? `#${p.tooth}` : '—'}</td>
-                    <td className="py-2">{formatDate(pl.date, { year: true })}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
       <section className="mt-6">
-        <h2 className="text-sm font-semibold">Questions from your patient</h2>
-        <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-sm">
+        <h2>Planned appointments</h2>
+        <ol className="divide-y divide-line">
+          {rows.map((pl) => {
+            const p = byId.get(pl.id);
+            const line = lines.get(pl.id);
+            return (
+              <li key={pl.id} className="py-5">
+                <h3>{p ? procedureName(p) : "Treatment item"}</h3>
+                <dl className="mt-3 space-y-3">
+                  <div>
+                    <dt className="text-xs text-muted">
+                      Target date
+                      {p?.cdt.startsWith("D8") ? " (treatment start)" : ""}
+                    </dt>
+                    <dd>
+                      {formatDate(pl.date, { year: true })}
+                      {p?.locked && ". Date set by dentist."}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-muted">
+                      Estimated amount you pay
+                    </dt>
+                    <dd className="tabular">
+                      {line ? formatMoney(line.memberOwes) : "Unavailable"}
+                      {p?.likelihood !== undefined &&
+                        p.likelihood < 1 &&
+                        " if needed"}
+                    </dd>
+                  </div>
+                </dl>
+                {line?.pricingWarning && (
+                  <p className="mt-3">{line.pricingWarning}</p>
+                )}
+                <details className="mt-3">
+                  <summary className="text-brand-700">
+                    Procedure reference
+                  </summary>
+                  <p className="text-xs">
+                    Billing code: {p?.cdt}. Estimate rules: {rulesVersion}.
+                  </p>
+                </details>
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+      <section className="mt-6 border-t border-line pt-5">
+        <h2>Questions for the dental office</h2>
+        <ol className="mt-4 list-decimal space-y-3 pl-5">
           {questions.map((q) => (
             <li key={q}>{q}</li>
           ))}
         </ol>
       </section>
-
       <p className="mt-6 text-xs text-muted">
-        Dates are targets chosen around the patient's annual maximum. Clinical judgment comes first: please tell the patient if any item
-        can't safely wait. Estimate rules version {rulesVersion}.
+        Dates are planning targets. Clinical judgment comes first. Please
+        confirm whether any treatment can safely wait.
       </p>
     </article>
   );

@@ -1,70 +1,62 @@
-import { DENTISTS, useDentistQuotes } from '../hooks/useDentistQuotes';
-import { formatMoney } from '../lib/format';
-
+import { DENTISTS, useDentistQuotes } from "../hooks/useDentistQuotes";
+import { formatMoney } from "../lib/format";
 export function DentistList({ pinnedId }: { pinnedId?: string }) {
   const quotes = useDentistQuotes();
-  const sorted = [...DENTISTS].sort((a, b) => {
-    if (a.id === pinnedId) return -1;
-    if (b.id === pinnedId) return 1;
-    const qa = quotes.get(a.id)!.yourCost;
-    const qb = quotes.get(b.id)!.yourCost;
-    return qa === qb ? 0 : qa < qb ? -1 : 1;
-  });
-
-  // The column matching the dentist's network status is what you'd pay; the other is the comparison.
-  const cell = (applies: boolean) =>
-    `tabular rounded-lg px-2 py-1 text-right ${applies ? 'bg-brand-50 font-semibold text-ink ring-1 ring-brand-200' : 'text-sm text-muted'}`;
-
+  const sorted = [...DENTISTS].sort((a, b) =>
+    a.id === pinnedId
+      ? -1
+      : b.id === pinnedId
+        ? 1
+        : quotes.get(a.id)!.yourCost - quotes.get(b.id)!.yourCost,
+  );
   return (
-    <div>
-      <p className="mb-2 text-xs text-muted">Highlighted: what you'd pay at that dentist.</p>
-      <div className="mb-2 hidden grid-cols-[1fr_8rem_9rem] gap-3 px-3 text-xs font-medium text-muted md:grid">
-        <span>Dentist</span>
-        <span className="text-right">If in network</span>
-        <span className="text-right">If out of network</span>
-      </div>
-      <ol className="space-y-2">
-        {sorted.map((d) => {
-          const q = quotes.get(d.id)!;
-          const pinned = d.id === pinnedId;
-          const vsCheapest = q.vsCheapest > 0 && (
-            <span className="tabular block text-[11px] font-normal text-muted">{formatMoney(q.vsCheapest, { signed: true })} vs cheapest</span>
-          );
-          return (
-            <li
-              key={d.id}
-              className={`grid grid-cols-2 gap-x-3 gap-y-1 rounded-xl border p-3 md:grid-cols-[1fr_8rem_9rem] md:items-center ${
-                pinned ? 'border-brand-500 bg-brand-50' : 'border-line bg-white'
-              }`}
-            >
-              <div className="col-span-2 min-w-0 md:col-span-1">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="font-medium">{d.name}</span>
-                  {pinned && <span className="rounded-full bg-brand-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">Your dentist</span>}
+    <ol className="divide-y divide-line">
+      {sorted.map((d) => {
+        const q = quotes.get(d.id)!;
+        return (
+          <li key={d.id} className="py-5">
+            <h3>
+              {d.name}
+              {d.id === pinnedId ? " (current dentist)" : ""}
+            </h3>
+            <p className="mt-2 text-xs text-muted">
+              {d.neighborhood} · {d.distanceMiles} miles ·{" "}
+              {d.inNetwork ? "In-network scenario" : "Out-of-network scenario"}
+            </p>
+            <div className="mt-3 flex flex-wrap justify-between gap-3">
+              <span>Estimated amount you pay</span>
+              <span className="tabular text-xl font-medium">
+                {formatMoney(q.yourCost)}
+              </span>
+            </div>
+            {!d.acceptingNew && (
+              <p className="mt-2 text-xs text-muted">
+                Not accepting new patients in this sample.
+              </p>
+            )}
+            <details className="mt-3">
+              <summary className="text-brand-700">
+                Compare network scenarios
+              </summary>
+              <dl className="space-y-3">
+                <div className="flex justify-between gap-3">
+                  <dt>If in-network</dt>
+                  <dd className="tabular">{formatMoney(q.inNetworkCost)}</dd>
                 </div>
-                <div className="text-xs text-muted">
-                  {d.neighborhood} · {d.distanceMiles} mi ·{' '}
-                  <span className={d.inNetwork ? 'font-medium text-save' : 'font-medium text-warn'}>
-                    {d.inNetwork ? 'In network' : 'Out of network'}
-                  </span>
-                  {!d.acceptingNew && ' · not accepting new patients'}
+                <div className="flex justify-between gap-3">
+                  <dt>If out-of-network</dt>
+                  <dd className="tabular">{formatMoney(q.outOfNetworkCost)}</dd>
                 </div>
-              </div>
-              <div className={cell(d.inNetwork)}>
-                <span className="block text-[11px] font-normal text-muted md:hidden">If in network</span>
-                {formatMoney(q.inNetworkCost)}
-                {d.inNetwork && vsCheapest}
-              </div>
-              <div className={cell(!d.inNetwork)}>
-                <span className="block text-[11px] font-normal text-muted md:hidden">If out of network</span>
-                {formatMoney(q.outOfNetworkCost)}
-                <span className="block text-[11px] font-normal text-muted">incl. {formatMoney(q.outOfNetworkExtra)} balance bill</span>
-                {!d.inNetwork && vsCheapest}
-              </div>
-            </li>
-          );
-        })}
-      </ol>
-    </div>
+              </dl>
+              <p className="mt-3 text-xs text-muted">
+                The out-of-network estimate includes{" "}
+                {formatMoney(q.outOfNetworkExtra)} in extra charges above
+                allowances. Confirm both fees and allowances before booking.
+              </p>
+            </details>
+          </li>
+        );
+      })}
+    </ol>
   );
 }

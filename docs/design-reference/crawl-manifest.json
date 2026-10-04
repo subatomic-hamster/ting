@@ -1,0 +1,320 @@
+{
+  "capturedOn": "2026-10-04",
+  "method": "Rendered public pages, read-only DOM/computed-style extraction, Chrome screenshots and public CSS inspection",
+  "coverage": "Representative design-template crawl; not an exhaustive archive of every route",
+  "uniquePages": 16,
+  "captures": [
+    {
+      "capture": "01-individuals-desktop",
+      "url": "https://www.lincolnfinancial.com/public/individuals",
+      "title": "Individuals | Lincoln Financial",
+      "viewport": {
+        "height": 1094,
+        "width": 1935
+      },
+      "pageHeight": 3174,
+      "screenshot": "screenshots/01-individuals-desktop.jpg",
+      "evidence": "evidence/01-individuals-desktop.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "03-annuities-desktop",
+      "url": "https://www.lincolnfinancial.com/public/individuals/products/annuities",
+      "title": "Annuities | Lincoln Financial",
+      "viewport": {
+        "height": 1094,
+        "width": 1935
+      },
+      "pageHeight": 3564,
+      "screenshot": "screenshots/03-annuities-desktop.jpg",
+      "evidence": "evidence/03-annuities-desktop.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "04-life-insurance-desktop",
+      "url": "https://www.lincolnfinancial.com/public/individuals/products/lifeinsurance",
+      "title": "Life insurance | Lincoln Financial",
+      "viewport": {
+        "height": 1094,
+        "width": 1935
+      },
+      "pageHeight": 3146,
+      "screenshot": "screenshots/04-life-insurance-desktop.jpg",
+      "evidence": "evidence/04-life-insurance-desktop.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "05-retirement-plans-desktop",
+      "url": "https://www.lincolnfinancial.com/public/individuals/products/workplaceplan",
+      "title": "Your workplace plan | Lincoln Financial",
+      "viewport": {
+        "height": 1094,
+        "width": 1935
+      },
+      "pageHeight": 2717,
+      "screenshot": "screenshots/05-retirement-plans-desktop.jpg",
+      "evidence": "evidence/05-retirement-plans-desktop.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "06-tools-desktop",
+      "url": "https://www.lincolnfinancial.com/public/individuals/planning/calculatorsandtools#financialwellness",
+      "title": "Calculators and tools | Lincoln Financial",
+      "viewport": {
+        "height": 1094,
+        "width": 1935
+      },
+      "pageHeight": 1947,
+      "screenshot": "screenshots/06-tools-desktop.jpg",
+      "evidence": "evidence/06-tools-desktop.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "08-customer-service-desktop",
+      "url": "https://www.lincolnfinancial.com/public/individuals/support/customerservice",
+      "title": "Customer service | Lincoln Financial",
+      "viewport": {
+        "height": 1094,
+        "width": 1935
+      },
+      "pageHeight": 2079,
+      "screenshot": "screenshots/08-customer-service-desktop.jpg",
+      "evidence": "evidence/08-customer-service-desktop.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "09-find-professional-desktop",
+      "url": "https://www.lincolnfinancial.com/public/individuals/support/findafinancialprofessional",
+      "title": "Find a financial professional | Lincoln Financial",
+      "viewport": {
+        "height": 1094,
+        "width": 1935
+      },
+      "pageHeight": 1907,
+      "screenshot": "screenshots/09-find-professional-desktop.jpg",
+      "evidence": "evidence/09-find-professional-desktop.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "10-claims-desktop",
+      "url": "https://www.lincolnfinancial.com/public/general/fileaclaimtool",
+      "title": "File a claim | Lincoln Financial",
+      "viewport": {
+        "height": 1094,
+        "width": 1935
+      },
+      "pageHeight": 1755,
+      "screenshot": "screenshots/10-claims-desktop.jpg",
+      "evidence": "evidence/10-claims-desktop.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "11-claims-step-desktop",
+      "url": "https://www.lincolnfinancial.com/public/general/fileaclaimtool",
+      "title": "File a claim | Lincoln Financial",
+      "viewport": {
+        "height": 1094,
+        "width": 1935
+      },
+      "pageHeight": 1755,
+      "screenshot": "screenshots/11-claims-step-desktop.jpg",
+      "evidence": "evidence/11-claims-step-desktop.json",
+      "screenshotMode": "viewport"
+    },
+    {
+      "capture": "12-company-desktop",
+      "url": "https://www.lincolnfinancial.com/public/aboutus/companyoverview",
+      "title": "About us | Lincoln Financial",
+      "viewport": {
+        "height": 1094,
+        "width": 1935
+      },
+      "pageHeight": 3166,
+      "screenshot": "screenshots/12-company-desktop.jpg",
+      "evidence": "evidence/12-company-desktop.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "13-action-plan-desktop",
+      "url": "https://www.lincolnfinancial.com/public/general/actionplan#annuities",
+      "title": "The Action Plan | Lincoln Financial",
+      "viewport": {
+        "height": 1094,
+        "width": 1935
+      },
+      "pageHeight": 5201,
+      "screenshot": "screenshots/13-action-plan-desktop.jpg",
+      "evidence": "evidence/13-action-plan-desktop.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "14-fixed-annuity-detail-desktop",
+      "url": "https://www.lincolnfinancial.com/public/individuals/products/annuities/fixedannuities",
+      "title": "Fixed annuities | Lincoln Financial",
+      "viewport": {
+        "height": 1094,
+        "width": 1935
+      },
+      "pageHeight": 2673,
+      "screenshot": "screenshots/14-fixed-annuity-detail-desktop.jpg",
+      "evidence": "evidence/14-fixed-annuity-detail-desktop.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "15-employers-desktop",
+      "url": "https://www.lincolnfinancial.com/public/employers",
+      "title": "Employers | Lincoln Financial",
+      "viewport": {
+        "height": 1094,
+        "width": 1935
+      },
+      "pageHeight": 3995,
+      "screenshot": "screenshots/15-employers-desktop.jpg",
+      "evidence": "evidence/15-employers-desktop.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "16-professionals-desktop",
+      "url": "https://www.lincolnfinancial.com/public/professionals",
+      "title": "Professionals | Lincoln Financial",
+      "viewport": {
+        "height": 1094,
+        "width": 1935
+      },
+      "pageHeight": 3244,
+      "screenshot": "screenshots/16-professionals-desktop.jpg",
+      "evidence": "evidence/16-professionals-desktop.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "17-individuals-1080",
+      "url": "https://www.lincolnfinancial.com/public/individuals",
+      "title": "Individuals | Lincoln Financial",
+      "viewport": {
+        "height": 633,
+        "width": 1080
+      },
+      "pageHeight": 3377,
+      "screenshot": "screenshots/17-individuals-1080.jpg",
+      "evidence": "evidence/17-individuals-1080.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "18-individuals-mobile",
+      "url": "https://www.lincolnfinancial.com/public/individuals",
+      "title": "Individuals | Lincoln Financial",
+      "viewport": {
+        "height": 844,
+        "width": 390
+      },
+      "pageHeight": 6759,
+      "screenshot": "screenshots/18-individuals-mobile.jpg",
+      "evidence": "evidence/18-individuals-mobile.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "21-tools-mobile",
+      "url": "https://www.lincolnfinancial.com/public/individuals/planning/calculatorsandtools#financialwellness",
+      "title": "Calculators and tools | Lincoln Financial",
+      "viewport": {
+        "height": 844,
+        "width": 390
+      },
+      "pageHeight": 4419,
+      "screenshot": "screenshots/21-tools-mobile.jpg",
+      "evidence": "evidence/21-tools-mobile.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "22-annuities-mobile",
+      "url": "https://www.lincolnfinancial.com/public/individuals/products/annuities",
+      "title": "Annuities | Lincoln Financial",
+      "viewport": {
+        "height": 844,
+        "width": 390
+      },
+      "pageHeight": 6639,
+      "screenshot": "screenshots/22-annuities-mobile.jpg",
+      "evidence": "evidence/22-annuities-mobile.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "23-customer-service-mobile",
+      "url": "https://www.lincolnfinancial.com/public/individuals/support/customerservice",
+      "title": "Customer service | Lincoln Financial",
+      "viewport": {
+        "height": 844,
+        "width": 390
+      },
+      "pageHeight": 4184,
+      "screenshot": "screenshots/23-customer-service-mobile.jpg",
+      "evidence": "evidence/23-customer-service-mobile.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "24-individuals-tablet",
+      "url": "https://www.lincolnfinancial.com/public/individuals",
+      "title": "Individuals | Lincoln Financial",
+      "viewport": {
+        "height": 844,
+        "width": 768
+      },
+      "pageHeight": 7646,
+      "screenshot": "screenshots/24-individuals-tablet.jpg",
+      "evidence": "evidence/24-individuals-tablet.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "26-employee-benefits-desktop",
+      "url": "https://www.lincolnfinancial.com/public/individuals/products/employeebenefits",
+      "title": "Employee benefits | Lincoln Financial",
+      "viewport": {
+        "height": 1038,
+        "width": 1935
+      },
+      "pageHeight": 2095,
+      "screenshot": "screenshots/26-employee-benefits-desktop.jpg",
+      "evidence": "evidence/26-employee-benefits-desktop.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "27-investments-desktop",
+      "url": "https://www.lincolnfinancial.com/public/individuals/products/lincolnfinancialinvestments",
+      "title": "Lincoln Financial Investments | Lincoln Financial",
+      "viewport": {
+        "height": 1038,
+        "width": 1935
+      },
+      "pageHeight": 4213,
+      "screenshot": "screenshots/27-investments-desktop.jpg",
+      "evidence": "evidence/27-investments-desktop.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "28-long-term-care-desktop",
+      "url": "https://www.lincolnfinancial.com/public/individuals/products/longtermcareplanning",
+      "title": "Long-term care planning | Lincoln Financial",
+      "viewport": {
+        "height": 1038,
+        "width": 1935
+      },
+      "pageHeight": 2800,
+      "screenshot": "screenshots/28-long-term-care-desktop.jpg",
+      "evidence": "evidence/28-long-term-care-desktop.json",
+      "screenshotMode": "full-page"
+    },
+    {
+      "capture": "29-tools-retirement-tab-desktop",
+      "url": "https://www.lincolnfinancial.com/public/individuals/planning/calculatorsandtools#retirement",
+      "title": "Calculators and tools | Lincoln Financial",
+      "viewport": {
+        "height": 1038,
+        "width": 1935
+      },
+      "pageHeight": 2051,
+      "screenshot": "screenshots/29-tools-retirement-tab-desktop.jpg",
+      "evidence": "evidence/29-tools-retirement-tab-desktop.json",
+      "screenshotMode": "full-page"
+    }
+  ]
+}

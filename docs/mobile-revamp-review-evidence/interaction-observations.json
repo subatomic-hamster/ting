@@ -1,0 +1,120 @@
+{
+  "ask": "Ask about your plan\nAsking…",
+  "catalogSearch": "Browse procedures\n\nChoose the procedure on your dentist’s plan. Enter a quote for an estimate. 137 procedures available.\n\nSearch procedures\nProcedure\nChoose a procedure\nRoot canal retreatment (front tooth) (D3346)\nRoot canal retreatment (premolar) (D3347)\nRoot canal retreatment (molar) (D3348)\nRoot canal (front tooth) (D3310)\nRoot canal (premolar) (D3320)\nRoot canal (molar) (D3330)\n\nFor braces or aligners, use the full-course fee from your orthodontist, including any bundled visits and retainers. Do not enter a monthly installment. This estimate models the fee at the start date; confirm installment payments, age eligibility, treatment in progress and your remaining lifetime benefit with your insurer.\n\nFull-course dentist fee ($)\nInsurer allowed amount ($), if confirmed\n\nLeave the allowance blank if unknown. We budget the full fee until you confirm it. Do not add adjustment visits or retainers again if already included in the course fee.\n\nTooth number, if stated (optional)\nAdd selected procedure",
+  "catalogSelection": {
+    "value": "D3346",
+    "selected": "Root canal retreatment (front tooth) (D3346)"
+  },
+  "recommendation": {
+    "active": [
+      {
+        "id": "rc19",
+        "date": "2026-10-04"
+      },
+      {
+        "id": "bu19",
+        "date": "2026-10-11"
+      },
+      {
+        "id": "cr19",
+        "date": "2026-10-18"
+      },
+      {
+        "id": "cr30",
+        "date": "2026-10-04"
+      },
+      {
+        "id": "clean",
+        "date": "2026-10-04"
+      },
+      {
+        "id": "rc3",
+        "date": "2026-10-04"
+      }
+    ],
+    "card": [
+      {
+        "id": "rc19",
+        "date": "2026-10-04"
+      },
+      {
+        "id": "bu19",
+        "date": "2026-10-11"
+      },
+      {
+        "id": "cr19",
+        "date": "2027-01-04"
+      },
+      {
+        "id": "cr30",
+        "date": "2027-01-04"
+      },
+      {
+        "id": "clean",
+        "date": "2026-10-04"
+      },
+      {
+        "id": "rc3",
+        "date": "2027-01-04"
+      }
+    ]
+  },
+  "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Ting//Dental plan//EN\r\nCALSCALE:GREGORIAN\r\nX-WR-CALNAME:Ting dental plan\r\nBEGIN:VEVENT\r\nUID:visit-rc19@ting.app\r\nDTSTAMP:20261004T075724Z\r\nDTSTART;VALUE=DATE:20261004\r\nDTEND;VALUE=DATE:20261005\r\nSUMMARY:Dentist: Root canal (molar) on #19\r\nDESCRIPTION:Estimated cost to you: $200.\r\nBEGIN:VALARM\r\nTRIGGER:-P1D\r\nACTION:DISPLAY\r\nDESCRIPTION:Dentist: Root canal (molar) on #19\r\nEND:VALARM\r\nEND:VEVENT\r\nBEGIN:VEVENT\r\nUID:visit-bu19@ting.app\r\nDTSTAMP:20261004T075724Z\r\nDTSTART;VALUE=DATE:20261011\r\nDTEND;VALUE=DATE:20261012\r\nSUMMARY:Dentist: Core buildup on #19\r\nDESCRIPTION:Estimated cost to you: $125.\r\nBEGIN:VALARM\r\nTRIGGER:-P1D\r\nACTION:DISPLAY\r\nDESCRIPTION:Dentist: Core buildup on #19\r\nEND:VALARM\r\nEND:VEVENT\r\nBEGIN:VEVENT\r\nUID:visit-cr19@ting.app\r\nDTSTAMP:20261004T075724Z\r\nDTSTART;VALUE=DATE:20270104\r\nDTEND;VALUE=DATE:20270105\r\nSUMMARY:Dentist: Crown (porcelain) on #19\r\nDESCRIPTION:Estimated cost to you: $510.\r\nBEGIN:VALARM\r\nTRIGGER:-P1D\r\nACTION:DISPLAY\r\nDESCRIPTION:Dentist: Crown (porcelain) on #19\r\nEND:VALARM\r\nEND:VEVENT\r\nBEGIN:VEVENT\r\nUID:visit-cr30@ting.app\r\nDTSTAMP:20261004T075724Z\r\nDTSTART;VALUE=DATE:20270104\r\nDTEND;VALUE=DATE:20270105\r\nSUMMARY:Dentist: Crown (porcelain) on #30\r\nDESCRIPTION:Estimated cost to you: $480.\r\nBEGIN:VALARM\r\nTRIGGER:-P1D\r\nACTION:DISPLAY\r\nDESCRIPTION:Dentist: Crown (porcelain) on #30\r\nEND:VALARM\r\nEND:VEVENT\r\nBEGIN:VEVENT\r\nUID:visit-clean@ting.app\r\nDTSTAMP:20261004T075724Z\r\nDTSTART;VALUE=DATE:20261004\r\nDTEND;VALUE=DATE:20261005\r\nSUMMARY:Dentist: Cleaning\r\nDESCRIPTION:Estimated cost to you: $0.\r\nBEGIN:VALARM\r\nTRIGGER:-P1D\r\nACTION:DISPLAY\r\nDESCRIPTION:Dentist: Cleaning\r\nEND:VALARM\r\nEND:VEVENT\r\nBEGIN:VEVENT\r\nUID:visit-rc3@ting.app\r\nDTSTAMP:20261004T075724Z\r\nDTSTART;VALUE=DATE:20270104\r\nDTEND;VALUE=DATE:20270105\r\nSUMMARY:Dentist: Root canal (molar) on #3\r\nDESCRIPTION:Estimated cost to you: $410.\r\nBEGIN:VALARM\r\nTRIGGER:-P1D\r\nACTION:DISPLAY\r\nDESCRIPTION:Dentist: Root canal (molar) on #3\r\nEND:VALARM\r\nEND:VEVENT\r\nBEGIN:VEVENT\r\nUID:fsa-deadline@ting.app\r\nDTSTAMP:20261004T075724Z\r\nDTSTART;VALUE=DATE:20261231\r\nDTEND;VALUE=DATE:20270101\r\nSUMMARY:FSA deadline: use remaining dental FSA money\r\nBEGIN:VALARM\r\nTRIGGER:-P1D\r\nACTION:DISPLAY\r\nDESCRIPTION:FSA deadline: use remaining dental FSA money\r\nEND:VALARM\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+  "shareUrl": "http://127.0.0.1:5173/share/dale.cheapest.y04fgr",
+  "shareText": "Sample handoff. In this mode, shared links open only in the browser where they were created.\n\nTing · Shared treatment plan\n\nDale’s treatment plan\n\nCheapest schedule. Estimated total you pay: $1,438.\n\nPrint treatment plan\nPlanned appointments\nRoot canal (molar) on #19\nTarget date\nOct 4, 2026. Date set by dentist.\nEstimated amount you pay\n$200\nProcedure reference\nCleaning\nTarget date\nOct 4, 2026\nEstimated amount you pay\n$0\nProcedure reference\nCore buildup on #19\nTarget date\nOct 11, 2026\nEstimated amount you pay\n$125\nProcedure reference\nCrown (porcelain) on #19\nTarget date\nJan 4, 2027\nEstimated amount you pay\n$510\nProcedure reference\nCrown (porcelain) on #30\nTarget date\nJan 4, 2027\nEstimated amount you pay\n$480\nProcedure reference\nRoot canal (molar) on #3\nTarget date\nJan 4, 2027\nEstimated amount you pay\n$410 if needed\nProcedure reference\nQuestions for the dental office\nCan the crown (porcelain) on #19 safely wait until Jan 4, 2027?\nCan the crown (porcelain) on #30 safely wait until Jan 4, 2027?\nCan the root canal (molar) on #3 safely wait until Jan 4, 2027?\n\nDates are planning targets. Clinical judgment comes first. Please confirm whether any treatment can safely wait.\n\nShared Oct 4, 2026. Expires Nov 3, 2026.\n\nHome-care summary\n\nShared by Dale · last 30 days · device data, not a clinical record\n\nTwice a day\n97%\nAverage session\n2:08\nSessions per day\n1.97\nPressure warnings / week\n4.9\nLast 2 weeks vs 2 before\n100% vs 93%\nSessions recorded\n59\nUp. right 28%\nUp. left 15%\nLow. left 28%\nLow. right 28%\nmirror view\n\nTalking points for the visit\n\nUpper left gets 15% of brushing time (an even split is 25%). Worth checking that area and showing technique there.\n4.9 high-pressure warnings a week. Check for gum recession or abrasion; suggest a lighter grip.\n\nEducational estimates. Confirm treatment, fees and coverage with your dentist and insurer before booking.",
+  "removed": 5,
+  "removedReload": 5,
+  "priceStatus": "Root canal (molar) on #19\n\nSelected item. In-network dentist.\n\nEstimated amount you pay\n\n$200\n\nDentist’s fee\n$1,250\nPlan discount\n$250\nPlan pays\n$800\nYou pay\n$200\nCost breakdown\nPrice sources\nUpdate dentist fee and insurer allowance\nDentist’s fee ($)\nConfirmed insurer allowance ($)\n\nLeave blank if unknown. The estimate budgets the full fee until confirmed.\n\nUpdate estimate\n\nUpdated. Saved on this device.",
+  "deleted": {
+    "consent": {
+      "optedIn": false,
+      "shareWithDentist": false,
+      "shareAggregateWithLincoln": false
+    },
+    "count": 0
+  },
+  "deletedReload": {
+    "consent": {
+      "optedIn": false,
+      "shareWithDentist": false,
+      "shareAggregateWithLincoln": false
+    },
+    "count": 0
+  },
+  "planTable": {
+    "width": 420,
+    "parent": 350,
+    "parentScroll": 420
+  },
+  "expanded320x2": {
+    "width": 320,
+    "scroll": 320,
+    "dates": [
+      {
+        "width": 90.234375,
+        "height": 66,
+        "font": "32px"
+      },
+      {
+        "width": 90.234375,
+        "height": 66,
+        "font": "32px"
+      },
+      {
+        "width": 90.234375,
+        "height": 66,
+        "font": "32px"
+      },
+      {
+        "width": 90.234375,
+        "height": 66,
+        "font": "32px"
+      }
+    ],
+    "controls": []
+  },
+  "webkit": {
+    "width": 375,
+    "scrollWidth": 375
+  }
+}

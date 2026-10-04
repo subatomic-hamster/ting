@@ -1,0 +1,12 @@
+{
+  "deleteButtons": [
+    "Delete sessions and leave"
+  ],
+  "hasSnapshotRetentionCopy": true,
+  "hasPremiumRewardCopy": true,
+  "hasScopedRetentionCopy": true,
+  "layout": {
+    "width": 320,
+    "scroll": 320
+  }
+}

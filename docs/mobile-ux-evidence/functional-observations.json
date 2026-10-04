@@ -1,0 +1,427 @@
+{
+  "journeys": {
+    "nav": {
+      "bounds": {
+        "x": 0,
+        "y": 56,
+        "width": 375,
+        "height": 43,
+        "top": 56,
+        "right": 375,
+        "bottom": 99,
+        "left": 0
+      },
+      "scroll": [
+        {
+          "client": 255,
+          "scroll": 518
+        }
+      ],
+      "links": [
+        {
+          "label": "Home",
+          "bounds": {
+            "x": 12,
+            "y": 56,
+            "width": 59,
+            "height": 42,
+            "top": 56,
+            "right": 71,
+            "bottom": 98,
+            "left": 12
+          }
+        },
+        {
+          "label": "Treatment",
+          "bounds": {
+            "x": 71,
+            "y": 56,
+            "width": 87.75,
+            "height": 42,
+            "top": 56,
+            "right": 158.75,
+            "bottom": 98,
+            "left": 71
+          }
+        },
+        {
+          "label": "Enroll",
+          "bounds": {
+            "x": 158.75,
+            "y": 56,
+            "width": 57.21875,
+            "height": 42,
+            "top": 56,
+            "right": 215.96875,
+            "bottom": 98,
+            "left": 158.75
+          }
+        },
+        {
+          "label": "Dentists",
+          "bounds": {
+            "x": 215.96875,
+            "y": 56,
+            "width": 74.75,
+            "height": 42,
+            "top": 56,
+            "right": 290.71875,
+            "bottom": 98,
+            "left": 215.96875
+          }
+        },
+        {
+          "label": "Email",
+          "bounds": {
+            "x": 290.71875,
+            "y": 56,
+            "width": 55.46875,
+            "height": 42,
+            "top": 56,
+            "right": 346.1875,
+            "bottom": 98,
+            "left": 290.71875
+          }
+        },
+        {
+          "label": "SmileStreak",
+          "bounds": {
+            "x": 346.1875,
+            "y": 56,
+            "width": 99.15625,
+            "height": 42,
+            "top": 56,
+            "right": 445.34375,
+            "bottom": 98,
+            "left": 346.1875
+          }
+        },
+        {
+          "label": "Plan rules",
+          "bounds": {
+            "x": 445.34375,
+            "y": 56,
+            "width": 84.78125,
+            "height": 42,
+            "top": 56,
+            "right": 530.125,
+            "bottom": 98,
+            "left": 445.34375
+          }
+        }
+      ]
+    },
+    "selection": {
+      "scrollY": 741,
+      "detailTop": 671.5
+    },
+    "afterRemove": {
+      "count": 5
+    },
+    "afterReload": {
+      "count": 6
+    },
+    "family": {
+      "keys": [
+        "asOf",
+        "currentPlan",
+        "ledger",
+        "procedures",
+        "money",
+        "fees"
+      ],
+      "procedures": 6
+    },
+    "auditFocus": {
+      "active": "<a href=\"#main\" class=\"sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2\">Skip to content</a>"
+    },
+    "/": {
+      "width": 320,
+      "scrollWidth": 320,
+      "overflows": [
+        {
+          "tag": "LI",
+          "text": "Email"
+        },
+        {
+          "tag": "A",
+          "text": "Email"
+        },
+        {
+          "tag": "LI",
+          "text": "SmileStreak"
+        },
+        {
+          "tag": "A",
+          "text": "SmileStreak"
+        },
+        {
+          "tag": "LI",
+          "text": "Plan rules"
+        },
+        {
+          "tag": "A",
+          "text": "Plan rules"
+        },
+        {
+          "tag": "DIV",
+          "text": "2026 max\n$190 left of $1,500\n2027 max\n$227.50 left of $1,500\nJan\nFeb\nMar\nApr\nMay"
+        },
+        {
+          "tag": "DIV",
+          "text": "2026 max\n$190 left of $1,500\n2027 max\n$227.50 left of $1,500"
+        }
+      ]
+    },
+    "/treatment": {
+      "width": 320,
+      "scrollWidth": 320,
+      "overflows": [
+        {
+          "tag": "LI",
+          "text": "Email"
+        },
+        {
+          "tag": "A",
+          "text": "Email"
+        },
+        {
+          "tag": "LI",
+          "text": "SmileStreak"
+        },
+        {
+          "tag": "A",
+          "text": "SmileStreak"
+        },
+        {
+          "tag": "LI",
+          "text": "Plan rules"
+        },
+        {
+          "tag": "A",
+          "text": "Plan rules"
+        },
+        {
+          "tag": "DIV",
+          "text": "2026 max\n$190 left of $1,500\n2027 max\n$227.50 left of $1,500\nJan\nFeb\nMar\nApr\nMay"
+        },
+        {
+          "tag": "DIV",
+          "text": "2026 max\n$190 left of $1,500\n2027 max\n$227.50 left of $1,500"
+        }
+      ]
+    },
+    "/enroll": {
+      "width": 320,
+      "scrollWidth": 320,
+      "overflows": [
+        {
+          "tag": "LI",
+          "text": "Email"
+        },
+        {
+          "tag": "A",
+          "text": "Email"
+        },
+        {
+          "tag": "LI",
+          "text": "SmileStreak"
+        },
+        {
+          "tag": "A",
+          "text": "SmileStreak"
+        },
+        {
+          "tag": "LI",
+          "text": "Plan rules"
+        },
+        {
+          "tag": "A",
+          "text": "Plan rules"
+        }
+      ]
+    },
+    "/plan": {
+      "width": 320,
+      "scrollWidth": 320,
+      "overflows": [
+        {
+          "tag": "LI",
+          "text": "Email"
+        },
+        {
+          "tag": "A",
+          "text": "Email"
+        },
+        {
+          "tag": "LI",
+          "text": "SmileStreak"
+        },
+        {
+          "tag": "A",
+          "text": "SmileStreak"
+        },
+        {
+          "tag": "LI",
+          "text": "Plan rules"
+        },
+        {
+          "tag": "A",
+          "text": "Plan rules"
+        },
+        {
+          "tag": "TABLE",
+          "text": "Plan pays\tPreventive\tBasic\tMajor\tOrtho\nIn network\t100%\t80%\t50%\t0%\nOut of network"
+        },
+        {
+          "tag": "THEAD",
+          "text": "Plan pays\tPreventive\tBasic\tMajor\tOrtho\n"
+        }
+      ]
+    },
+    "/email": {
+      "width": 320,
+      "scrollWidth": 320,
+      "overflows": [
+        {
+          "tag": "LI",
+          "text": "Email"
+        },
+        {
+          "tag": "A",
+          "text": "Email"
+        },
+        {
+          "tag": "LI",
+          "text": "SmileStreak"
+        },
+        {
+          "tag": "A",
+          "text": "SmileStreak"
+        },
+        {
+          "tag": "LI",
+          "text": "Plan rules"
+        },
+        {
+          "tag": "A",
+          "text": "Plan rules"
+        }
+      ]
+    },
+    "/habits": {
+      "width": 320,
+      "scrollWidth": 320,
+      "overflows": [
+        {
+          "tag": "LI",
+          "text": "Email"
+        },
+        {
+          "tag": "A",
+          "text": "Email"
+        },
+        {
+          "tag": "LI",
+          "text": "SmileStreak"
+        },
+        {
+          "tag": "A",
+          "text": "SmileStreak"
+        },
+        {
+          "tag": "LI",
+          "text": "Plan rules"
+        },
+        {
+          "tag": "A",
+          "text": "Plan rules"
+        },
+        {
+          "tag": "TABLE",
+          "text": "Plan\tExpected cost next year\tSmileStreak credit\tNet\nAcme Dental Low\t$1,148.35\t\u2212$"
+        },
+        {
+          "tag": "THEAD",
+          "text": "Plan\tExpected cost next year\tSmileStreak credit\tNet\n"
+        }
+      ]
+    },
+    "webkit": "rendered"
+  },
+  "additional": {
+    "exportMismatch": {
+      "activeKind": "fastest",
+      "active": [
+        {
+          "id": "rc19",
+          "date": "2026-10-04"
+        },
+        {
+          "id": "bu19",
+          "date": "2026-10-11"
+        },
+        {
+          "id": "cr19",
+          "date": "2026-10-18"
+        },
+        {
+          "id": "cr30",
+          "date": "2026-10-04"
+        },
+        {
+          "id": "clean",
+          "date": "2026-10-04"
+        },
+        {
+          "id": "rc3",
+          "date": "2026-10-04"
+        }
+      ],
+      "card": [
+        {
+          "id": "rc19",
+          "date": "2026-10-04"
+        },
+        {
+          "id": "bu19",
+          "date": "2026-10-11"
+        },
+        {
+          "id": "cr19",
+          "date": "2027-01-04"
+        },
+        {
+          "id": "cr30",
+          "date": "2027-01-04"
+        },
+        {
+          "id": "clean",
+          "date": "2026-10-04"
+        },
+        {
+          "id": "rc3",
+          "date": "2027-01-04"
+        }
+      ]
+    },
+    "invalidShare": "Demo handoff\n\nTREATMENT HANDOFF FOR THE DENTAL OFFICE\n\nDale's treatment plan\nPrint\nRecommended order (lowest-cost order)\n#\tCDT\tProcedure\tTooth\tTarget date\n1\tD3330\tRoot canal (molar)(urgent, date set by dentist)\t#19\tOct 4, 2026\n2\tD1110\tCleaning\t\u2014\tOct 4, 2026\n3\tD2950\tCore buildup\t#19\tOct 11, 2026\n4\tD2740\tCrown (porcelain)\t#19\tJan 4, 2027\n5\tD2740\tCrown (porcelain)\t#30\tJan 4, 2027\n6\tD3330\tRoot canal (molar)(only if needed, 30% likely)\t#3\tJan 4, 2027\nQuestions from your patient\nCan the crown (porcelain) on #19 safely wait until Jan 4, 2027?\nCan the crown (porcelain) on #30 safely wait until Jan 4, 2027?\nCan the root canal (molar) on #3 safely wait until Jan 4, 2027?\n\nDates are targets chosen around the patient's annual maximum. Clinical judgment comes first: please tell the patient if any item can't safely wait. Estimate rules version PLAN-ACME-LOW-v3.\n\nHome-care summary\n\nShared by Dale \u00b7 last 30 days \u00b7 device data, not a clinical record\n\nTwice a day\n97%\nAverage session\n2:08\nSessions per day\n1.97\nPressure warnings / week\n4.9\nLast 2 weeks vs 2 before\n100% vs 93%\nSessions recorded\n59\nUp. right 28%\nUp. left 15%\nLow. left 28%\nLow. right 28%\nmirror view\n\nTalking points for the visit\n\nUpper left gets 15% of brushing time (an even split is 25%). Worth checking that area and showing technique there.\n4.9 high-pressure warnings a week. Check for gum recession or abrasion; suggest a lighter grip.\n\nEducational estimate \u2014 not insurance or tax advice.\n\nTing is a hackathon prototype. Confirm costs with your dentist and your official plan documents.",
+    "deleted": {
+      "consent": {
+        "optedIn": false,
+        "shareWithDentist": false,
+        "shareAggregateWithLincoln": false
+      },
+      "sessions": 0
+    },
+    "afterHabitReload": {
+      "consent": {
+        "optedIn": true,
+        "consentedAt": "2026-01-02",
+        "shareWithDentist": true,
+        "shareAggregateWithLincoln": true
+      },
+      "sessions": 537
+    }
+  }
+}

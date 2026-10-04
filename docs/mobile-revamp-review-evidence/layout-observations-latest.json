@@ -1,0 +1,2019 @@
+[
+  {
+    "route": "/",
+    "width": 320,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 2554,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nHi Dale\nPlan your dental care and understand what you may pay.\nYour planned care\n\n$1,752.50\n\nEstimated amount you pay across 2026 and 2027. 6 treatment items. Cheapest schedule.\n\nReview treatment and dates\nBenefits this year\n\nAcme Dental Low\nAcme Dental High\n · as of Oct 4, 2026\n\nAnnual maximum 2026\nof $1,500\n$190\nleft after scheduled work\nUsed\n$300\nScheduled\n$1,010\nRemaining\n$190\nDeductible\n$50 of $50 met\nYour FSA\nFSA balance\nSome can carry over\n$400\n88 days left (until Dec 31, 2026)\n\nYour scheduled work uses it in time.\n\nCompare next year’s plans\nAsk about your plan\nAsk\nReminders\nEmail settings\n\nGet a reminder before unused benefits expire. FSA deadlines follow your employer’s carryover or grace-period rules.\n\nNov 1\n2026\n\n2 months left to use your dental benefits\n\nYou still have $190 of annual max for 2026. They reset on Jan 1, so book now while appointments are open.\n\nOff\nDec 1\n2026\n\nLast month: $190 of annual max left\n\nYou still have $190 of annual max for 2026. After Dec 31 it's gone.\n\nOff\nRemind me\nAdd to calendar\nClaims and account activity\nBrushing rewards and privacy\nSet up your treatment plan",
+    "h1": [
+      {
+        "text": "Hi Dale",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/treatment",
+    "width": 320,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 4350,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nYour treatment\nAcme Dental Low. Estimated care across 2026 and 2027.\n\nEstimated total you pay\n\n$1,752.50\n\nChoose treatment dates\nDentist network for this plan\nTreatment items\nRoot canal (molar) on #19\nFee $1,180 · you pay $200 · dentist's deadline Nov 14, 2026\nCore buildup on #19\nFee $330 · you pay $125 · dentist's deadline Mar 31, 2027\nCrown (porcelain) on #19\nFee $1,450 · you pay $625 · dentist's deadline Mar 31, 2027\nCrown (porcelain) on #30\nFee $1,450 · you pay $600 · dentist's deadline Mar 31, 2027\nCleaning\nFee $120 · you pay $0 · dentist's deadline Jan 31, 2027\nRoot canal (molar) on #3\nOnly if needed\nFee $1,180 · you pay $675 · dentist's deadline Dec 31, 2027\nRoot canal (molar) on #19\n\nSelected item. In-network dentist.\n\nEstimated amount you pay\n\n$200\n\nDentist’s fee\n$1,180\nPlan discount\n$180\nPlan pays\n$800\nYou pay\n$200\nCost breakdown\nPrice sources\nUpdate dentist fee and insurer allowance\nChoose dates\nCheapest\n$1,752.50\nsaves $1,082.50\nLast date: Jan 4\nFastest\n$2,835\nEarliest dates\nLast date: Oct 18\nBalanced\n$1,752.50\nsaves $1,082.50\nLast date: Jan 4\nCheapest · Lowest cost after the max, deductible and FSA\n$1,752.50\nAfter FSA tax savings: $946.75\nLast planned visit: Jan 4, 2027\nVs. doing it all now: saves $1,082.50\nRoot canal (molar) on #19\n$200 if done\n\nOct 4, 2026. Your dentist set this date.\n\nDentist’s deadline: Nov 14, 2026\n\nCore buildup on #19\n$125 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCrown (porcelain) on #19\n$625 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCrown (porcelain) on #30\n$600 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCleaning\n$0 if done\nTreatment date\nApply date\n\nDentist’s deadline: Jan 31, 2027\n\nRoot canal (molar) on #3\n$675 if done\nTreatment date\nApply date\n\nDentist’s deadline: Dec 31, 2027\n\nVisual timeline (optional)\n\nShare with my dentist\nAdd a treatment plan\nBrowse procedures, including braces",
+    "h1": [
+      {
+        "text": "Your treatment",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [
+      {
+        "tag": "LABEL",
+        "text": "",
+        "w": 264.875,
+        "h": 43,
+        "size": "16px"
+      }
+    ],
+    "overflows": [
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 595
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 595
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 587
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 587
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 587
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 587
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 524.203125
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 595
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 333.5
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 366.90625
+      }
+    ]
+  },
+  {
+    "route": "/enroll",
+    "width": 320,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 3317,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nOpen enrollment for 2027\nWhich option costs you least once premiums, taxes and likely dental work are counted.\n\nRecommended plan for 2027\n\nChoose Acme Dental High and put $1,040 in your 2027 FSA\n\n$1,129.80\n\nExpected total with premiums and care after tax, across this year and 2027.\n\nAdd to calendar\nShare with my dentist\nRemind me\nPlan and date details\n\nExpected savings $1,506.80 vs keeping your plan and doing everything now.\n\nCompare options\nAcme Dental Low(current)\nPremiums after tax\n$201.60\nExpected care\n$946.75\nExpected total\n$1,148.35\nIf every maybe happens\n$1,479.10\n\n$18.55 more than Acme Dental High in an expected year.\n\nAcme Dental High\nLowest expected cost\nPremiums after tax\n$403.20\nExpected care\n$726.60\nExpected total\n$1,129.80\nIf every maybe happens\n$1,330.70\n\nLowest expected total.\n\nWaive coverage and pay yourself\nPremiums after tax\n$0\nExpected care\n$2,177.80\nExpected total\n$2,177.80\nIf every maybe happens\n$2,756\n\n$1,048 more than Acme Dental High in an expected year.\n\nYour dentist's membership plan\nPremiums after tax\n$399\nExpected care\n$1,769.74\nExpected total\n$2,168.74\nIf every maybe happens\n$2,631.30\n\n$1,038.94 more than Acme Dental High in an expected year.\n\nCare covers the rest of this year (on your current plan) and next year, each option scheduled its cheapest way, after FSA tax savings.\n\nYou ran out of your max in 2025. Acme Dental High's $2,000 max would have covered up to $500 more.\nAbove a 20% chance of the root canal on #3, Acme Dental High pays for itself.\n\"Maybe\" work\nRoot canal (molar) on #3\n30% likely\n\nTipping point: Above a 20% chance of the root canal on #3, Acme Dental High pays for itself.\n\nFSA\n\nRecommended FSA election for 2027\n\n$1,040\n\nExpected out-of-pocket care in 2027\n$1,113\nAlready covered by money carried in\n$75\nIRS limit (not yet published)\n$3,400\nThis year's balance left after care\n$75\nThis year's money must be spent by\nDec 31, 2026\n\nSized to your expected out-of-pocket on the recommended plan and schedule, rounded up to $10, so little is left to forfeit.",
+    "h1": [
+      {
+        "text": "Open enrollment for 2027",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [
+      {
+        "tag": "LABEL",
+        "text": "Root canal (molar) on #3",
+        "w": 177.28125,
+        "h": 24,
+        "size": "16px"
+      }
+    ],
+    "overflows": []
+  },
+  {
+    "route": "/dentists",
+    "width": 320,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 4518,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nCompare dentists\nCompare the costs of your planned care near Greensboro, NC 27401.\n\nProvider prices and participation shown here are sample comparisons. Confirm a real dentist’s network status with your insurer and request a written quote.\n\nEnter your dentist’s quote\nCurrent dentist: Fisher Park Dental Studio\nFisher Park Dental Studio as an in-network dentist\n$1,752.50\nSame fees, out of network\n$2,274.60\n+$522.10 mostly Balance billing\nKeep this dentist first in comparisons\nProvider comparisons\nList\nMap\nSedgefield Smile Center\n\nSedgefield · 7.3 miles · In-network scenario\n\nEstimated amount you pay\n$1,468.45\nCompare network scenarios\nStarmount Dental Group\n\nStarmount · 4.9 miles · In-network scenario\n\nEstimated amount you pay\n$1,534\nCompare network scenarios\nGlenwood Community Dental\n\nGlenwood · 1.9 miles · In-network scenario\n\nEstimated amount you pay\n$1,577.70\nCompare network scenarios\nLindley Park Dental Care\n\nLindley Park · 2.1 miles · In-network scenario\n\nEstimated amount you pay\n$1,621.40\nCompare network scenarios\nCollege Hill Dental\n\nCollege Hill · 1.1 miles · In-network scenario\n\nEstimated amount you pay\n$1,708.80\nCompare network scenarios\nFisher Park Dental Studio\n\nFisher Park · 0.8 miles · In-network scenario\n\nEstimated amount you pay\n$1,752.50\nCompare network scenarios\nGuilford Hills Dental\n\nGuilford Hills · 6 miles · In-network scenario\n\nEstimated amount you pay\n$1,796.20\nCompare network scenarios\nBattleground Family Dentistry\n\nBattleground · 3.6 miles · In-network scenario\n\nEstimated amount you pay\n$1,861.75\n\nNot accepting new patients in this sample.\n\nCompare network scenarios\nWestover Terrace Dental\n\nWestover · 2.4 miles · Out-of-network scenario\n\nEstimated amount you pay\n$2,665.32\nCompare network scenarios\nSummit Avenue Smiles\n\nSummit Ave · 1.4 miles · Out-of-network scenario\n\nEstimated amount you pay\n$2,860.68\nCompare network scenarios\nHamilton Lakes Dentistry\n\nHamilton Lakes · 5.2 miles · Out-of-network scenario\n\nEstimated amount you pay\n$3,349.08\nCompare network scenarios\nIrving Park Dental Arts\n\nIrving Park · 2.7 miles · Out-of-network scenario\n\nEstimated amount you pay\n$3,984\nCompare network scenarios\nPublished clinic fees nearby\n\nCleveland Avenue Dental Center in Winston-Salem publishes procedure charges. They may differ from your dentist’s fees, and do not establish your insurer’s allowance.\n\nClinic details and eligibilityCall the clinic: 336-703-3090Browse published procedure references",
+    "h1": [
+      {
+        "text": "Compare dentists",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/email",
+    "width": 320,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 1608,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nEmail\nTing works over email: send it anything about your dental care; get a monthly overview and urgent alerts.\nYour email and alerts\n\nEmail anything about your dental care to ting-dental@agentmail.to: EOBs, bills, treatment plans, notes from your dentist. Ting reads it, updates your record, plans any work and replies.\nDemo: email isn’t connected here, so messages show under “What Ting sent”.\n\nYour email\nMonthly overview (1st of the month)\nUrgent alerts right away\nPrivate mode\nEmails only say there’s an update; the details stay in the app.\nSave\nYour forwarding address\n\nFor bills and receipts your insurer can’t see. Forward an email, or set a filter in your own mail app. Ting never reads your inbox.\n\nWhat Ting read\n\nNothing yet. Email Ting a document and it shows up here.\n\nWhat Ting sent\n\nNo emails sent yet.",
+    "h1": [
+      {
+        "text": "Email",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/habits",
+    "width": 320,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 4967,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nSmileStreak\nEarn credits for good brushing habits. Rewards only: your premium never goes up.\nBrush\n\nConnect a brush, then brush. Each area of your mouth lights up as you go; the session is checked and saved when you stop.\n\nYour brush\nconnected\nOral-B iO Series 5 (demo)\nBrush to connect\n\nOral-B smart brush\n\nSmart, Genius and iO brushes over Bluetooth. No pairing needed.\n\nConnect\n\nDIY clip\n\nA motion sensor that clips onto any toothbrush and sends sessions over Wi-Fi.\n\nConnect\nRewards\n$95\nearned of $120 for 2026\n\n$25 from cleanings · $70 from brushing\n\nThis month: 3 good days of 3 so far · 25 needed by month end · on track\n\nCleaning verified from your insurance claim\nApr 10, 2026 · Claim on 2026-04-10\n+$25\nBrushing goal met in January\nJan 31, 2026 · Device summaries\n+$10\nBrushing goal met in February\nFeb 28, 2026 · Device summaries\n+$10\nBrushing goal met in March\nMar 31, 2026 · Device summaries\n+$10\nBrushing goal met in April\nApr 30, 2026 · Device summaries\n+$10\nBrushing goal met in May\nMay 31, 2026 · Device summaries\n+$10\nBrushing goal met in June\nJun 30, 2026 · Device summaries\n+$10\nBrushing goal met in July\nJul 31, 2026 · Device summaries\n+$10\n\nEarn $25 per cleaning (up to 2) and $10 per month you brush twice a day on 80% of days (up to 7 months). Paid next plan year as an employer-funded wellness deposit to your FSA/HSA, or added to your plan's rollover balance.\n\nNo smart brush? Your dentist can confirm good home care at a cleaning. That earns the full brushing portion ($70), so nobody needs a device to qualify.\n\nStreak\n25\nday streak · 33 good days in the last 35\n2+ good sessions\n1 session\nnone\nnot collected\nPlan costs with your credit\n\nExpected premiums and care after tax for this year and next year.\n\nAcme Dental Low\nExpected total\n$1,148.35\nBrushing credit\n−$95\nTotal after credit\n$1,053.35\nAcme Dental High\nExpected total\n$1,129.80\nBrushing credit\n−$95\nTotal after credit\n$1,034.80\n\nLowest expected cost\n\nWaive coverage and pay yourself\nExpected total\n$2,177.80\nBrushing credit\n−$95\nTotal after credit\n$2,082.80\nYour dentist's membership plan\nExpected total\n$2,168.74\nBrushing credit\n−$95\nTotal after credit\n$2,073.74\n\nThe credit is the same on every plan, so it lowers your cost without changing which plan is best for you.\n\nDiscuss treatment with your dentist\n\nYour brushing record supports a conversation with your dentist. It does not predict whether you need a filling or root canal.\n\nReview uncertain treatment costs\nYour data, your call\nYou\nEvery session, your streak, your credits.\nYour dentist\nA 30-day summary on the visit handoff page, only if you turn it on below.\nNever sees: Individual sessions or times.\nYour insurer\nYour credit total (to pay it) and, if you allow, counts in groups of 20 or more.\nNever sees: Sessions, times or device IDs. Never used for pricing, underwriting or claim decisions.\nYour employer\nThe credit amount to deposit to your FSA/HSA.\nNever sees: Any brushing data.\nShare a 30-day summary with my dentist\nInclude me in your insurer's group counts (20+ people)\n\nCollecting since Jan 2, 2026 · 537 sessions stored.\n\nLeave and delete my data\nWhat your dentist sees\nShared on your visit handoff page\nWho benefits from this data\nYou · your dentist · your insurer",
+    "h1": [
+      {
+        "text": "SmileStreak",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [
+      {
+        "tag": "A",
+        "text": "",
+        "w": 154.53125,
+        "h": 19,
+        "size": "16px",
+        "type": ""
+      }
+    ],
+    "overflows": []
+  },
+  {
+    "route": "/plan",
+    "width": 320,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 2329,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nPlan rules\nThe rules every estimate uses, read from your plan's own documents.\nYour plan this year\nAcme Dental Low\nAcme Dental High\nYour plan's rules\n\nAcme Dental Low\n\nPreventive: plan pays\nIn-network 100%\nOut-of-network 100%\nBasic: plan pays\nIn-network 80%\nOut-of-network 80%\nMajor: plan pays\nIn-network 50%\nOut-of-network 50%\nOrthodontics: plan pays\nIn-network 0%\nOut-of-network 0%\n\nOrthodontic lifetime maximum: $0. Confirm age eligibility and any installment rules in your plan document.\n\nAnnual max $1,500; deductible $50 on basic and major care. Plan Maximums, §4\nPremium $24 a month, pre-tax.\nOut of network: 80th percentile of usual and customary fees. Out-of-Network Benefits, §3\nMax Rollover: plan payments of $750 or less in a year add $375 (+$125 if all in network) to next year's max, deposited on day 65, up to $1,500. Max Rollover, §5\nBack-tooth tooth-colored fillings are paid at the silver-filling rate. Limitations, §8.3\nDeductible paid in October to December also counts toward next year. Schedule of Benefits, §1.4\nExams: 2 per calendar year\nCleanings: 2 per calendar year\nBitewing X-rays: 1 per calendar year\nFull-mouth or panoramic X-rays: 1 per 60 months\nCrowns and bridges: 1 per tooth per 60 months\nBuildups and posts: 1 per tooth per 60 months\nScaling and root planing: 1 per quadrant per 24 months\nNight guards: 1 per 36 months\nLoad a plan document\n\nUpload your benefits summary, review the coverage and fill in anything missing before using it for an estimate.\n\nUpload benefits summary\nScan insurance card\nSample benefits summary (PDF)",
+    "h1": [
+      {
+        "text": "Plan rules",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/onboarding",
+    "width": 320,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 844,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nGet started\nBring your dentist’s recommendations and any quoted fees.\nStart with one person’s care\n\nTing estimates treatment for one person at a time. Family deductibles and combined family care need confirmation with your insurer.\n\nYou can type a treatment plan, upload a document, or browse procedures including braces. No treatment is added automatically.\n\nAdd my treatment plan",
+    "h1": [
+      {
+        "text": "Get started",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/share/not-a-real-token",
+    "width": 320,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 844,
+    "text": "Shared plan unavailable\n\nThis link is invalid, expired or could not be loaded. Ask the person who shared it for a new link.\n\nTry againTing home",
+    "h1": [
+      {
+        "text": "Shared plan unavailable",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/try",
+    "width": 320,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 844,
+    "text": "Try Ting on your phone\n\nExplore sample treatment costs and change dates to compare estimates.\n\nhttp://127.0.0.1:5173/?persona=dale&demo=1\n\nThis opens the sample account with illustrative fees.\n\nOpen the sample app",
+    "h1": [
+      {
+        "text": "Try Ting on your phone",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/auth/callback",
+    "width": 320,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 844,
+    "text": "Sign-in was cancelled.\n\nBack to Ting",
+    "h1": [],
+    "small": [
+      {
+        "tag": "A",
+        "text": "Back to Ting",
+        "w": 89.03125,
+        "h": 24,
+        "size": "16px",
+        "type": ""
+      }
+    ],
+    "overflows": []
+  },
+  {
+    "route": "/",
+    "width": 375,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 375,
+    "height": 2341,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nHi Dale\nPlan your dental care and understand what you may pay.\nYour planned care\n\n$1,752.50\n\nEstimated amount you pay across 2026 and 2027. 6 treatment items. Cheapest schedule.\n\nReview treatment and dates\nBenefits this year\n\nAcme Dental Low\nAcme Dental High\n · as of Oct 4, 2026\n\nAnnual maximum 2026\nof $1,500\n$190\nleft after scheduled work\nUsed\n$300\nScheduled\n$1,010\nRemaining\n$190\nDeductible\n$50 of $50 met\nYour FSA\nFSA balance\nSome can carry over\n$400\n88 days left (until Dec 31, 2026)\n\nYour scheduled work uses it in time.\n\nCompare next year’s plans\nAsk about your plan\nAsk\nReminders\nEmail settings\n\nGet a reminder before unused benefits expire. FSA deadlines follow your employer’s carryover or grace-period rules.\n\nNov 1\n2026\n\n2 months left to use your dental benefits\n\nYou still have $190 of annual max for 2026. They reset on Jan 1, so book now while appointments are open.\n\nOff\nDec 1\n2026\n\nLast month: $190 of annual max left\n\nYou still have $190 of annual max for 2026. After Dec 31 it's gone.\n\nOff\nRemind me\nAdd to calendar\nClaims and account activity\nBrushing rewards and privacy\nSet up your treatment plan",
+    "h1": [
+      {
+        "text": "Hi Dale",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/treatment",
+    "width": 375,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 375,
+    "height": 4312,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nYour treatment\nAcme Dental Low. Estimated care across 2026 and 2027.\n\nEstimated total you pay\n\n$1,752.50\n\nChoose treatment dates\nDentist network for this plan\nTreatment items\nRoot canal (molar) on #19\nFee $1,180 · you pay $200 · dentist's deadline Nov 14, 2026\nCore buildup on #19\nFee $330 · you pay $125 · dentist's deadline Mar 31, 2027\nCrown (porcelain) on #19\nFee $1,450 · you pay $625 · dentist's deadline Mar 31, 2027\nCrown (porcelain) on #30\nFee $1,450 · you pay $600 · dentist's deadline Mar 31, 2027\nCleaning\nFee $120 · you pay $0 · dentist's deadline Jan 31, 2027\nRoot canal (molar) on #3\nOnly if needed\nFee $1,180 · you pay $675 · dentist's deadline Dec 31, 2027\nRoot canal (molar) on #19\n\nSelected item. In-network dentist.\n\nEstimated amount you pay\n\n$200\n\nDentist’s fee\n$1,180\nPlan discount\n$180\nPlan pays\n$800\nYou pay\n$200\nCost breakdown\nPrice sources\nUpdate dentist fee and insurer allowance\nChoose dates\nCheapest\n$1,752.50\nsaves $1,082.50\nLast date: Jan 4\nFastest\n$2,835\nEarliest dates\nLast date: Oct 18\nBalanced\n$1,752.50\nsaves $1,082.50\nLast date: Jan 4\nCheapest · Lowest cost after the max, deductible and FSA\n$1,752.50\nAfter FSA tax savings: $946.75\nLast planned visit: Jan 4, 2027\nVs. doing it all now: saves $1,082.50\nRoot canal (molar) on #19\n$200 if done\n\nOct 4, 2026. Your dentist set this date.\n\nDentist’s deadline: Nov 14, 2026\n\nCore buildup on #19\n$125 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCrown (porcelain) on #19\n$625 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCrown (porcelain) on #30\n$600 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCleaning\n$0 if done\nTreatment date\nApply date\n\nDentist’s deadline: Jan 31, 2027\n\nRoot canal (molar) on #3\n$675 if done\nTreatment date\nApply date\n\nDentist’s deadline: Dec 31, 2027\n\nVisual timeline (optional)\n\nShare with my dentist\nAdd a treatment plan\nBrowse procedures, including braces",
+    "h1": [
+      {
+        "text": "Your treatment",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [
+      {
+        "tag": "LABEL",
+        "text": "",
+        "w": 325.828125,
+        "h": 43,
+        "size": "16px"
+      }
+    ],
+    "overflows": [
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 595
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 595
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 587
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 587
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 587
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 587
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 524.203125
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 595
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 397.96875
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 440.3125
+      }
+    ]
+  },
+  {
+    "route": "/enroll",
+    "width": 375,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 375,
+    "height": 3009,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nOpen enrollment for 2027\nWhich option costs you least once premiums, taxes and likely dental work are counted.\n\nRecommended plan for 2027\n\nChoose Acme Dental High and put $1,040 in your 2027 FSA\n\n$1,129.80\n\nExpected total with premiums and care after tax, across this year and 2027.\n\nAdd to calendar\nShare with my dentist\nRemind me\nPlan and date details\n\nExpected savings $1,506.80 vs keeping your plan and doing everything now.\n\nCompare options\nAcme Dental Low(current)\nPremiums after tax\n$201.60\nExpected care\n$946.75\nExpected total\n$1,148.35\nIf every maybe happens\n$1,479.10\n\n$18.55 more than Acme Dental High in an expected year.\n\nAcme Dental High\nLowest expected cost\nPremiums after tax\n$403.20\nExpected care\n$726.60\nExpected total\n$1,129.80\nIf every maybe happens\n$1,330.70\n\nLowest expected total.\n\nWaive coverage and pay yourself\nPremiums after tax\n$0\nExpected care\n$2,177.80\nExpected total\n$2,177.80\nIf every maybe happens\n$2,756\n\n$1,048 more than Acme Dental High in an expected year.\n\nYour dentist's membership plan\nPremiums after tax\n$399\nExpected care\n$1,769.74\nExpected total\n$2,168.74\nIf every maybe happens\n$2,631.30\n\n$1,038.94 more than Acme Dental High in an expected year.\n\nCare covers the rest of this year (on your current plan) and next year, each option scheduled its cheapest way, after FSA tax savings.\n\nYou ran out of your max in 2025. Acme Dental High's $2,000 max would have covered up to $500 more.\nAbove a 20% chance of the root canal on #3, Acme Dental High pays for itself.\n\"Maybe\" work\nRoot canal (molar) on #3\n30% likely\n\nTipping point: Above a 20% chance of the root canal on #3, Acme Dental High pays for itself.\n\nFSA\n\nRecommended FSA election for 2027\n\n$1,040\n\nExpected out-of-pocket care in 2027\n$1,113\nAlready covered by money carried in\n$75\nIRS limit (not yet published)\n$3,400\nThis year's balance left after care\n$75\nThis year's money must be spent by\nDec 31, 2026\n\nSized to your expected out-of-pocket on the recommended plan and schedule, rounded up to $10, so little is left to forfeit.",
+    "h1": [
+      {
+        "text": "Open enrollment for 2027",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [
+      {
+        "tag": "LABEL",
+        "text": "Root canal (molar) on #3",
+        "w": 177.28125,
+        "h": 24,
+        "size": "16px"
+      }
+    ],
+    "overflows": []
+  },
+  {
+    "route": "/dentists",
+    "width": 375,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 375,
+    "height": 4010,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nCompare dentists\nCompare the costs of your planned care near Greensboro, NC 27401.\n\nProvider prices and participation shown here are sample comparisons. Confirm a real dentist’s network status with your insurer and request a written quote.\n\nEnter your dentist’s quote\nCurrent dentist: Fisher Park Dental Studio\nFisher Park Dental Studio as an in-network dentist\n$1,752.50\nSame fees, out of network\n$2,274.60\n+$522.10 mostly Balance billing\nKeep this dentist first in comparisons\nProvider comparisons\nList\nMap\nSedgefield Smile Center\n\nSedgefield · 7.3 miles · In-network scenario\n\nEstimated amount you pay\n$1,468.45\nCompare network scenarios\nStarmount Dental Group\n\nStarmount · 4.9 miles · In-network scenario\n\nEstimated amount you pay\n$1,534\nCompare network scenarios\nGlenwood Community Dental\n\nGlenwood · 1.9 miles · In-network scenario\n\nEstimated amount you pay\n$1,577.70\nCompare network scenarios\nLindley Park Dental Care\n\nLindley Park · 2.1 miles · In-network scenario\n\nEstimated amount you pay\n$1,621.40\nCompare network scenarios\nCollege Hill Dental\n\nCollege Hill · 1.1 miles · In-network scenario\n\nEstimated amount you pay\n$1,708.80\nCompare network scenarios\nFisher Park Dental Studio\n\nFisher Park · 0.8 miles · In-network scenario\n\nEstimated amount you pay\n$1,752.50\nCompare network scenarios\nGuilford Hills Dental\n\nGuilford Hills · 6 miles · In-network scenario\n\nEstimated amount you pay\n$1,796.20\nCompare network scenarios\nBattleground Family Dentistry\n\nBattleground · 3.6 miles · In-network scenario\n\nEstimated amount you pay\n$1,861.75\n\nNot accepting new patients in this sample.\n\nCompare network scenarios\nWestover Terrace Dental\n\nWestover · 2.4 miles · Out-of-network scenario\n\nEstimated amount you pay\n$2,665.32\nCompare network scenarios\nSummit Avenue Smiles\n\nSummit Ave · 1.4 miles · Out-of-network scenario\n\nEstimated amount you pay\n$2,860.68\nCompare network scenarios\nHamilton Lakes Dentistry\n\nHamilton Lakes · 5.2 miles · Out-of-network scenario\n\nEstimated amount you pay\n$3,349.08\nCompare network scenarios\nIrving Park Dental Arts\n\nIrving Park · 2.7 miles · Out-of-network scenario\n\nEstimated amount you pay\n$3,984\nCompare network scenarios\nPublished clinic fees nearby\n\nCleveland Avenue Dental Center in Winston-Salem publishes procedure charges. They may differ from your dentist’s fees, and do not establish your insurer’s allowance.\n\nClinic details and eligibilityCall the clinic: 336-703-3090Browse published procedure references",
+    "h1": [
+      {
+        "text": "Compare dentists",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/email",
+    "width": 375,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 375,
+    "height": 1540,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nEmail\nTing works over email: send it anything about your dental care; get a monthly overview and urgent alerts.\nYour email and alerts\n\nEmail anything about your dental care to ting-dental@agentmail.to: EOBs, bills, treatment plans, notes from your dentist. Ting reads it, updates your record, plans any work and replies.\nDemo: email isn’t connected here, so messages show under “What Ting sent”.\n\nYour email\nMonthly overview (1st of the month)\nUrgent alerts right away\nPrivate mode\nEmails only say there’s an update; the details stay in the app.\nSave\nYour forwarding address\n\nFor bills and receipts your insurer can’t see. Forward an email, or set a filter in your own mail app. Ting never reads your inbox.\n\nWhat Ting read\n\nNothing yet. Email Ting a document and it shows up here.\n\nWhat Ting sent\n\nNo emails sent yet.",
+    "h1": [
+      {
+        "text": "Email",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/habits",
+    "width": 375,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 375,
+    "height": 4718,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nSmileStreak\nEarn credits for good brushing habits. Rewards only: your premium never goes up.\nBrush\n\nConnect a brush, then brush. Each area of your mouth lights up as you go; the session is checked and saved when you stop.\n\nYour brush\nconnected\nOral-B iO Series 5 (demo)\nBrush to connect\n\nOral-B smart brush\n\nSmart, Genius and iO brushes over Bluetooth. No pairing needed.\n\nConnect\n\nDIY clip\n\nA motion sensor that clips onto any toothbrush and sends sessions over Wi-Fi.\n\nConnect\nRewards\n$95\nearned of $120 for 2026\n\n$25 from cleanings · $70 from brushing\n\nThis month: 3 good days of 3 so far · 25 needed by month end · on track\n\nCleaning verified from your insurance claim\nApr 10, 2026 · Claim on 2026-04-10\n+$25\nBrushing goal met in January\nJan 31, 2026 · Device summaries\n+$10\nBrushing goal met in February\nFeb 28, 2026 · Device summaries\n+$10\nBrushing goal met in March\nMar 31, 2026 · Device summaries\n+$10\nBrushing goal met in April\nApr 30, 2026 · Device summaries\n+$10\nBrushing goal met in May\nMay 31, 2026 · Device summaries\n+$10\nBrushing goal met in June\nJun 30, 2026 · Device summaries\n+$10\nBrushing goal met in July\nJul 31, 2026 · Device summaries\n+$10\n\nEarn $25 per cleaning (up to 2) and $10 per month you brush twice a day on 80% of days (up to 7 months). Paid next plan year as an employer-funded wellness deposit to your FSA/HSA, or added to your plan's rollover balance.\n\nNo smart brush? Your dentist can confirm good home care at a cleaning. That earns the full brushing portion ($70), so nobody needs a device to qualify.\n\nStreak\n25\nday streak · 33 good days in the last 35\n2+ good sessions\n1 session\nnone\nnot collected\nPlan costs with your credit\n\nExpected premiums and care after tax for this year and next year.\n\nAcme Dental Low\nExpected total\n$1,148.35\nBrushing credit\n−$95\nTotal after credit\n$1,053.35\nAcme Dental High\nExpected total\n$1,129.80\nBrushing credit\n−$95\nTotal after credit\n$1,034.80\n\nLowest expected cost\n\nWaive coverage and pay yourself\nExpected total\n$2,177.80\nBrushing credit\n−$95\nTotal after credit\n$2,082.80\nYour dentist's membership plan\nExpected total\n$2,168.74\nBrushing credit\n−$95\nTotal after credit\n$2,073.74\n\nThe credit is the same on every plan, so it lowers your cost without changing which plan is best for you.\n\nDiscuss treatment with your dentist\n\nYour brushing record supports a conversation with your dentist. It does not predict whether you need a filling or root canal.\n\nReview uncertain treatment costs\nYour data, your call\nYou\nEvery session, your streak, your credits.\nYour dentist\nA 30-day summary on the visit handoff page, only if you turn it on below.\nNever sees: Individual sessions or times.\nYour insurer\nYour credit total (to pay it) and, if you allow, counts in groups of 20 or more.\nNever sees: Sessions, times or device IDs. Never used for pricing, underwriting or claim decisions.\nYour employer\nThe credit amount to deposit to your FSA/HSA.\nNever sees: Any brushing data.\nShare a 30-day summary with my dentist\nInclude me in your insurer's group counts (20+ people)\n\nCollecting since Jan 2, 2026 · 537 sessions stored.\n\nLeave and delete my data\nWhat your dentist sees\nShared on your visit handoff page\nWho benefits from this data\nYou · your dentist · your insurer",
+    "h1": [
+      {
+        "text": "SmileStreak",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [
+      {
+        "tag": "A",
+        "text": "",
+        "w": 276.265625,
+        "h": 43,
+        "size": "16px",
+        "type": ""
+      }
+    ],
+    "overflows": []
+  },
+  {
+    "route": "/plan",
+    "width": 375,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 375,
+    "height": 2213,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nPlan rules\nThe rules every estimate uses, read from your plan's own documents.\nYour plan this year\nAcme Dental Low\nAcme Dental High\nYour plan's rules\n\nAcme Dental Low\n\nPreventive: plan pays\nIn-network 100%\nOut-of-network 100%\nBasic: plan pays\nIn-network 80%\nOut-of-network 80%\nMajor: plan pays\nIn-network 50%\nOut-of-network 50%\nOrthodontics: plan pays\nIn-network 0%\nOut-of-network 0%\n\nOrthodontic lifetime maximum: $0. Confirm age eligibility and any installment rules in your plan document.\n\nAnnual max $1,500; deductible $50 on basic and major care. Plan Maximums, §4\nPremium $24 a month, pre-tax.\nOut of network: 80th percentile of usual and customary fees. Out-of-Network Benefits, §3\nMax Rollover: plan payments of $750 or less in a year add $375 (+$125 if all in network) to next year's max, deposited on day 65, up to $1,500. Max Rollover, §5\nBack-tooth tooth-colored fillings are paid at the silver-filling rate. Limitations, §8.3\nDeductible paid in October to December also counts toward next year. Schedule of Benefits, §1.4\nExams: 2 per calendar year\nCleanings: 2 per calendar year\nBitewing X-rays: 1 per calendar year\nFull-mouth or panoramic X-rays: 1 per 60 months\nCrowns and bridges: 1 per tooth per 60 months\nBuildups and posts: 1 per tooth per 60 months\nScaling and root planing: 1 per quadrant per 24 months\nNight guards: 1 per 36 months\nLoad a plan document\n\nUpload your benefits summary, review the coverage and fill in anything missing before using it for an estimate.\n\nUpload benefits summary\nScan insurance card\nSample benefits summary (PDF)",
+    "h1": [
+      {
+        "text": "Plan rules",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/onboarding",
+    "width": 375,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 375,
+    "height": 844,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nGet started\nBring your dentist’s recommendations and any quoted fees.\nStart with one person’s care\n\nTing estimates treatment for one person at a time. Family deductibles and combined family care need confirmation with your insurer.\n\nYou can type a treatment plan, upload a document, or browse procedures including braces. No treatment is added automatically.\n\nAdd my treatment plan",
+    "h1": [
+      {
+        "text": "Get started",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/share/not-a-real-token",
+    "width": 375,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 375,
+    "height": 844,
+    "text": "Shared plan unavailable\n\nThis link is invalid, expired or could not be loaded. Ask the person who shared it for a new link.\n\nTry againTing home",
+    "h1": [
+      {
+        "text": "Shared plan unavailable",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/try",
+    "width": 375,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 375,
+    "height": 844,
+    "text": "Try Ting on your phone\n\nExplore sample treatment costs and change dates to compare estimates.\n\nhttp://127.0.0.1:5173/?persona=dale&demo=1\n\nThis opens the sample account with illustrative fees.\n\nOpen the sample app",
+    "h1": [
+      {
+        "text": "Try Ting on your phone",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/auth/callback",
+    "width": 375,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 375,
+    "height": 844,
+    "text": "Sign-in was cancelled.\n\nBack to Ting",
+    "h1": [],
+    "small": [
+      {
+        "tag": "A",
+        "text": "Back to Ting",
+        "w": 89.03125,
+        "h": 24,
+        "size": "16px",
+        "type": ""
+      }
+    ],
+    "overflows": []
+  },
+  {
+    "route": "/",
+    "width": 390,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 2321,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nHi Dale\nPlan your dental care and understand what you may pay.\nYour planned care\n\n$1,752.50\n\nEstimated amount you pay across 2026 and 2027. 6 treatment items. Cheapest schedule.\n\nReview treatment and dates\nBenefits this year\n\nAcme Dental Low\nAcme Dental High\n · as of Oct 4, 2026\n\nAnnual maximum 2026\nof $1,500\n$190\nleft after scheduled work\nUsed\n$300\nScheduled\n$1,010\nRemaining\n$190\nDeductible\n$50 of $50 met\nYour FSA\nFSA balance\nSome can carry over\n$400\n88 days left (until Dec 31, 2026)\n\nYour scheduled work uses it in time.\n\nCompare next year’s plans\nAsk about your plan\nAsk\nReminders\nEmail settings\n\nGet a reminder before unused benefits expire. FSA deadlines follow your employer’s carryover or grace-period rules.\n\nNov 1\n2026\n\n2 months left to use your dental benefits\n\nYou still have $190 of annual max for 2026. They reset on Jan 1, so book now while appointments are open.\n\nOff\nDec 1\n2026\n\nLast month: $190 of annual max left\n\nYou still have $190 of annual max for 2026. After Dec 31 it's gone.\n\nOff\nRemind me\nAdd to calendar\nClaims and account activity\nBrushing rewards and privacy\nSet up your treatment plan",
+    "h1": [
+      {
+        "text": "Hi Dale",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/treatment",
+    "width": 390,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 4292,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nYour treatment\nAcme Dental Low. Estimated care across 2026 and 2027.\n\nEstimated total you pay\n\n$1,752.50\n\nChoose treatment dates\nDentist network for this plan\nTreatment items\nRoot canal (molar) on #19\nFee $1,180 · you pay $200 · dentist's deadline Nov 14, 2026\nCore buildup on #19\nFee $330 · you pay $125 · dentist's deadline Mar 31, 2027\nCrown (porcelain) on #19\nFee $1,450 · you pay $625 · dentist's deadline Mar 31, 2027\nCrown (porcelain) on #30\nFee $1,450 · you pay $600 · dentist's deadline Mar 31, 2027\nCleaning\nFee $120 · you pay $0 · dentist's deadline Jan 31, 2027\nRoot canal (molar) on #3\nOnly if needed\nFee $1,180 · you pay $675 · dentist's deadline Dec 31, 2027\nRoot canal (molar) on #19\n\nSelected item. In-network dentist.\n\nEstimated amount you pay\n\n$200\n\nDentist’s fee\n$1,180\nPlan discount\n$180\nPlan pays\n$800\nYou pay\n$200\nCost breakdown\nPrice sources\nUpdate dentist fee and insurer allowance\nChoose dates\nCheapest\n$1,752.50\nsaves $1,082.50\nLast date: Jan 4\nFastest\n$2,835\nEarliest dates\nLast date: Oct 18\nBalanced\n$1,752.50\nsaves $1,082.50\nLast date: Jan 4\nCheapest · Lowest cost after the max, deductible and FSA\n$1,752.50\nAfter FSA tax savings: $946.75\nLast planned visit: Jan 4, 2027\nVs. doing it all now: saves $1,082.50\nRoot canal (molar) on #19\n$200 if done\n\nOct 4, 2026. Your dentist set this date.\n\nDentist’s deadline: Nov 14, 2026\n\nCore buildup on #19\n$125 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCrown (porcelain) on #19\n$625 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCrown (porcelain) on #30\n$600 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCleaning\n$0 if done\nTreatment date\nApply date\n\nDentist’s deadline: Jan 31, 2027\n\nRoot canal (molar) on #3\n$675 if done\nTreatment date\nApply date\n\nDentist’s deadline: Dec 31, 2027\n\nVisual timeline (optional)\n\nShare with my dentist\nAdd a treatment plan\nBrowse procedures, including braces",
+    "h1": [
+      {
+        "text": "Your treatment",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [
+      {
+        "tag": "LABEL",
+        "text": "",
+        "w": 325.828125,
+        "h": 43,
+        "size": "16px"
+      }
+    ],
+    "overflows": [
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 599
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 599
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 591
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 591
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 591
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 591
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 528.203125
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 599
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 401.96875
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 444.3125
+      }
+    ]
+  },
+  {
+    "route": "/enroll",
+    "width": 390,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 2989,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nOpen enrollment for 2027\nWhich option costs you least once premiums, taxes and likely dental work are counted.\n\nRecommended plan for 2027\n\nChoose Acme Dental High and put $1,040 in your 2027 FSA\n\n$1,129.80\n\nExpected total with premiums and care after tax, across this year and 2027.\n\nAdd to calendar\nShare with my dentist\nRemind me\nPlan and date details\n\nExpected savings $1,506.80 vs keeping your plan and doing everything now.\n\nCompare options\nAcme Dental Low(current)\nPremiums after tax\n$201.60\nExpected care\n$946.75\nExpected total\n$1,148.35\nIf every maybe happens\n$1,479.10\n\n$18.55 more than Acme Dental High in an expected year.\n\nAcme Dental High\nLowest expected cost\nPremiums after tax\n$403.20\nExpected care\n$726.60\nExpected total\n$1,129.80\nIf every maybe happens\n$1,330.70\n\nLowest expected total.\n\nWaive coverage and pay yourself\nPremiums after tax\n$0\nExpected care\n$2,177.80\nExpected total\n$2,177.80\nIf every maybe happens\n$2,756\n\n$1,048 more than Acme Dental High in an expected year.\n\nYour dentist's membership plan\nPremiums after tax\n$399\nExpected care\n$1,769.74\nExpected total\n$2,168.74\nIf every maybe happens\n$2,631.30\n\n$1,038.94 more than Acme Dental High in an expected year.\n\nCare covers the rest of this year (on your current plan) and next year, each option scheduled its cheapest way, after FSA tax savings.\n\nYou ran out of your max in 2025. Acme Dental High's $2,000 max would have covered up to $500 more.\nAbove a 20% chance of the root canal on #3, Acme Dental High pays for itself.\n\"Maybe\" work\nRoot canal (molar) on #3\n30% likely\n\nTipping point: Above a 20% chance of the root canal on #3, Acme Dental High pays for itself.\n\nFSA\n\nRecommended FSA election for 2027\n\n$1,040\n\nExpected out-of-pocket care in 2027\n$1,113\nAlready covered by money carried in\n$75\nIRS limit (not yet published)\n$3,400\nThis year's balance left after care\n$75\nThis year's money must be spent by\nDec 31, 2026\n\nSized to your expected out-of-pocket on the recommended plan and schedule, rounded up to $10, so little is left to forfeit.",
+    "h1": [
+      {
+        "text": "Open enrollment for 2027",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [
+      {
+        "tag": "LABEL",
+        "text": "Root canal (molar) on #3",
+        "w": 177.28125,
+        "h": 24,
+        "size": "16px"
+      }
+    ],
+    "overflows": []
+  },
+  {
+    "route": "/dentists",
+    "width": 390,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 3990,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nCompare dentists\nCompare the costs of your planned care near Greensboro, NC 27401.\n\nProvider prices and participation shown here are sample comparisons. Confirm a real dentist’s network status with your insurer and request a written quote.\n\nEnter your dentist’s quote\nCurrent dentist: Fisher Park Dental Studio\nFisher Park Dental Studio as an in-network dentist\n$1,752.50\nSame fees, out of network\n$2,274.60\n+$522.10 mostly Balance billing\nKeep this dentist first in comparisons\nProvider comparisons\nList\nMap\nSedgefield Smile Center\n\nSedgefield · 7.3 miles · In-network scenario\n\nEstimated amount you pay\n$1,468.45\nCompare network scenarios\nStarmount Dental Group\n\nStarmount · 4.9 miles · In-network scenario\n\nEstimated amount you pay\n$1,534\nCompare network scenarios\nGlenwood Community Dental\n\nGlenwood · 1.9 miles · In-network scenario\n\nEstimated amount you pay\n$1,577.70\nCompare network scenarios\nLindley Park Dental Care\n\nLindley Park · 2.1 miles · In-network scenario\n\nEstimated amount you pay\n$1,621.40\nCompare network scenarios\nCollege Hill Dental\n\nCollege Hill · 1.1 miles · In-network scenario\n\nEstimated amount you pay\n$1,708.80\nCompare network scenarios\nFisher Park Dental Studio\n\nFisher Park · 0.8 miles · In-network scenario\n\nEstimated amount you pay\n$1,752.50\nCompare network scenarios\nGuilford Hills Dental\n\nGuilford Hills · 6 miles · In-network scenario\n\nEstimated amount you pay\n$1,796.20\nCompare network scenarios\nBattleground Family Dentistry\n\nBattleground · 3.6 miles · In-network scenario\n\nEstimated amount you pay\n$1,861.75\n\nNot accepting new patients in this sample.\n\nCompare network scenarios\nWestover Terrace Dental\n\nWestover · 2.4 miles · Out-of-network scenario\n\nEstimated amount you pay\n$2,665.32\nCompare network scenarios\nSummit Avenue Smiles\n\nSummit Ave · 1.4 miles · Out-of-network scenario\n\nEstimated amount you pay\n$2,860.68\nCompare network scenarios\nHamilton Lakes Dentistry\n\nHamilton Lakes · 5.2 miles · Out-of-network scenario\n\nEstimated amount you pay\n$3,349.08\nCompare network scenarios\nIrving Park Dental Arts\n\nIrving Park · 2.7 miles · Out-of-network scenario\n\nEstimated amount you pay\n$3,984\nCompare network scenarios\nPublished clinic fees nearby\n\nCleveland Avenue Dental Center in Winston-Salem publishes procedure charges. They may differ from your dentist’s fees, and do not establish your insurer’s allowance.\n\nClinic details and eligibilityCall the clinic: 336-703-3090Browse published procedure references",
+    "h1": [
+      {
+        "text": "Compare dentists",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/email",
+    "width": 390,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 1520,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nEmail\nTing works over email: send it anything about your dental care; get a monthly overview and urgent alerts.\nYour email and alerts\n\nEmail anything about your dental care to ting-dental@agentmail.to: EOBs, bills, treatment plans, notes from your dentist. Ting reads it, updates your record, plans any work and replies.\nDemo: email isn’t connected here, so messages show under “What Ting sent”.\n\nYour email\nMonthly overview (1st of the month)\nUrgent alerts right away\nPrivate mode\nEmails only say there’s an update; the details stay in the app.\nSave\nYour forwarding address\n\nFor bills and receipts your insurer can’t see. Forward an email, or set a filter in your own mail app. Ting never reads your inbox.\n\nWhat Ting read\n\nNothing yet. Email Ting a document and it shows up here.\n\nWhat Ting sent\n\nNo emails sent yet.",
+    "h1": [
+      {
+        "text": "Email",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/habits",
+    "width": 390,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 4655,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nSmileStreak\nEarn credits for good brushing habits. Rewards only: your premium never goes up.\nBrush\n\nConnect a brush, then brush. Each area of your mouth lights up as you go; the session is checked and saved when you stop.\n\nYour brush\nconnected\nOral-B iO Series 5 (demo)\nBrush to connect\n\nOral-B smart brush\n\nSmart, Genius and iO brushes over Bluetooth. No pairing needed.\n\nConnect\n\nDIY clip\n\nA motion sensor that clips onto any toothbrush and sends sessions over Wi-Fi.\n\nConnect\nRewards\n$95\nearned of $120 for 2026\n\n$25 from cleanings · $70 from brushing\n\nThis month: 3 good days of 3 so far · 25 needed by month end · on track\n\nCleaning verified from your insurance claim\nApr 10, 2026 · Claim on 2026-04-10\n+$25\nBrushing goal met in January\nJan 31, 2026 · Device summaries\n+$10\nBrushing goal met in February\nFeb 28, 2026 · Device summaries\n+$10\nBrushing goal met in March\nMar 31, 2026 · Device summaries\n+$10\nBrushing goal met in April\nApr 30, 2026 · Device summaries\n+$10\nBrushing goal met in May\nMay 31, 2026 · Device summaries\n+$10\nBrushing goal met in June\nJun 30, 2026 · Device summaries\n+$10\nBrushing goal met in July\nJul 31, 2026 · Device summaries\n+$10\n\nEarn $25 per cleaning (up to 2) and $10 per month you brush twice a day on 80% of days (up to 7 months). Paid next plan year as an employer-funded wellness deposit to your FSA/HSA, or added to your plan's rollover balance.\n\nNo smart brush? Your dentist can confirm good home care at a cleaning. That earns the full brushing portion ($70), so nobody needs a device to qualify.\n\nStreak\n25\nday streak · 33 good days in the last 35\n2+ good sessions\n1 session\nnone\nnot collected\nPlan costs with your credit\n\nExpected premiums and care after tax for this year and next year.\n\nAcme Dental Low\nExpected total\n$1,148.35\nBrushing credit\n−$95\nTotal after credit\n$1,053.35\nAcme Dental High\nExpected total\n$1,129.80\nBrushing credit\n−$95\nTotal after credit\n$1,034.80\n\nLowest expected cost\n\nWaive coverage and pay yourself\nExpected total\n$2,177.80\nBrushing credit\n−$95\nTotal after credit\n$2,082.80\nYour dentist's membership plan\nExpected total\n$2,168.74\nBrushing credit\n−$95\nTotal after credit\n$2,073.74\n\nThe credit is the same on every plan, so it lowers your cost without changing which plan is best for you.\n\nDiscuss treatment with your dentist\n\nYour brushing record supports a conversation with your dentist. It does not predict whether you need a filling or root canal.\n\nReview uncertain treatment costs\nYour data, your call\nYou\nEvery session, your streak, your credits.\nYour dentist\nA 30-day summary on the visit handoff page, only if you turn it on below.\nNever sees: Individual sessions or times.\nYour insurer\nYour credit total (to pay it) and, if you allow, counts in groups of 20 or more.\nNever sees: Sessions, times or device IDs. Never used for pricing, underwriting or claim decisions.\nYour employer\nThe credit amount to deposit to your FSA/HSA.\nNever sees: Any brushing data.\nShare a 30-day summary with my dentist\nInclude me in your insurer's group counts (20+ people)\n\nCollecting since Jan 2, 2026 · 537 sessions stored.\n\nLeave and delete my data\nWhat your dentist sees\nShared on your visit handoff page\nWho benefits from this data\nYou · your dentist · your insurer",
+    "h1": [
+      {
+        "text": "SmileStreak",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [
+      {
+        "tag": "A",
+        "text": "",
+        "w": 276.265625,
+        "h": 43,
+        "size": "16px",
+        "type": ""
+      }
+    ],
+    "overflows": []
+  },
+  {
+    "route": "/plan",
+    "width": 390,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 2169,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nPlan rules\nThe rules every estimate uses, read from your plan's own documents.\nYour plan this year\nAcme Dental Low\nAcme Dental High\nYour plan's rules\n\nAcme Dental Low\n\nPreventive: plan pays\nIn-network 100%\nOut-of-network 100%\nBasic: plan pays\nIn-network 80%\nOut-of-network 80%\nMajor: plan pays\nIn-network 50%\nOut-of-network 50%\nOrthodontics: plan pays\nIn-network 0%\nOut-of-network 0%\n\nOrthodontic lifetime maximum: $0. Confirm age eligibility and any installment rules in your plan document.\n\nAnnual max $1,500; deductible $50 on basic and major care. Plan Maximums, §4\nPremium $24 a month, pre-tax.\nOut of network: 80th percentile of usual and customary fees. Out-of-Network Benefits, §3\nMax Rollover: plan payments of $750 or less in a year add $375 (+$125 if all in network) to next year's max, deposited on day 65, up to $1,500. Max Rollover, §5\nBack-tooth tooth-colored fillings are paid at the silver-filling rate. Limitations, §8.3\nDeductible paid in October to December also counts toward next year. Schedule of Benefits, §1.4\nExams: 2 per calendar year\nCleanings: 2 per calendar year\nBitewing X-rays: 1 per calendar year\nFull-mouth or panoramic X-rays: 1 per 60 months\nCrowns and bridges: 1 per tooth per 60 months\nBuildups and posts: 1 per tooth per 60 months\nScaling and root planing: 1 per quadrant per 24 months\nNight guards: 1 per 36 months\nLoad a plan document\n\nUpload your benefits summary, review the coverage and fill in anything missing before using it for an estimate.\n\nUpload benefits summary\nScan insurance card\nSample benefits summary (PDF)",
+    "h1": [
+      {
+        "text": "Plan rules",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/onboarding",
+    "width": 390,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 844,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nGet started\nBring your dentist’s recommendations and any quoted fees.\nStart with one person’s care\n\nTing estimates treatment for one person at a time. Family deductibles and combined family care need confirmation with your insurer.\n\nYou can type a treatment plan, upload a document, or browse procedures including braces. No treatment is added automatically.\n\nAdd my treatment plan",
+    "h1": [
+      {
+        "text": "Get started",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/share/not-a-real-token",
+    "width": 390,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 844,
+    "text": "Shared plan unavailable\n\nThis link is invalid, expired or could not be loaded. Ask the person who shared it for a new link.\n\nTry againTing home",
+    "h1": [
+      {
+        "text": "Shared plan unavailable",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/try",
+    "width": 390,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 844,
+    "text": "Try Ting on your phone\n\nExplore sample treatment costs and change dates to compare estimates.\n\nhttp://127.0.0.1:5173/?persona=dale&demo=1\n\nThis opens the sample account with illustrative fees.\n\nOpen the sample app",
+    "h1": [
+      {
+        "text": "Try Ting on your phone",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/auth/callback",
+    "width": 390,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 844,
+    "text": "Sign-in was cancelled.\n\nBack to Ting",
+    "h1": [],
+    "small": [
+      {
+        "tag": "A",
+        "text": "Back to Ting",
+        "w": 89.03125,
+        "h": 24,
+        "size": "16px",
+        "type": ""
+      }
+    ],
+    "overflows": []
+  },
+  {
+    "route": "/",
+    "width": 430,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 430,
+    "height": 2277,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nHi Dale\nPlan your dental care and understand what you may pay.\nYour planned care\n\n$1,752.50\n\nEstimated amount you pay across 2026 and 2027. 6 treatment items. Cheapest schedule.\n\nReview treatment and dates\nBenefits this year\n\nAcme Dental Low\nAcme Dental High\n · as of Oct 4, 2026\n\nAnnual maximum 2026\nof $1,500\n$190\nleft after scheduled work\nUsed\n$300\nScheduled\n$1,010\nRemaining\n$190\nDeductible\n$50 of $50 met\nYour FSA\nFSA balance\nSome can carry over\n$400\n88 days left (until Dec 31, 2026)\n\nYour scheduled work uses it in time.\n\nCompare next year’s plans\nAsk about your plan\nAsk\nReminders\nEmail settings\n\nGet a reminder before unused benefits expire. FSA deadlines follow your employer’s carryover or grace-period rules.\n\nNov 1\n2026\n\n2 months left to use your dental benefits\n\nYou still have $190 of annual max for 2026. They reset on Jan 1, so book now while appointments are open.\n\nOff\nDec 1\n2026\n\nLast month: $190 of annual max left\n\nYou still have $190 of annual max for 2026. After Dec 31 it's gone.\n\nOff\nRemind me\nAdd to calendar\nClaims and account activity\nBrushing rewards and privacy\nSet up your treatment plan",
+    "h1": [
+      {
+        "text": "Hi Dale",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/treatment",
+    "width": 430,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 430,
+    "height": 4284,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nYour treatment\nAcme Dental Low. Estimated care across 2026 and 2027.\n\nEstimated total you pay\n\n$1,752.50\n\nChoose treatment dates\nDentist network for this plan\nTreatment items\nRoot canal (molar) on #19\nFee $1,180 · you pay $200 · dentist's deadline Nov 14, 2026\nCore buildup on #19\nFee $330 · you pay $125 · dentist's deadline Mar 31, 2027\nCrown (porcelain) on #19\nFee $1,450 · you pay $625 · dentist's deadline Mar 31, 2027\nCrown (porcelain) on #30\nFee $1,450 · you pay $600 · dentist's deadline Mar 31, 2027\nCleaning\nFee $120 · you pay $0 · dentist's deadline Jan 31, 2027\nRoot canal (molar) on #3\nOnly if needed\nFee $1,180 · you pay $675 · dentist's deadline Dec 31, 2027\nRoot canal (molar) on #19\n\nSelected item. In-network dentist.\n\nEstimated amount you pay\n\n$200\n\nDentist’s fee\n$1,180\nPlan discount\n$180\nPlan pays\n$800\nYou pay\n$200\nCost breakdown\nPrice sources\nUpdate dentist fee and insurer allowance\nChoose dates\nCheapest\n$1,752.50\nsaves $1,082.50\nLast date: Jan 4\nFastest\n$2,835\nEarliest dates\nLast date: Oct 18\nBalanced\n$1,752.50\nsaves $1,082.50\nLast date: Jan 4\nCheapest · Lowest cost after the max, deductible and FSA\n$1,752.50\nAfter FSA tax savings: $946.75\nLast planned visit: Jan 4, 2027\nVs. doing it all now: saves $1,082.50\nRoot canal (molar) on #19\n$200 if done\n\nOct 4, 2026. Your dentist set this date.\n\nDentist’s deadline: Nov 14, 2026\n\nCore buildup on #19\n$125 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCrown (porcelain) on #19\n$625 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCrown (porcelain) on #30\n$600 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCleaning\n$0 if done\nTreatment date\nApply date\n\nDentist’s deadline: Jan 31, 2027\n\nRoot canal (molar) on #3\n$675 if done\nTreatment date\nApply date\n\nDentist’s deadline: Dec 31, 2027\n\nVisual timeline (optional)\n\nShare with my dentist\nAdd a treatment plan\nBrowse procedures, including braces",
+    "h1": [
+      {
+        "text": "Your treatment",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [
+      {
+        "tag": "LABEL",
+        "text": "",
+        "w": 364.875,
+        "h": 19,
+        "size": "16px"
+      }
+    ],
+    "overflows": [
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 599
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 599
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 591
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 591
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 591
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 591
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 528.203125
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 599
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 444.3125
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 479.859375
+      }
+    ]
+  },
+  {
+    "route": "/enroll",
+    "width": 430,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 430,
+    "height": 2713,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nOpen enrollment for 2027\nWhich option costs you least once premiums, taxes and likely dental work are counted.\n\nRecommended plan for 2027\n\nChoose Acme Dental High and put $1,040 in your 2027 FSA\n\n$1,129.80\n\nExpected total with premiums and care after tax, across this year and 2027.\n\nAdd to calendar\nShare with my dentist\nRemind me\nPlan and date details\n\nExpected savings $1,506.80 vs keeping your plan and doing everything now.\n\nCompare options\nAcme Dental Low(current)\nPremiums after tax\n$201.60\nExpected care\n$946.75\nExpected total\n$1,148.35\nIf every maybe happens\n$1,479.10\n\n$18.55 more than Acme Dental High in an expected year.\n\nAcme Dental High\nLowest expected cost\nPremiums after tax\n$403.20\nExpected care\n$726.60\nExpected total\n$1,129.80\nIf every maybe happens\n$1,330.70\n\nLowest expected total.\n\nWaive coverage and pay yourself\nPremiums after tax\n$0\nExpected care\n$2,177.80\nExpected total\n$2,177.80\nIf every maybe happens\n$2,756\n\n$1,048 more than Acme Dental High in an expected year.\n\nYour dentist's membership plan\nPremiums after tax\n$399\nExpected care\n$1,769.74\nExpected total\n$2,168.74\nIf every maybe happens\n$2,631.30\n\n$1,038.94 more than Acme Dental High in an expected year.\n\nCare covers the rest of this year (on your current plan) and next year, each option scheduled its cheapest way, after FSA tax savings.\n\nYou ran out of your max in 2025. Acme Dental High's $2,000 max would have covered up to $500 more.\nAbove a 20% chance of the root canal on #3, Acme Dental High pays for itself.\n\"Maybe\" work\nRoot canal (molar) on #3\n30% likely\n\nTipping point: Above a 20% chance of the root canal on #3, Acme Dental High pays for itself.\n\nFSA\n\nRecommended FSA election for 2027\n\n$1,040\n\nExpected out-of-pocket care in 2027\n$1,113\nAlready covered by money carried in\n$75\nIRS limit (not yet published)\n$3,400\nThis year's balance left after care\n$75\nThis year's money must be spent by\nDec 31, 2026\n\nSized to your expected out-of-pocket on the recommended plan and schedule, rounded up to $10, so little is left to forfeit.",
+    "h1": [
+      {
+        "text": "Open enrollment for 2027",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [
+      {
+        "tag": "LABEL",
+        "text": "Root canal (molar) on #3",
+        "w": 177.28125,
+        "h": 24,
+        "size": "16px"
+      }
+    ],
+    "overflows": []
+  },
+  {
+    "route": "/dentists",
+    "width": 430,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 430,
+    "height": 3966,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nCompare dentists\nCompare the costs of your planned care near Greensboro, NC 27401.\n\nProvider prices and participation shown here are sample comparisons. Confirm a real dentist’s network status with your insurer and request a written quote.\n\nEnter your dentist’s quote\nCurrent dentist: Fisher Park Dental Studio\nFisher Park Dental Studio as an in-network dentist\n$1,752.50\nSame fees, out of network\n$2,274.60\n+$522.10 mostly Balance billing\nKeep this dentist first in comparisons\nProvider comparisons\nList\nMap\nSedgefield Smile Center\n\nSedgefield · 7.3 miles · In-network scenario\n\nEstimated amount you pay\n$1,468.45\nCompare network scenarios\nStarmount Dental Group\n\nStarmount · 4.9 miles · In-network scenario\n\nEstimated amount you pay\n$1,534\nCompare network scenarios\nGlenwood Community Dental\n\nGlenwood · 1.9 miles · In-network scenario\n\nEstimated amount you pay\n$1,577.70\nCompare network scenarios\nLindley Park Dental Care\n\nLindley Park · 2.1 miles · In-network scenario\n\nEstimated amount you pay\n$1,621.40\nCompare network scenarios\nCollege Hill Dental\n\nCollege Hill · 1.1 miles · In-network scenario\n\nEstimated amount you pay\n$1,708.80\nCompare network scenarios\nFisher Park Dental Studio\n\nFisher Park · 0.8 miles · In-network scenario\n\nEstimated amount you pay\n$1,752.50\nCompare network scenarios\nGuilford Hills Dental\n\nGuilford Hills · 6 miles · In-network scenario\n\nEstimated amount you pay\n$1,796.20\nCompare network scenarios\nBattleground Family Dentistry\n\nBattleground · 3.6 miles · In-network scenario\n\nEstimated amount you pay\n$1,861.75\n\nNot accepting new patients in this sample.\n\nCompare network scenarios\nWestover Terrace Dental\n\nWestover · 2.4 miles · Out-of-network scenario\n\nEstimated amount you pay\n$2,665.32\nCompare network scenarios\nSummit Avenue Smiles\n\nSummit Ave · 1.4 miles · Out-of-network scenario\n\nEstimated amount you pay\n$2,860.68\nCompare network scenarios\nHamilton Lakes Dentistry\n\nHamilton Lakes · 5.2 miles · Out-of-network scenario\n\nEstimated amount you pay\n$3,349.08\nCompare network scenarios\nIrving Park Dental Arts\n\nIrving Park · 2.7 miles · Out-of-network scenario\n\nEstimated amount you pay\n$3,984\nCompare network scenarios\nPublished clinic fees nearby\n\nCleveland Avenue Dental Center in Winston-Salem publishes procedure charges. They may differ from your dentist’s fees, and do not establish your insurer’s allowance.\n\nClinic details and eligibilityCall the clinic: 336-703-3090Browse published procedure references",
+    "h1": [
+      {
+        "text": "Compare dentists",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/email",
+    "width": 430,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 430,
+    "height": 1496,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nEmail\nTing works over email: send it anything about your dental care; get a monthly overview and urgent alerts.\nYour email and alerts\n\nEmail anything about your dental care to ting-dental@agentmail.to: EOBs, bills, treatment plans, notes from your dentist. Ting reads it, updates your record, plans any work and replies.\nDemo: email isn’t connected here, so messages show under “What Ting sent”.\n\nYour email\nMonthly overview (1st of the month)\nUrgent alerts right away\nPrivate mode\nEmails only say there’s an update; the details stay in the app.\nSave\nYour forwarding address\n\nFor bills and receipts your insurer can’t see. Forward an email, or set a filter in your own mail app. Ting never reads your inbox.\n\nWhat Ting read\n\nNothing yet. Email Ting a document and it shows up here.\n\nWhat Ting sent\n\nNo emails sent yet.",
+    "h1": [
+      {
+        "text": "Email",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/habits",
+    "width": 430,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 430,
+    "height": 4584,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nSmileStreak\nEarn credits for good brushing habits. Rewards only: your premium never goes up.\nBrush\n\nConnect a brush, then brush. Each area of your mouth lights up as you go; the session is checked and saved when you stop.\n\nYour brush\nconnected\nOral-B iO Series 5 (demo)\nBrush to connect\n\nOral-B smart brush\n\nSmart, Genius and iO brushes over Bluetooth. No pairing needed.\n\nConnect\n\nDIY clip\n\nA motion sensor that clips onto any toothbrush and sends sessions over Wi-Fi.\n\nConnect\nRewards\n$95\nearned of $120 for 2026\n\n$25 from cleanings · $70 from brushing\n\nThis month: 3 good days of 3 so far · 25 needed by month end · on track\n\nCleaning verified from your insurance claim\nApr 10, 2026 · Claim on 2026-04-10\n+$25\nBrushing goal met in January\nJan 31, 2026 · Device summaries\n+$10\nBrushing goal met in February\nFeb 28, 2026 · Device summaries\n+$10\nBrushing goal met in March\nMar 31, 2026 · Device summaries\n+$10\nBrushing goal met in April\nApr 30, 2026 · Device summaries\n+$10\nBrushing goal met in May\nMay 31, 2026 · Device summaries\n+$10\nBrushing goal met in June\nJun 30, 2026 · Device summaries\n+$10\nBrushing goal met in July\nJul 31, 2026 · Device summaries\n+$10\n\nEarn $25 per cleaning (up to 2) and $10 per month you brush twice a day on 80% of days (up to 7 months). Paid next plan year as an employer-funded wellness deposit to your FSA/HSA, or added to your plan's rollover balance.\n\nNo smart brush? Your dentist can confirm good home care at a cleaning. That earns the full brushing portion ($70), so nobody needs a device to qualify.\n\nStreak\n25\nday streak · 33 good days in the last 35\n2+ good sessions\n1 session\nnone\nnot collected\nPlan costs with your credit\n\nExpected premiums and care after tax for this year and next year.\n\nAcme Dental Low\nExpected total\n$1,148.35\nBrushing credit\n−$95\nTotal after credit\n$1,053.35\nAcme Dental High\nExpected total\n$1,129.80\nBrushing credit\n−$95\nTotal after credit\n$1,034.80\n\nLowest expected cost\n\nWaive coverage and pay yourself\nExpected total\n$2,177.80\nBrushing credit\n−$95\nTotal after credit\n$2,082.80\nYour dentist's membership plan\nExpected total\n$2,168.74\nBrushing credit\n−$95\nTotal after credit\n$2,073.74\n\nThe credit is the same on every plan, so it lowers your cost without changing which plan is best for you.\n\nDiscuss treatment with your dentist\n\nYour brushing record supports a conversation with your dentist. It does not predict whether you need a filling or root canal.\n\nReview uncertain treatment costs\nYour data, your call\nYou\nEvery session, your streak, your credits.\nYour dentist\nA 30-day summary on the visit handoff page, only if you turn it on below.\nNever sees: Individual sessions or times.\nYour insurer\nYour credit total (to pay it) and, if you allow, counts in groups of 20 or more.\nNever sees: Sessions, times or device IDs. Never used for pricing, underwriting or claim decisions.\nYour employer\nThe credit amount to deposit to your FSA/HSA.\nNever sees: Any brushing data.\nShare a 30-day summary with my dentist\nInclude me in your insurer's group counts (20+ people)\n\nCollecting since Jan 2, 2026 · 537 sessions stored.\n\nLeave and delete my data\nWhat your dentist sees\nShared on your visit handoff page\nWho benefits from this data\nYou · your dentist · your insurer",
+    "h1": [
+      {
+        "text": "SmileStreak",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [
+      {
+        "tag": "A",
+        "text": "",
+        "w": 154.53125,
+        "h": 19,
+        "size": "16px",
+        "type": ""
+      }
+    ],
+    "overflows": []
+  },
+  {
+    "route": "/plan",
+    "width": 430,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 430,
+    "height": 2041,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nPlan rules\nThe rules every estimate uses, read from your plan's own documents.\nYour plan this year\nAcme Dental Low\nAcme Dental High\nYour plan's rules\n\nAcme Dental Low\n\nPreventive: plan pays\nIn-network 100%\nOut-of-network 100%\nBasic: plan pays\nIn-network 80%\nOut-of-network 80%\nMajor: plan pays\nIn-network 50%\nOut-of-network 50%\nOrthodontics: plan pays\nIn-network 0%\nOut-of-network 0%\n\nOrthodontic lifetime maximum: $0. Confirm age eligibility and any installment rules in your plan document.\n\nAnnual max $1,500; deductible $50 on basic and major care. Plan Maximums, §4\nPremium $24 a month, pre-tax.\nOut of network: 80th percentile of usual and customary fees. Out-of-Network Benefits, §3\nMax Rollover: plan payments of $750 or less in a year add $375 (+$125 if all in network) to next year's max, deposited on day 65, up to $1,500. Max Rollover, §5\nBack-tooth tooth-colored fillings are paid at the silver-filling rate. Limitations, §8.3\nDeductible paid in October to December also counts toward next year. Schedule of Benefits, §1.4\nExams: 2 per calendar year\nCleanings: 2 per calendar year\nBitewing X-rays: 1 per calendar year\nFull-mouth or panoramic X-rays: 1 per 60 months\nCrowns and bridges: 1 per tooth per 60 months\nBuildups and posts: 1 per tooth per 60 months\nScaling and root planing: 1 per quadrant per 24 months\nNight guards: 1 per 36 months\nLoad a plan document\n\nUpload your benefits summary, review the coverage and fill in anything missing before using it for an estimate.\n\nUpload benefits summary\nScan insurance card\nSample benefits summary (PDF)",
+    "h1": [
+      {
+        "text": "Plan rules",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/onboarding",
+    "width": 430,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 430,
+    "height": 844,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nGet started\nBring your dentist’s recommendations and any quoted fees.\nStart with one person’s care\n\nTing estimates treatment for one person at a time. Family deductibles and combined family care need confirmation with your insurer.\n\nYou can type a treatment plan, upload a document, or browse procedures including braces. No treatment is added automatically.\n\nAdd my treatment plan",
+    "h1": [
+      {
+        "text": "Get started",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/share/not-a-real-token",
+    "width": 430,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 430,
+    "height": 844,
+    "text": "Shared plan unavailable\n\nThis link is invalid, expired or could not be loaded. Ask the person who shared it for a new link.\n\nTry againTing home",
+    "h1": [
+      {
+        "text": "Shared plan unavailable",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/try",
+    "width": 430,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 430,
+    "height": 844,
+    "text": "Try Ting on your phone\n\nExplore sample treatment costs and change dates to compare estimates.\n\nhttp://127.0.0.1:5173/?persona=dale&demo=1\n\nThis opens the sample account with illustrative fees.\n\nOpen the sample app",
+    "h1": [
+      {
+        "text": "Try Ting on your phone",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/auth/callback",
+    "width": 430,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 430,
+    "height": 844,
+    "text": "Sign-in was cancelled.\n\nBack to Ting",
+    "h1": [],
+    "small": [
+      {
+        "tag": "A",
+        "text": "Back to Ting",
+        "w": 89.03125,
+        "h": 24,
+        "size": "16px",
+        "type": ""
+      }
+    ],
+    "overflows": []
+  },
+  {
+    "route": "/",
+    "width": 768,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 2041,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nHi Dale\nPlan your dental care and understand what you may pay.\nYour planned care\n\n$1,752.50\n\nEstimated amount you pay across 2026 and 2027. 6 treatment items. Cheapest schedule.\n\nReview treatment and dates\nBenefits this year\n\nAcme Dental Low\nAcme Dental High\n · as of Oct 4, 2026\n\nAnnual maximum 2026\nof $1,500\n$190\nleft after scheduled work\nUsed\n$300\nScheduled\n$1,010\nRemaining\n$190\nDeductible\n$50 of $50 met\nYour FSA\nFSA balance\nSome can carry over\n$400\n88 days left (until Dec 31, 2026)\n\nYour scheduled work uses it in time.\n\nCompare next year’s plans\nAsk about your plan\nAsk\nReminders\nEmail settings\n\nGet a reminder before unused benefits expire. FSA deadlines follow your employer’s carryover or grace-period rules.\n\nNov 1\n2026\n\n2 months left to use your dental benefits\n\nYou still have $190 of annual max for 2026. They reset on Jan 1, so book now while appointments are open.\n\nOff\nDec 1\n2026\n\nLast month: $190 of annual max left\n\nYou still have $190 of annual max for 2026. After Dec 31 it's gone.\n\nOff\nRemind me\nAdd to calendar\nClaims and account activity\nBrushing rewards and privacy\nSet up your treatment plan",
+    "h1": [
+      {
+        "text": "Hi Dale",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/treatment",
+    "width": 768,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 4074,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nYour treatment\nAcme Dental Low. Estimated care across 2026 and 2027.\n\nEstimated total you pay\n\n$1,752.50\n\nChoose treatment dates\nDentist network for this plan\nTreatment items\nRoot canal (molar) on #19\nFee $1,180 · you pay $200 · dentist's deadline Nov 14, 2026\nCore buildup on #19\nFee $330 · you pay $125 · dentist's deadline Mar 31, 2027\nCrown (porcelain) on #19\nFee $1,450 · you pay $625 · dentist's deadline Mar 31, 2027\nCrown (porcelain) on #30\nFee $1,450 · you pay $600 · dentist's deadline Mar 31, 2027\nCleaning\nFee $120 · you pay $0 · dentist's deadline Jan 31, 2027\nRoot canal (molar) on #3\nOnly if needed\nFee $1,180 · you pay $675 · dentist's deadline Dec 31, 2027\nRoot canal (molar) on #19\n\nSelected item. In-network dentist.\n\nEstimated amount you pay\n\n$200\n\nDentist’s fee\n$1,180\nPlan discount\n$180\nPlan pays\n$800\nYou pay\n$200\nCost breakdown\nPrice sources\nUpdate dentist fee and insurer allowance\nChoose dates\nCheapest\n$1,752.50\nsaves $1,082.50\nLast date: Jan 4\nFastest\n$2,835\nEarliest dates\nLast date: Oct 18\nBalanced\n$1,752.50\nsaves $1,082.50\nLast date: Jan 4\nCheapest · Lowest cost after the max, deductible and FSA\n$1,752.50\nAfter FSA tax savings: $946.75\nLast planned visit: Jan 4, 2027\nVs. doing it all now: saves $1,082.50\nRoot canal (molar) on #19\n$200 if done\n\nOct 4, 2026. Your dentist set this date.\n\nDentist’s deadline: Nov 14, 2026\n\nCore buildup on #19\n$125 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCrown (porcelain) on #19\n$625 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCrown (porcelain) on #30\n$600 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCleaning\n$0 if done\nTreatment date\nApply date\n\nDentist’s deadline: Jan 31, 2027\n\nRoot canal (molar) on #3\n$675 if done\nTreatment date\nApply date\n\nDentist’s deadline: Dec 31, 2027\n\nVisual timeline (optional)\n\nShare with my dentist\nAdd a treatment plan\nBrowse procedures, including braces",
+    "h1": [
+      {
+        "text": "Your treatment",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [
+      {
+        "tag": "LABEL",
+        "text": "",
+        "w": 364.875,
+        "h": 19,
+        "size": "16px"
+      }
+    ],
+    "overflows": []
+  },
+  {
+    "route": "/enroll",
+    "width": 768,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 2433,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nOpen enrollment for 2027\nWhich option costs you least once premiums, taxes and likely dental work are counted.\n\nRecommended plan for 2027\n\nChoose Acme Dental High and put $1,040 in your 2027 FSA\n\n$1,129.80\n\nExpected total with premiums and care after tax, across this year and 2027.\n\nAdd to calendar\nShare with my dentist\nRemind me\nPlan and date details\n\nExpected savings $1,506.80 vs keeping your plan and doing everything now.\n\nCompare options\nAcme Dental Low(current)\nPremiums after tax\n$201.60\nExpected care\n$946.75\nExpected total\n$1,148.35\nIf every maybe happens\n$1,479.10\n\n$18.55 more than Acme Dental High in an expected year.\n\nAcme Dental High\nLowest expected cost\nPremiums after tax\n$403.20\nExpected care\n$726.60\nExpected total\n$1,129.80\nIf every maybe happens\n$1,330.70\n\nLowest expected total.\n\nWaive coverage and pay yourself\nPremiums after tax\n$0\nExpected care\n$2,177.80\nExpected total\n$2,177.80\nIf every maybe happens\n$2,756\n\n$1,048 more than Acme Dental High in an expected year.\n\nYour dentist's membership plan\nPremiums after tax\n$399\nExpected care\n$1,769.74\nExpected total\n$2,168.74\nIf every maybe happens\n$2,631.30\n\n$1,038.94 more than Acme Dental High in an expected year.\n\nCare covers the rest of this year (on your current plan) and next year, each option scheduled its cheapest way, after FSA tax savings.\n\nYou ran out of your max in 2025. Acme Dental High's $2,000 max would have covered up to $500 more.\nAbove a 20% chance of the root canal on #3, Acme Dental High pays for itself.\n\"Maybe\" work\nRoot canal (molar) on #3\n30% likely\n\nTipping point: Above a 20% chance of the root canal on #3, Acme Dental High pays for itself.\n\nFSA\n\nRecommended FSA election for 2027\n\n$1,040\n\nExpected out-of-pocket care in 2027\n$1,113\nAlready covered by money carried in\n$75\nIRS limit (not yet published)\n$3,400\nThis year's balance left after care\n$75\nThis year's money must be spent by\nDec 31, 2026\n\nSized to your expected out-of-pocket on the recommended plan and schedule, rounded up to $10, so little is left to forfeit.",
+    "h1": [
+      {
+        "text": "Open enrollment for 2027",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [
+      {
+        "tag": "LABEL",
+        "text": "Root canal (molar) on #3",
+        "w": 177.28125,
+        "h": 24,
+        "size": "16px"
+      }
+    ],
+    "overflows": []
+  },
+  {
+    "route": "/dentists",
+    "width": 768,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 3680,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nCompare dentists\nCompare the costs of your planned care near Greensboro, NC 27401.\n\nProvider prices and participation shown here are sample comparisons. Confirm a real dentist’s network status with your insurer and request a written quote.\n\nEnter your dentist’s quote\nCurrent dentist: Fisher Park Dental Studio\nFisher Park Dental Studio as an in-network dentist\n$1,752.50\nSame fees, out of network\n$2,274.60\n+$522.10 mostly Balance billing\nKeep this dentist first in comparisons\nProvider comparisons\nList\nMap\nSedgefield Smile Center\n\nSedgefield · 7.3 miles · In-network scenario\n\nEstimated amount you pay\n$1,468.45\nCompare network scenarios\nStarmount Dental Group\n\nStarmount · 4.9 miles · In-network scenario\n\nEstimated amount you pay\n$1,534\nCompare network scenarios\nGlenwood Community Dental\n\nGlenwood · 1.9 miles · In-network scenario\n\nEstimated amount you pay\n$1,577.70\nCompare network scenarios\nLindley Park Dental Care\n\nLindley Park · 2.1 miles · In-network scenario\n\nEstimated amount you pay\n$1,621.40\nCompare network scenarios\nCollege Hill Dental\n\nCollege Hill · 1.1 miles · In-network scenario\n\nEstimated amount you pay\n$1,708.80\nCompare network scenarios\nFisher Park Dental Studio\n\nFisher Park · 0.8 miles · In-network scenario\n\nEstimated amount you pay\n$1,752.50\nCompare network scenarios\nGuilford Hills Dental\n\nGuilford Hills · 6 miles · In-network scenario\n\nEstimated amount you pay\n$1,796.20\nCompare network scenarios\nBattleground Family Dentistry\n\nBattleground · 3.6 miles · In-network scenario\n\nEstimated amount you pay\n$1,861.75\n\nNot accepting new patients in this sample.\n\nCompare network scenarios\nWestover Terrace Dental\n\nWestover · 2.4 miles · Out-of-network scenario\n\nEstimated amount you pay\n$2,665.32\nCompare network scenarios\nSummit Avenue Smiles\n\nSummit Ave · 1.4 miles · Out-of-network scenario\n\nEstimated amount you pay\n$2,860.68\nCompare network scenarios\nHamilton Lakes Dentistry\n\nHamilton Lakes · 5.2 miles · Out-of-network scenario\n\nEstimated amount you pay\n$3,349.08\nCompare network scenarios\nIrving Park Dental Arts\n\nIrving Park · 2.7 miles · Out-of-network scenario\n\nEstimated amount you pay\n$3,984\nCompare network scenarios\nPublished clinic fees nearby\n\nCleveland Avenue Dental Center in Winston-Salem publishes procedure charges. They may differ from your dentist’s fees, and do not establish your insurer’s allowance.\n\nClinic details and eligibilityCall the clinic: 336-703-3090Browse published procedure references",
+    "h1": [
+      {
+        "text": "Compare dentists",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/email",
+    "width": 768,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 1284,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nEmail\nTing works over email: send it anything about your dental care; get a monthly overview and urgent alerts.\nYour email and alerts\n\nEmail anything about your dental care to ting-dental@agentmail.to: EOBs, bills, treatment plans, notes from your dentist. Ting reads it, updates your record, plans any work and replies.\nDemo: email isn’t connected here, so messages show under “What Ting sent”.\n\nYour email\nMonthly overview (1st of the month)\nUrgent alerts right away\nPrivate mode\nEmails only say there’s an update; the details stay in the app.\nSave\nYour forwarding address\n\nFor bills and receipts your insurer can’t see. Forward an email, or set a filter in your own mail app. Ting never reads your inbox.\n\nWhat Ting read\n\nNothing yet. Email Ting a document and it shows up here.\n\nWhat Ting sent\n\nNo emails sent yet.",
+    "h1": [
+      {
+        "text": "Email",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/habits",
+    "width": 768,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 4426,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nSmileStreak\nEarn credits for good brushing habits. Rewards only: your premium never goes up.\nBrush\n\nConnect a brush, then brush. Each area of your mouth lights up as you go; the session is checked and saved when you stop.\n\nYour brush\nconnected\nOral-B iO Series 5 (demo)\nBrush to connect\n\nOral-B smart brush\n\nSmart, Genius and iO brushes over Bluetooth. No pairing needed.\n\nConnect\n\nDIY clip\n\nA motion sensor that clips onto any toothbrush and sends sessions over Wi-Fi.\n\nConnect\nRewards\n$95\nearned of $120 for 2026\n\n$25 from cleanings · $70 from brushing\n\nThis month: 3 good days of 3 so far · 25 needed by month end · on track\n\nCleaning verified from your insurance claim\nApr 10, 2026 · Claim on 2026-04-10\n+$25\nBrushing goal met in January\nJan 31, 2026 · Device summaries\n+$10\nBrushing goal met in February\nFeb 28, 2026 · Device summaries\n+$10\nBrushing goal met in March\nMar 31, 2026 · Device summaries\n+$10\nBrushing goal met in April\nApr 30, 2026 · Device summaries\n+$10\nBrushing goal met in May\nMay 31, 2026 · Device summaries\n+$10\nBrushing goal met in June\nJun 30, 2026 · Device summaries\n+$10\nBrushing goal met in July\nJul 31, 2026 · Device summaries\n+$10\n\nEarn $25 per cleaning (up to 2) and $10 per month you brush twice a day on 80% of days (up to 7 months). Paid next plan year as an employer-funded wellness deposit to your FSA/HSA, or added to your plan's rollover balance.\n\nNo smart brush? Your dentist can confirm good home care at a cleaning. That earns the full brushing portion ($70), so nobody needs a device to qualify.\n\nStreak\n25\nday streak · 33 good days in the last 35\n2+ good sessions\n1 session\nnone\nnot collected\nPlan costs with your credit\n\nExpected premiums and care after tax for this year and next year.\n\nAcme Dental Low\nExpected total\n$1,148.35\nBrushing credit\n−$95\nTotal after credit\n$1,053.35\nAcme Dental High\nExpected total\n$1,129.80\nBrushing credit\n−$95\nTotal after credit\n$1,034.80\n\nLowest expected cost\n\nWaive coverage and pay yourself\nExpected total\n$2,177.80\nBrushing credit\n−$95\nTotal after credit\n$2,082.80\nYour dentist's membership plan\nExpected total\n$2,168.74\nBrushing credit\n−$95\nTotal after credit\n$2,073.74\n\nThe credit is the same on every plan, so it lowers your cost without changing which plan is best for you.\n\nDiscuss treatment with your dentist\n\nYour brushing record supports a conversation with your dentist. It does not predict whether you need a filling or root canal.\n\nReview uncertain treatment costs\nYour data, your call\nYou\nEvery session, your streak, your credits.\nYour dentist\nA 30-day summary on the visit handoff page, only if you turn it on below.\nNever sees: Individual sessions or times.\nYour insurer\nYour credit total (to pay it) and, if you allow, counts in groups of 20 or more.\nNever sees: Sessions, times or device IDs. Never used for pricing, underwriting or claim decisions.\nYour employer\nThe credit amount to deposit to your FSA/HSA.\nNever sees: Any brushing data.\nShare a 30-day summary with my dentist\nInclude me in your insurer's group counts (20+ people)\n\nCollecting since Jan 2, 2026 · 537 sessions stored.\n\nLeave and delete my data\nWhat your dentist sees\nShared on your visit handoff page\nWho benefits from this data\nYou · your dentist · your insurer",
+    "h1": [
+      {
+        "text": "SmileStreak",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [
+      {
+        "tag": "A",
+        "text": "",
+        "w": 131.078125,
+        "h": 43,
+        "size": "16px",
+        "type": ""
+      }
+    ],
+    "overflows": []
+  },
+  {
+    "route": "/plan",
+    "width": 768,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 1721,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nPlan rules\nThe rules every estimate uses, read from your plan's own documents.\nYour plan this year\nAcme Dental Low\nAcme Dental High\nYour plan's rules\n\nAcme Dental Low\n\nPreventive: plan pays\nIn-network 100%\nOut-of-network 100%\nBasic: plan pays\nIn-network 80%\nOut-of-network 80%\nMajor: plan pays\nIn-network 50%\nOut-of-network 50%\nOrthodontics: plan pays\nIn-network 0%\nOut-of-network 0%\n\nOrthodontic lifetime maximum: $0. Confirm age eligibility and any installment rules in your plan document.\n\nAnnual max $1,500; deductible $50 on basic and major care. Plan Maximums, §4\nPremium $24 a month, pre-tax.\nOut of network: 80th percentile of usual and customary fees. Out-of-Network Benefits, §3\nMax Rollover: plan payments of $750 or less in a year add $375 (+$125 if all in network) to next year's max, deposited on day 65, up to $1,500. Max Rollover, §5\nBack-tooth tooth-colored fillings are paid at the silver-filling rate. Limitations, §8.3\nDeductible paid in October to December also counts toward next year. Schedule of Benefits, §1.4\nExams: 2 per calendar year\nCleanings: 2 per calendar year\nBitewing X-rays: 1 per calendar year\nFull-mouth or panoramic X-rays: 1 per 60 months\nCrowns and bridges: 1 per tooth per 60 months\nBuildups and posts: 1 per tooth per 60 months\nScaling and root planing: 1 per quadrant per 24 months\nNight guards: 1 per 36 months\nLoad a plan document\n\nUpload your benefits summary, review the coverage and fill in anything missing before using it for an estimate.\n\nUpload benefits summary\nScan insurance card\nSample benefits summary (PDF)",
+    "h1": [
+      {
+        "text": "Plan rules",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/onboarding",
+    "width": 768,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 844,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nGet started\nBring your dentist’s recommendations and any quoted fees.\nStart with one person’s care\n\nTing estimates treatment for one person at a time. Family deductibles and combined family care need confirmation with your insurer.\n\nYou can type a treatment plan, upload a document, or browse procedures including braces. No treatment is added automatically.\n\nAdd my treatment plan",
+    "h1": [
+      {
+        "text": "Get started",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/share/not-a-real-token",
+    "width": 768,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 844,
+    "text": "Shared plan unavailable\n\nThis link is invalid, expired or could not be loaded. Ask the person who shared it for a new link.\n\nTry againTing home",
+    "h1": [
+      {
+        "text": "Shared plan unavailable",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/try",
+    "width": 768,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 844,
+    "text": "Try Ting on your phone\n\nExplore sample treatment costs and change dates to compare estimates.\n\nhttp://127.0.0.1:5173/?persona=dale&demo=1\n\nThis opens the sample account with illustrative fees.\n\nOpen the sample app",
+    "h1": [
+      {
+        "text": "Try Ting on your phone",
+        "size": "32px",
+        "line": "38px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/auth/callback",
+    "width": 768,
+    "zoom": 1,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 844,
+    "text": "Sign-in was cancelled.\n\nBack to Ting",
+    "h1": [],
+    "small": [
+      {
+        "tag": "A",
+        "text": "Back to Ting",
+        "w": 89.03125,
+        "h": 24,
+        "size": "16px",
+        "type": ""
+      }
+    ],
+    "overflows": []
+  },
+  {
+    "route": "/",
+    "width": 437,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 437,
+    "height": 6015,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nHi Dale\nPlan your dental care and understand what you may pay.\nYour planned care\n\n$1,752.50\n\nEstimated amount you pay across 2026 and 2027. 6 treatment items. Cheapest schedule.\n\nReview treatment and dates\nBenefits this year\n\nAcme Dental Low\nAcme Dental High\n · as of Oct 4, 2026\n\nAnnual maximum 2026\nof $1,500\n$190\nleft after scheduled work\nUsed\n$300\nScheduled\n$1,010\nRemaining\n$190\nDeductible\n$50 of $50 met\nYour FSA\nFSA balance\nSome can carry over\n$400\n88 days left (until Dec 31, 2026)\n\nYour scheduled work uses it in time.\n\nCompare next year’s plans\nAsk about your plan\nAsk\nReminders\nEmail settings\n\nGet a reminder before unused benefits expire. FSA deadlines follow your employer’s carryover or grace-period rules.\n\nNov 1\n2026\n\n2 months left to use your dental benefits\n\nYou still have $190 of annual max for 2026. They reset on Jan 1, so book now while appointments are open.\n\nOff\nDec 1\n2026\n\nLast month: $190 of annual max left\n\nYou still have $190 of annual max for 2026. After Dec 31 it's gone.\n\nOff\nRemind me\nAdd to calendar\nClaims and account activity\nBrushing rewards and privacy\nSet up your treatment plan",
+    "h1": [
+      {
+        "text": "Hi Dale",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/treatment",
+    "width": 320,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 9984,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nYour treatment\nAcme Dental Low. Estimated care across 2026 and 2027.\n\nEstimated total you pay\n\n$1,752.50\n\nChoose treatment dates\nDentist network for this plan\nTreatment items\nRoot canal (molar) on #19\nFee $1,180 · you pay $200 · dentist's deadline Nov 14, 2026\nCore buildup on #19\nFee $330 · you pay $125 · dentist's deadline Mar 31, 2027\nCrown (porcelain) on #19\nFee $1,450 · you pay $625 · dentist's deadline Mar 31, 2027\nCrown (porcelain) on #30\nFee $1,450 · you pay $600 · dentist's deadline Mar 31, 2027\nCleaning\nFee $120 · you pay $0 · dentist's deadline Jan 31, 2027\nRoot canal (molar) on #3\nOnly if needed\nFee $1,180 · you pay $675 · dentist's deadline Dec 31, 2027\nRoot canal (molar) on #19\n\nSelected item. In-network dentist.\n\nEstimated amount you pay\n\n$200\n\nDentist’s fee\n$1,180\nPlan discount\n$180\nPlan pays\n$800\nYou pay\n$200\nCost breakdown\nPrice sources\nUpdate dentist fee and insurer allowance\nChoose dates\nCheapest\n$1,752.50\nsaves $1,082.50\nLast date: Jan 4\nFastest\n$2,835\nEarliest dates\nLast date: Oct 18\nBalanced\n$1,752.50\nsaves $1,082.50\nLast date: Jan 4\nCheapest · Lowest cost after the max, deductible and FSA\n$1,752.50\nAfter FSA tax savings: $946.75\nLast planned visit: Jan 4, 2027\nVs. doing it all now: saves $1,082.50\nRoot canal (molar) on #19\n$200 if done\n\nOct 4, 2026. Your dentist set this date.\n\nDentist’s deadline: Nov 14, 2026\n\nCore buildup on #19\n$125 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCrown (porcelain) on #19\n$625 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCrown (porcelain) on #30\n$600 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCleaning\n$0 if done\nTreatment date\nApply date\n\nDentist’s deadline: Jan 31, 2027\n\nRoot canal (molar) on #3\n$675 if done\nTreatment date\nApply date\n\nDentist’s deadline: Dec 31, 2027\n\nVisual timeline (optional)\n\nShare with my dentist\nAdd a treatment plan\nBrowse procedures, including braces",
+    "h1": [
+      {
+        "text": "Your treatment",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": [
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 595
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 595
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 587
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 587
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 587
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 587
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 524.203125
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 595
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 359.859375
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 390.078125
+      }
+    ]
+  },
+  {
+    "route": "/enroll",
+    "width": 320,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 8776,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nOpen enrollment for 2027\nWhich option costs you least once premiums, taxes and likely dental work are counted.\n\nRecommended plan for 2027\n\nChoose Acme Dental High and put $1,040 in your 2027 FSA\n\n$1,129.80\n\nExpected total with premiums and care after tax, across this year and 2027.\n\nAdd to calendar\nShare with my dentist\nRemind me\nPlan and date details\n\nExpected savings $1,506.80 vs keeping your plan and doing everything now.\n\nCompare options\nAcme Dental Low(current)\nPremiums after tax\n$201.60\nExpected care\n$946.75\nExpected total\n$1,148.35\nIf every maybe happens\n$1,479.10\n\n$18.55 more than Acme Dental High in an expected year.\n\nAcme Dental High\nLowest expected cost\nPremiums after tax\n$403.20\nExpected care\n$726.60\nExpected total\n$1,129.80\nIf every maybe happens\n$1,330.70\n\nLowest expected total.\n\nWaive coverage and pay yourself\nPremiums after tax\n$0\nExpected care\n$2,177.80\nExpected total\n$2,177.80\nIf every maybe happens\n$2,756\n\n$1,048 more than Acme Dental High in an expected year.\n\nYour dentist's membership plan\nPremiums after tax\n$399\nExpected care\n$1,769.74\nExpected total\n$2,168.74\nIf every maybe happens\n$2,631.30\n\n$1,038.94 more than Acme Dental High in an expected year.\n\nCare covers the rest of this year (on your current plan) and next year, each option scheduled its cheapest way, after FSA tax savings.\n\nYou ran out of your max in 2025. Acme Dental High's $2,000 max would have covered up to $500 more.\nAbove a 20% chance of the root canal on #3, Acme Dental High pays for itself.\n\"Maybe\" work\nRoot canal (molar) on #3\n30% likely\n\nTipping point: Above a 20% chance of the root canal on #3, Acme Dental High pays for itself.\n\nFSA\n\nRecommended FSA election for 2027\n\n$1,040\n\nExpected out-of-pocket care in 2027\n$1,113\nAlready covered by money carried in\n$75\nIRS limit (not yet published)\n$3,400\nThis year's balance left after care\n$75\nThis year's money must be spent by\nDec 31, 2026\n\nSized to your expected out-of-pocket on the recommended plan and schedule, rounded up to $10, so little is left to forfeit.",
+    "h1": [
+      {
+        "text": "Open enrollment for 2027",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/dentists",
+    "width": 320,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 10762,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nCompare dentists\nCompare the costs of your planned care near Greensboro, NC 27401.\n\nProvider prices and participation shown here are sample comparisons. Confirm a real dentist’s network status with your insurer and request a written quote.\n\nEnter your dentist’s quote\nCurrent dentist: Fisher Park Dental Studio\nFisher Park Dental Studio as an in-network dentist\n$1,752.50\nSame fees, out of network\n$2,274.60\n+$522.10 mostly Balance billing\nKeep this dentist first in comparisons\nProvider comparisons\nList\nMap\nSedgefield Smile Center\n\nSedgefield · 7.3 miles · In-network scenario\n\nEstimated amount you pay\n$1,468.45\nCompare network scenarios\nStarmount Dental Group\n\nStarmount · 4.9 miles · In-network scenario\n\nEstimated amount you pay\n$1,534\nCompare network scenarios\nGlenwood Community Dental\n\nGlenwood · 1.9 miles · In-network scenario\n\nEstimated amount you pay\n$1,577.70\nCompare network scenarios\nLindley Park Dental Care\n\nLindley Park · 2.1 miles · In-network scenario\n\nEstimated amount you pay\n$1,621.40\nCompare network scenarios\nCollege Hill Dental\n\nCollege Hill · 1.1 miles · In-network scenario\n\nEstimated amount you pay\n$1,708.80\nCompare network scenarios\nFisher Park Dental Studio\n\nFisher Park · 0.8 miles · In-network scenario\n\nEstimated amount you pay\n$1,752.50\nCompare network scenarios\nGuilford Hills Dental\n\nGuilford Hills · 6 miles · In-network scenario\n\nEstimated amount you pay\n$1,796.20\nCompare network scenarios\nBattleground Family Dentistry\n\nBattleground · 3.6 miles · In-network scenario\n\nEstimated amount you pay\n$1,861.75\n\nNot accepting new patients in this sample.\n\nCompare network scenarios\nWestover Terrace Dental\n\nWestover · 2.4 miles · Out-of-network scenario\n\nEstimated amount you pay\n$2,665.32\nCompare network scenarios\nSummit Avenue Smiles\n\nSummit Ave · 1.4 miles · Out-of-network scenario\n\nEstimated amount you pay\n$2,860.68\nCompare network scenarios\nHamilton Lakes Dentistry\n\nHamilton Lakes · 5.2 miles · Out-of-network scenario\n\nEstimated amount you pay\n$3,349.08\nCompare network scenarios\nIrving Park Dental Arts\n\nIrving Park · 2.7 miles · Out-of-network scenario\n\nEstimated amount you pay\n$3,984\nCompare network scenarios\nPublished clinic fees nearby\n\nCleveland Avenue Dental Center in Winston-Salem publishes procedure charges. They may differ from your dentist’s fees, and do not establish your insurer’s allowance.\n\nClinic details and eligibilityCall the clinic: 336-703-3090Browse published procedure references",
+    "h1": [
+      {
+        "text": "Compare dentists",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/email",
+    "width": 320,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 3882,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nEmail\nTing works over email: send it anything about your dental care; get a monthly overview and urgent alerts.\nYour email and alerts\n\nEmail anything about your dental care to ting-dental@agentmail.to: EOBs, bills, treatment plans, notes from your dentist. Ting reads it, updates your record, plans any work and replies.\nDemo: email isn’t connected here, so messages show under “What Ting sent”.\n\nYour email\nMonthly overview (1st of the month)\nUrgent alerts right away\nPrivate mode\nEmails only say there’s an update; the details stay in the app.\nSave\nYour forwarding address\n\nFor bills and receipts your insurer can’t see. Forward an email, or set a filter in your own mail app. Ting never reads your inbox.\n\nWhat Ting read\n\nNothing yet. Email Ting a document and it shows up here.\n\nWhat Ting sent\n\nNo emails sent yet.",
+    "h1": [
+      {
+        "text": "Email",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/habits",
+    "width": 343,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 343,
+    "height": 13372,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nSmileStreak\nEarn credits for good brushing habits. Rewards only: your premium never goes up.\nBrush\n\nConnect a brush, then brush. Each area of your mouth lights up as you go; the session is checked and saved when you stop.\n\nYour brush\nconnected\nOral-B iO Series 5 (demo)\nBrush to connect\n\nOral-B smart brush\n\nSmart, Genius and iO brushes over Bluetooth. No pairing needed.\n\nConnect\n\nDIY clip\n\nA motion sensor that clips onto any toothbrush and sends sessions over Wi-Fi.\n\nConnect\nRewards\n$95\nearned of $120 for 2026\n\n$25 from cleanings · $70 from brushing\n\nThis month: 3 good days of 3 so far · 25 needed by month end · on track\n\nCleaning verified from your insurance claim\nApr 10, 2026 · Claim on 2026-04-10\n+$25\nBrushing goal met in January\nJan 31, 2026 · Device summaries\n+$10\nBrushing goal met in February\nFeb 28, 2026 · Device summaries\n+$10\nBrushing goal met in March\nMar 31, 2026 · Device summaries\n+$10\nBrushing goal met in April\nApr 30, 2026 · Device summaries\n+$10\nBrushing goal met in May\nMay 31, 2026 · Device summaries\n+$10\nBrushing goal met in June\nJun 30, 2026 · Device summaries\n+$10\nBrushing goal met in July\nJul 31, 2026 · Device summaries\n+$10\n\nEarn $25 per cleaning (up to 2) and $10 per month you brush twice a day on 80% of days (up to 7 months). Paid next plan year as an employer-funded wellness deposit to your FSA/HSA, or added to your plan's rollover balance.\n\nNo smart brush? Your dentist can confirm good home care at a cleaning. That earns the full brushing portion ($70), so nobody needs a device to qualify.\n\nStreak\n25\nday streak · 33 good days in the last 35\n2+ good sessions\n1 session\nnone\nnot collected\nPlan costs with your credit\n\nExpected premiums and care after tax for this year and next year.\n\nAcme Dental Low\nExpected total\n$1,148.35\nBrushing credit\n−$95\nTotal after credit\n$1,053.35\nAcme Dental High\nExpected total\n$1,129.80\nBrushing credit\n−$95\nTotal after credit\n$1,034.80\n\nLowest expected cost\n\nWaive coverage and pay yourself\nExpected total\n$2,177.80\nBrushing credit\n−$95\nTotal after credit\n$2,082.80\nYour dentist's membership plan\nExpected total\n$2,168.74\nBrushing credit\n−$95\nTotal after credit\n$2,073.74\n\nThe credit is the same on every plan, so it lowers your cost without changing which plan is best for you.\n\nDiscuss treatment with your dentist\n\nYour brushing record supports a conversation with your dentist. It does not predict whether you need a filling or root canal.\n\nReview uncertain treatment costs\nYour data, your call\nYou\nEvery session, your streak, your credits.\nYour dentist\nA 30-day summary on the visit handoff page, only if you turn it on below.\nNever sees: Individual sessions or times.\nYour insurer\nYour credit total (to pay it) and, if you allow, counts in groups of 20 or more.\nNever sees: Sessions, times or device IDs. Never used for pricing, underwriting or claim decisions.\nYour employer\nThe credit amount to deposit to your FSA/HSA.\nNever sees: Any brushing data.\nShare a 30-day summary with my dentist\nInclude me in your insurer's group counts (20+ people)\n\nCollecting since Jan 2, 2026 · 537 sessions stored.\n\nLeave and delete my data\nWhat your dentist sees\nShared on your visit handoff page\nWho benefits from this data\nYou · your dentist · your insurer",
+    "h1": [
+      {
+        "text": "SmileStreak",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/plan",
+    "width": 385,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 385,
+    "height": 6449,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nPlan rules\nThe rules every estimate uses, read from your plan's own documents.\nYour plan this year\nAcme Dental Low\nAcme Dental High\nYour plan's rules\n\nAcme Dental Low\n\nPreventive: plan pays\nIn-network 100%\nOut-of-network 100%\nBasic: plan pays\nIn-network 80%\nOut-of-network 80%\nMajor: plan pays\nIn-network 50%\nOut-of-network 50%\nOrthodontics: plan pays\nIn-network 0%\nOut-of-network 0%\n\nOrthodontic lifetime maximum: $0. Confirm age eligibility and any installment rules in your plan document.\n\nAnnual max $1,500; deductible $50 on basic and major care. Plan Maximums, §4\nPremium $24 a month, pre-tax.\nOut of network: 80th percentile of usual and customary fees. Out-of-Network Benefits, §3\nMax Rollover: plan payments of $750 or less in a year add $375 (+$125 if all in network) to next year's max, deposited on day 65, up to $1,500. Max Rollover, §5\nBack-tooth tooth-colored fillings are paid at the silver-filling rate. Limitations, §8.3\nDeductible paid in October to December also counts toward next year. Schedule of Benefits, §1.4\nExams: 2 per calendar year\nCleanings: 2 per calendar year\nBitewing X-rays: 1 per calendar year\nFull-mouth or panoramic X-rays: 1 per 60 months\nCrowns and bridges: 1 per tooth per 60 months\nBuildups and posts: 1 per tooth per 60 months\nScaling and root planing: 1 per quadrant per 24 months\nNight guards: 1 per 36 months\nLoad a plan document\n\nUpload your benefits summary, review the coverage and fill in anything missing before using it for an estimate.\n\nUpload benefits summary\nScan insurance card\nSample benefits summary (PDF)",
+    "h1": [
+      {
+        "text": "Plan rules",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/onboarding",
+    "width": 320,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 2189,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nGet started\nBring your dentist’s recommendations and any quoted fees.\nStart with one person’s care\n\nTing estimates treatment for one person at a time. Family deductibles and combined family care need confirmation with your insurer.\n\nYou can type a treatment plan, upload a document, or browse procedures including braces. No treatment is added automatically.\n\nAdd my treatment plan",
+    "h1": [
+      {
+        "text": "Get started",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/share/not-a-real-token",
+    "width": 369,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 369,
+    "height": 974,
+    "text": "Shared plan unavailable\n\nThis link is invalid, expired or could not be loaded. Ask the person who shared it for a new link.\n\nTry againTing home",
+    "h1": [
+      {
+        "text": "Shared plan unavailable",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/try",
+    "width": 320,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 1241,
+    "text": "Try Ting on your phone\n\nExplore sample treatment costs and change dates to compare estimates.\n\nhttp://127.0.0.1:5173/?persona=dale&demo=1\n\nThis opens the sample account with illustrative fees.\n\nOpen the sample app",
+    "h1": [
+      {
+        "text": "Try Ting on your phone",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/auth/callback",
+    "width": 320,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 320,
+    "height": 844,
+    "text": "Sign-in was cancelled.\n\nBack to Ting",
+    "h1": [],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/",
+    "width": 473,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 473,
+    "height": 5235,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nHi Dale\nPlan your dental care and understand what you may pay.\nYour planned care\n\n$1,752.50\n\nEstimated amount you pay across 2026 and 2027. 6 treatment items. Cheapest schedule.\n\nReview treatment and dates\nBenefits this year\n\nAcme Dental Low\nAcme Dental High\n · as of Oct 4, 2026\n\nAnnual maximum 2026\nof $1,500\n$190\nleft after scheduled work\nUsed\n$300\nScheduled\n$1,010\nRemaining\n$190\nDeductible\n$50 of $50 met\nYour FSA\nFSA balance\nSome can carry over\n$400\n88 days left (until Dec 31, 2026)\n\nYour scheduled work uses it in time.\n\nCompare next year’s plans\nAsk about your plan\nAsk\nReminders\nEmail settings\n\nGet a reminder before unused benefits expire. FSA deadlines follow your employer’s carryover or grace-period rules.\n\nNov 1\n2026\n\n2 months left to use your dental benefits\n\nYou still have $190 of annual max for 2026. They reset on Jan 1, so book now while appointments are open.\n\nOff\nDec 1\n2026\n\nLast month: $190 of annual max left\n\nYou still have $190 of annual max for 2026. After Dec 31 it's gone.\n\nOff\nRemind me\nAdd to calendar\nClaims and account activity\nBrushing rewards and privacy\nSet up your treatment plan",
+    "h1": [
+      {
+        "text": "Hi Dale",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/treatment",
+    "width": 390,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 8824,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nYour treatment\nAcme Dental Low. Estimated care across 2026 and 2027.\n\nEstimated total you pay\n\n$1,752.50\n\nChoose treatment dates\nDentist network for this plan\nTreatment items\nRoot canal (molar) on #19\nFee $1,180 · you pay $200 · dentist's deadline Nov 14, 2026\nCore buildup on #19\nFee $330 · you pay $125 · dentist's deadline Mar 31, 2027\nCrown (porcelain) on #19\nFee $1,450 · you pay $625 · dentist's deadline Mar 31, 2027\nCrown (porcelain) on #30\nFee $1,450 · you pay $600 · dentist's deadline Mar 31, 2027\nCleaning\nFee $120 · you pay $0 · dentist's deadline Jan 31, 2027\nRoot canal (molar) on #3\nOnly if needed\nFee $1,180 · you pay $675 · dentist's deadline Dec 31, 2027\nRoot canal (molar) on #19\n\nSelected item. In-network dentist.\n\nEstimated amount you pay\n\n$200\n\nDentist’s fee\n$1,180\nPlan discount\n$180\nPlan pays\n$800\nYou pay\n$200\nCost breakdown\nPrice sources\nUpdate dentist fee and insurer allowance\nChoose dates\nCheapest\n$1,752.50\nsaves $1,082.50\nLast date: Jan 4\nFastest\n$2,835\nEarliest dates\nLast date: Oct 18\nBalanced\n$1,752.50\nsaves $1,082.50\nLast date: Jan 4\nCheapest · Lowest cost after the max, deductible and FSA\n$1,752.50\nAfter FSA tax savings: $946.75\nLast planned visit: Jan 4, 2027\nVs. doing it all now: saves $1,082.50\nRoot canal (molar) on #19\n$200 if done\n\nOct 4, 2026. Your dentist set this date.\n\nDentist’s deadline: Nov 14, 2026\n\nCore buildup on #19\n$125 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCrown (porcelain) on #19\n$625 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCrown (porcelain) on #30\n$600 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCleaning\n$0 if done\nTreatment date\nApply date\n\nDentist’s deadline: Jan 31, 2027\n\nRoot canal (molar) on #3\n$675 if done\nTreatment date\nApply date\n\nDentist’s deadline: Dec 31, 2027\n\nVisual timeline (optional)\n\nShare with my dentist\nAdd a treatment plan\nBrowse procedures, including braces",
+    "h1": [
+      {
+        "text": "Your treatment",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": [
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 599
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 599
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 591
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 591
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 591
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 591
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 528.203125
+      },
+      {
+        "tag": "DIV",
+        "text": "",
+        "right": 599
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 394.078125
+      },
+      {
+        "tag": "SPAN",
+        "text": "",
+        "right": 420.8125
+      }
+    ]
+  },
+  {
+    "route": "/enroll",
+    "width": 390,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 7452,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nOpen enrollment for 2027\nWhich option costs you least once premiums, taxes and likely dental work are counted.\n\nRecommended plan for 2027\n\nChoose Acme Dental High and put $1,040 in your 2027 FSA\n\n$1,129.80\n\nExpected total with premiums and care after tax, across this year and 2027.\n\nAdd to calendar\nShare with my dentist\nRemind me\nPlan and date details\n\nExpected savings $1,506.80 vs keeping your plan and doing everything now.\n\nCompare options\nAcme Dental Low(current)\nPremiums after tax\n$201.60\nExpected care\n$946.75\nExpected total\n$1,148.35\nIf every maybe happens\n$1,479.10\n\n$18.55 more than Acme Dental High in an expected year.\n\nAcme Dental High\nLowest expected cost\nPremiums after tax\n$403.20\nExpected care\n$726.60\nExpected total\n$1,129.80\nIf every maybe happens\n$1,330.70\n\nLowest expected total.\n\nWaive coverage and pay yourself\nPremiums after tax\n$0\nExpected care\n$2,177.80\nExpected total\n$2,177.80\nIf every maybe happens\n$2,756\n\n$1,048 more than Acme Dental High in an expected year.\n\nYour dentist's membership plan\nPremiums after tax\n$399\nExpected care\n$1,769.74\nExpected total\n$2,168.74\nIf every maybe happens\n$2,631.30\n\n$1,038.94 more than Acme Dental High in an expected year.\n\nCare covers the rest of this year (on your current plan) and next year, each option scheduled its cheapest way, after FSA tax savings.\n\nYou ran out of your max in 2025. Acme Dental High's $2,000 max would have covered up to $500 more.\nAbove a 20% chance of the root canal on #3, Acme Dental High pays for itself.\n\"Maybe\" work\nRoot canal (molar) on #3\n30% likely\n\nTipping point: Above a 20% chance of the root canal on #3, Acme Dental High pays for itself.\n\nFSA\n\nRecommended FSA election for 2027\n\n$1,040\n\nExpected out-of-pocket care in 2027\n$1,113\nAlready covered by money carried in\n$75\nIRS limit (not yet published)\n$3,400\nThis year's balance left after care\n$75\nThis year's money must be spent by\nDec 31, 2026\n\nSized to your expected out-of-pocket on the recommended plan and schedule, rounded up to $10, so little is left to forfeit.",
+    "h1": [
+      {
+        "text": "Open enrollment for 2027",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/dentists",
+    "width": 390,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 9758,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nCompare dentists\nCompare the costs of your planned care near Greensboro, NC 27401.\n\nProvider prices and participation shown here are sample comparisons. Confirm a real dentist’s network status with your insurer and request a written quote.\n\nEnter your dentist’s quote\nCurrent dentist: Fisher Park Dental Studio\nFisher Park Dental Studio as an in-network dentist\n$1,752.50\nSame fees, out of network\n$2,274.60\n+$522.10 mostly Balance billing\nKeep this dentist first in comparisons\nProvider comparisons\nList\nMap\nSedgefield Smile Center\n\nSedgefield · 7.3 miles · In-network scenario\n\nEstimated amount you pay\n$1,468.45\nCompare network scenarios\nStarmount Dental Group\n\nStarmount · 4.9 miles · In-network scenario\n\nEstimated amount you pay\n$1,534\nCompare network scenarios\nGlenwood Community Dental\n\nGlenwood · 1.9 miles · In-network scenario\n\nEstimated amount you pay\n$1,577.70\nCompare network scenarios\nLindley Park Dental Care\n\nLindley Park · 2.1 miles · In-network scenario\n\nEstimated amount you pay\n$1,621.40\nCompare network scenarios\nCollege Hill Dental\n\nCollege Hill · 1.1 miles · In-network scenario\n\nEstimated amount you pay\n$1,708.80\nCompare network scenarios\nFisher Park Dental Studio\n\nFisher Park · 0.8 miles · In-network scenario\n\nEstimated amount you pay\n$1,752.50\nCompare network scenarios\nGuilford Hills Dental\n\nGuilford Hills · 6 miles · In-network scenario\n\nEstimated amount you pay\n$1,796.20\nCompare network scenarios\nBattleground Family Dentistry\n\nBattleground · 3.6 miles · In-network scenario\n\nEstimated amount you pay\n$1,861.75\n\nNot accepting new patients in this sample.\n\nCompare network scenarios\nWestover Terrace Dental\n\nWestover · 2.4 miles · Out-of-network scenario\n\nEstimated amount you pay\n$2,665.32\nCompare network scenarios\nSummit Avenue Smiles\n\nSummit Ave · 1.4 miles · Out-of-network scenario\n\nEstimated amount you pay\n$2,860.68\nCompare network scenarios\nHamilton Lakes Dentistry\n\nHamilton Lakes · 5.2 miles · Out-of-network scenario\n\nEstimated amount you pay\n$3,349.08\nCompare network scenarios\nIrving Park Dental Arts\n\nIrving Park · 2.7 miles · Out-of-network scenario\n\nEstimated amount you pay\n$3,984\nCompare network scenarios\nPublished clinic fees nearby\n\nCleveland Avenue Dental Center in Winston-Salem publishes procedure charges. They may differ from your dentist’s fees, and do not establish your insurer’s allowance.\n\nClinic details and eligibilityCall the clinic: 336-703-3090Browse published procedure references",
+    "h1": [
+      {
+        "text": "Compare dentists",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/email",
+    "width": 390,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 3314,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nEmail\nTing works over email: send it anything about your dental care; get a monthly overview and urgent alerts.\nYour email and alerts\n\nEmail anything about your dental care to ting-dental@agentmail.to: EOBs, bills, treatment plans, notes from your dentist. Ting reads it, updates your record, plans any work and replies.\nDemo: email isn’t connected here, so messages show under “What Ting sent”.\n\nYour email\nMonthly overview (1st of the month)\nUrgent alerts right away\nPrivate mode\nEmails only say there’s an update; the details stay in the app.\nSave\nYour forwarding address\n\nFor bills and receipts your insurer can’t see. Forward an email, or set a filter in your own mail app. Ting never reads your inbox.\n\nWhat Ting read\n\nNothing yet. Email Ting a document and it shows up here.\n\nWhat Ting sent\n\nNo emails sent yet.",
+    "h1": [
+      {
+        "text": "Email",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/habits",
+    "width": 390,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 11432,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nSmileStreak\nEarn credits for good brushing habits. Rewards only: your premium never goes up.\nBrush\n\nConnect a brush, then brush. Each area of your mouth lights up as you go; the session is checked and saved when you stop.\n\nYour brush\nconnected\nOral-B iO Series 5 (demo)\nBrush to connect\n\nOral-B smart brush\n\nSmart, Genius and iO brushes over Bluetooth. No pairing needed.\n\nConnect\n\nDIY clip\n\nA motion sensor that clips onto any toothbrush and sends sessions over Wi-Fi.\n\nConnect\nRewards\n$95\nearned of $120 for 2026\n\n$25 from cleanings · $70 from brushing\n\nThis month: 3 good days of 3 so far · 25 needed by month end · on track\n\nCleaning verified from your insurance claim\nApr 10, 2026 · Claim on 2026-04-10\n+$25\nBrushing goal met in January\nJan 31, 2026 · Device summaries\n+$10\nBrushing goal met in February\nFeb 28, 2026 · Device summaries\n+$10\nBrushing goal met in March\nMar 31, 2026 · Device summaries\n+$10\nBrushing goal met in April\nApr 30, 2026 · Device summaries\n+$10\nBrushing goal met in May\nMay 31, 2026 · Device summaries\n+$10\nBrushing goal met in June\nJun 30, 2026 · Device summaries\n+$10\nBrushing goal met in July\nJul 31, 2026 · Device summaries\n+$10\n\nEarn $25 per cleaning (up to 2) and $10 per month you brush twice a day on 80% of days (up to 7 months). Paid next plan year as an employer-funded wellness deposit to your FSA/HSA, or added to your plan's rollover balance.\n\nNo smart brush? Your dentist can confirm good home care at a cleaning. That earns the full brushing portion ($70), so nobody needs a device to qualify.\n\nStreak\n25\nday streak · 33 good days in the last 35\n2+ good sessions\n1 session\nnone\nnot collected\nPlan costs with your credit\n\nExpected premiums and care after tax for this year and next year.\n\nAcme Dental Low\nExpected total\n$1,148.35\nBrushing credit\n−$95\nTotal after credit\n$1,053.35\nAcme Dental High\nExpected total\n$1,129.80\nBrushing credit\n−$95\nTotal after credit\n$1,034.80\n\nLowest expected cost\n\nWaive coverage and pay yourself\nExpected total\n$2,177.80\nBrushing credit\n−$95\nTotal after credit\n$2,082.80\nYour dentist's membership plan\nExpected total\n$2,168.74\nBrushing credit\n−$95\nTotal after credit\n$2,073.74\n\nThe credit is the same on every plan, so it lowers your cost without changing which plan is best for you.\n\nDiscuss treatment with your dentist\n\nYour brushing record supports a conversation with your dentist. It does not predict whether you need a filling or root canal.\n\nReview uncertain treatment costs\nYour data, your call\nYou\nEvery session, your streak, your credits.\nYour dentist\nA 30-day summary on the visit handoff page, only if you turn it on below.\nNever sees: Individual sessions or times.\nYour insurer\nYour credit total (to pay it) and, if you allow, counts in groups of 20 or more.\nNever sees: Sessions, times or device IDs. Never used for pricing, underwriting or claim decisions.\nYour employer\nThe credit amount to deposit to your FSA/HSA.\nNever sees: Any brushing data.\nShare a 30-day summary with my dentist\nInclude me in your insurer's group counts (20+ people)\n\nCollecting since Jan 2, 2026 · 537 sessions stored.\n\nLeave and delete my data\nWhat your dentist sees\nShared on your visit handoff page\nWho benefits from this data\nYou · your dentist · your insurer",
+    "h1": [
+      {
+        "text": "SmileStreak",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/plan",
+    "width": 390,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 5381,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nPlan rules\nThe rules every estimate uses, read from your plan's own documents.\nYour plan this year\nAcme Dental Low\nAcme Dental High\nYour plan's rules\n\nAcme Dental Low\n\nPreventive: plan pays\nIn-network 100%\nOut-of-network 100%\nBasic: plan pays\nIn-network 80%\nOut-of-network 80%\nMajor: plan pays\nIn-network 50%\nOut-of-network 50%\nOrthodontics: plan pays\nIn-network 0%\nOut-of-network 0%\n\nOrthodontic lifetime maximum: $0. Confirm age eligibility and any installment rules in your plan document.\n\nAnnual max $1,500; deductible $50 on basic and major care. Plan Maximums, §4\nPremium $24 a month, pre-tax.\nOut of network: 80th percentile of usual and customary fees. Out-of-Network Benefits, §3\nMax Rollover: plan payments of $750 or less in a year add $375 (+$125 if all in network) to next year's max, deposited on day 65, up to $1,500. Max Rollover, §5\nBack-tooth tooth-colored fillings are paid at the silver-filling rate. Limitations, §8.3\nDeductible paid in October to December also counts toward next year. Schedule of Benefits, §1.4\nExams: 2 per calendar year\nCleanings: 2 per calendar year\nBitewing X-rays: 1 per calendar year\nFull-mouth or panoramic X-rays: 1 per 60 months\nCrowns and bridges: 1 per tooth per 60 months\nBuildups and posts: 1 per tooth per 60 months\nScaling and root planing: 1 per quadrant per 24 months\nNight guards: 1 per 36 months\nLoad a plan document\n\nUpload your benefits summary, review the coverage and fill in anything missing before using it for an estimate.\n\nUpload benefits summary\nScan insurance card\nSample benefits summary (PDF)",
+    "h1": [
+      {
+        "text": "Plan rules",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/onboarding",
+    "width": 390,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 1753,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nGet started\nBring your dentist’s recommendations and any quoted fees.\nStart with one person’s care\n\nTing estimates treatment for one person at a time. Family deductibles and combined family care need confirmation with your insurer.\n\nYou can type a treatment plan, upload a document, or browse procedures including braces. No treatment is added automatically.\n\nAdd my treatment plan",
+    "h1": [
+      {
+        "text": "Get started",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/share/not-a-real-token",
+    "width": 390,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 844,
+    "text": "Shared plan unavailable\n\nThis link is invalid, expired or could not be loaded. Ask the person who shared it for a new link.\n\nTry againTing home",
+    "h1": [
+      {
+        "text": "Shared plan unavailable",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/try",
+    "width": 390,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 1145,
+    "text": "Try Ting on your phone\n\nExplore sample treatment costs and change dates to compare estimates.\n\nhttp://127.0.0.1:5173/?persona=dale&demo=1\n\nThis opens the sample account with illustrative fees.\n\nOpen the sample app",
+    "h1": [
+      {
+        "text": "Try Ting on your phone",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/auth/callback",
+    "width": 390,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 390,
+    "height": 844,
+    "text": "Sign-in was cancelled.\n\nBack to Ting",
+    "h1": [],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/",
+    "width": 768,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 3192,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nHi Dale\nPlan your dental care and understand what you may pay.\nYour planned care\n\n$1,752.50\n\nEstimated amount you pay across 2026 and 2027. 6 treatment items. Cheapest schedule.\n\nReview treatment and dates\nBenefits this year\n\nAcme Dental Low\nAcme Dental High\n · as of Oct 4, 2026\n\nAnnual maximum 2026\nof $1,500\n$190\nleft after scheduled work\nUsed\n$300\nScheduled\n$1,010\nRemaining\n$190\nDeductible\n$50 of $50 met\nYour FSA\nFSA balance\nSome can carry over\n$400\n88 days left (until Dec 31, 2026)\n\nYour scheduled work uses it in time.\n\nCompare next year’s plans\nAsk about your plan\nAsk\nReminders\nEmail settings\n\nGet a reminder before unused benefits expire. FSA deadlines follow your employer’s carryover or grace-period rules.\n\nNov 1\n2026\n\n2 months left to use your dental benefits\n\nYou still have $190 of annual max for 2026. They reset on Jan 1, so book now while appointments are open.\n\nOff\nDec 1\n2026\n\nLast month: $190 of annual max left\n\nYou still have $190 of annual max for 2026. After Dec 31 it's gone.\n\nOff\nRemind me\nAdd to calendar\nClaims and account activity\nBrushing rewards and privacy\nSet up your treatment plan",
+    "h1": [
+      {
+        "text": "Hi Dale",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/treatment",
+    "width": 768,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 6374,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nYour treatment\nAcme Dental Low. Estimated care across 2026 and 2027.\n\nEstimated total you pay\n\n$1,752.50\n\nChoose treatment dates\nDentist network for this plan\nTreatment items\nRoot canal (molar) on #19\nFee $1,180 · you pay $200 · dentist's deadline Nov 14, 2026\nCore buildup on #19\nFee $330 · you pay $125 · dentist's deadline Mar 31, 2027\nCrown (porcelain) on #19\nFee $1,450 · you pay $625 · dentist's deadline Mar 31, 2027\nCrown (porcelain) on #30\nFee $1,450 · you pay $600 · dentist's deadline Mar 31, 2027\nCleaning\nFee $120 · you pay $0 · dentist's deadline Jan 31, 2027\nRoot canal (molar) on #3\nOnly if needed\nFee $1,180 · you pay $675 · dentist's deadline Dec 31, 2027\nRoot canal (molar) on #19\n\nSelected item. In-network dentist.\n\nEstimated amount you pay\n\n$200\n\nDentist’s fee\n$1,180\nPlan discount\n$180\nPlan pays\n$800\nYou pay\n$200\nCost breakdown\nPrice sources\nUpdate dentist fee and insurer allowance\nChoose dates\nCheapest\n$1,752.50\nsaves $1,082.50\nLast date: Jan 4\nFastest\n$2,835\nEarliest dates\nLast date: Oct 18\nBalanced\n$1,752.50\nsaves $1,082.50\nLast date: Jan 4\nCheapest · Lowest cost after the max, deductible and FSA\n$1,752.50\nAfter FSA tax savings: $946.75\nLast planned visit: Jan 4, 2027\nVs. doing it all now: saves $1,082.50\nRoot canal (molar) on #19\n$200 if done\n\nOct 4, 2026. Your dentist set this date.\n\nDentist’s deadline: Nov 14, 2026\n\nCore buildup on #19\n$125 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCrown (porcelain) on #19\n$625 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCrown (porcelain) on #30\n$600 if done\nTreatment date\nApply date\n\nDentist’s deadline: Mar 31, 2027\n\nCleaning\n$0 if done\nTreatment date\nApply date\n\nDentist’s deadline: Jan 31, 2027\n\nRoot canal (molar) on #3\n$675 if done\nTreatment date\nApply date\n\nDentist’s deadline: Dec 31, 2027\n\nVisual timeline (optional)\n\nShare with my dentist\nAdd a treatment plan\nBrowse procedures, including braces",
+    "h1": [
+      {
+        "text": "Your treatment",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/enroll",
+    "width": 768,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 4456,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nOpen enrollment for 2027\nWhich option costs you least once premiums, taxes and likely dental work are counted.\n\nRecommended plan for 2027\n\nChoose Acme Dental High and put $1,040 in your 2027 FSA\n\n$1,129.80\n\nExpected total with premiums and care after tax, across this year and 2027.\n\nAdd to calendar\nShare with my dentist\nRemind me\nPlan and date details\n\nExpected savings $1,506.80 vs keeping your plan and doing everything now.\n\nCompare options\nAcme Dental Low(current)\nPremiums after tax\n$201.60\nExpected care\n$946.75\nExpected total\n$1,148.35\nIf every maybe happens\n$1,479.10\n\n$18.55 more than Acme Dental High in an expected year.\n\nAcme Dental High\nLowest expected cost\nPremiums after tax\n$403.20\nExpected care\n$726.60\nExpected total\n$1,129.80\nIf every maybe happens\n$1,330.70\n\nLowest expected total.\n\nWaive coverage and pay yourself\nPremiums after tax\n$0\nExpected care\n$2,177.80\nExpected total\n$2,177.80\nIf every maybe happens\n$2,756\n\n$1,048 more than Acme Dental High in an expected year.\n\nYour dentist's membership plan\nPremiums after tax\n$399\nExpected care\n$1,769.74\nExpected total\n$2,168.74\nIf every maybe happens\n$2,631.30\n\n$1,038.94 more than Acme Dental High in an expected year.\n\nCare covers the rest of this year (on your current plan) and next year, each option scheduled its cheapest way, after FSA tax savings.\n\nYou ran out of your max in 2025. Acme Dental High's $2,000 max would have covered up to $500 more.\nAbove a 20% chance of the root canal on #3, Acme Dental High pays for itself.\n\"Maybe\" work\nRoot canal (molar) on #3\n30% likely\n\nTipping point: Above a 20% chance of the root canal on #3, Acme Dental High pays for itself.\n\nFSA\n\nRecommended FSA election for 2027\n\n$1,040\n\nExpected out-of-pocket care in 2027\n$1,113\nAlready covered by money carried in\n$75\nIRS limit (not yet published)\n$3,400\nThis year's balance left after care\n$75\nThis year's money must be spent by\nDec 31, 2026\n\nSized to your expected out-of-pocket on the recommended plan and schedule, rounded up to $10, so little is left to forfeit.",
+    "h1": [
+      {
+        "text": "Open enrollment for 2027",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/dentists",
+    "width": 768,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 5552,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nCompare dentists\nCompare the costs of your planned care near Greensboro, NC 27401.\n\nProvider prices and participation shown here are sample comparisons. Confirm a real dentist’s network status with your insurer and request a written quote.\n\nEnter your dentist’s quote\nCurrent dentist: Fisher Park Dental Studio\nFisher Park Dental Studio as an in-network dentist\n$1,752.50\nSame fees, out of network\n$2,274.60\n+$522.10 mostly Balance billing\nKeep this dentist first in comparisons\nProvider comparisons\nList\nMap\nSedgefield Smile Center\n\nSedgefield · 7.3 miles · In-network scenario\n\nEstimated amount you pay\n$1,468.45\nCompare network scenarios\nStarmount Dental Group\n\nStarmount · 4.9 miles · In-network scenario\n\nEstimated amount you pay\n$1,534\nCompare network scenarios\nGlenwood Community Dental\n\nGlenwood · 1.9 miles · In-network scenario\n\nEstimated amount you pay\n$1,577.70\nCompare network scenarios\nLindley Park Dental Care\n\nLindley Park · 2.1 miles · In-network scenario\n\nEstimated amount you pay\n$1,621.40\nCompare network scenarios\nCollege Hill Dental\n\nCollege Hill · 1.1 miles · In-network scenario\n\nEstimated amount you pay\n$1,708.80\nCompare network scenarios\nFisher Park Dental Studio\n\nFisher Park · 0.8 miles · In-network scenario\n\nEstimated amount you pay\n$1,752.50\nCompare network scenarios\nGuilford Hills Dental\n\nGuilford Hills · 6 miles · In-network scenario\n\nEstimated amount you pay\n$1,796.20\nCompare network scenarios\nBattleground Family Dentistry\n\nBattleground · 3.6 miles · In-network scenario\n\nEstimated amount you pay\n$1,861.75\n\nNot accepting new patients in this sample.\n\nCompare network scenarios\nWestover Terrace Dental\n\nWestover · 2.4 miles · Out-of-network scenario\n\nEstimated amount you pay\n$2,665.32\nCompare network scenarios\nSummit Avenue Smiles\n\nSummit Ave · 1.4 miles · Out-of-network scenario\n\nEstimated amount you pay\n$2,860.68\nCompare network scenarios\nHamilton Lakes Dentistry\n\nHamilton Lakes · 5.2 miles · Out-of-network scenario\n\nEstimated amount you pay\n$3,349.08\nCompare network scenarios\nIrving Park Dental Arts\n\nIrving Park · 2.7 miles · Out-of-network scenario\n\nEstimated amount you pay\n$3,984\nCompare network scenarios\nPublished clinic fees nearby\n\nCleveland Avenue Dental Center in Winston-Salem publishes procedure charges. They may differ from your dentist’s fees, and do not establish your insurer’s allowance.\n\nClinic details and eligibilityCall the clinic: 336-703-3090Browse published procedure references",
+    "h1": [
+      {
+        "text": "Compare dentists",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/email",
+    "width": 768,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 2246,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nEmail\nTing works over email: send it anything about your dental care; get a monthly overview and urgent alerts.\nYour email and alerts\n\nEmail anything about your dental care to ting-dental@agentmail.to: EOBs, bills, treatment plans, notes from your dentist. Ting reads it, updates your record, plans any work and replies.\nDemo: email isn’t connected here, so messages show under “What Ting sent”.\n\nYour email\nMonthly overview (1st of the month)\nUrgent alerts right away\nPrivate mode\nEmails only say there’s an update; the details stay in the app.\nSave\nYour forwarding address\n\nFor bills and receipts your insurer can’t see. Forward an email, or set a filter in your own mail app. Ting never reads your inbox.\n\nWhat Ting read\n\nNothing yet. Email Ting a document and it shows up here.\n\nWhat Ting sent\n\nNo emails sent yet.",
+    "h1": [
+      {
+        "text": "Email",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/habits",
+    "width": 768,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 7298,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nSmileStreak\nEarn credits for good brushing habits. Rewards only: your premium never goes up.\nBrush\n\nConnect a brush, then brush. Each area of your mouth lights up as you go; the session is checked and saved when you stop.\n\nYour brush\nconnected\nOral-B iO Series 5 (demo)\nBrush to connect\n\nOral-B smart brush\n\nSmart, Genius and iO brushes over Bluetooth. No pairing needed.\n\nConnect\n\nDIY clip\n\nA motion sensor that clips onto any toothbrush and sends sessions over Wi-Fi.\n\nConnect\nRewards\n$95\nearned of $120 for 2026\n\n$25 from cleanings · $70 from brushing\n\nThis month: 3 good days of 3 so far · 25 needed by month end · on track\n\nCleaning verified from your insurance claim\nApr 10, 2026 · Claim on 2026-04-10\n+$25\nBrushing goal met in January\nJan 31, 2026 · Device summaries\n+$10\nBrushing goal met in February\nFeb 28, 2026 · Device summaries\n+$10\nBrushing goal met in March\nMar 31, 2026 · Device summaries\n+$10\nBrushing goal met in April\nApr 30, 2026 · Device summaries\n+$10\nBrushing goal met in May\nMay 31, 2026 · Device summaries\n+$10\nBrushing goal met in June\nJun 30, 2026 · Device summaries\n+$10\nBrushing goal met in July\nJul 31, 2026 · Device summaries\n+$10\n\nEarn $25 per cleaning (up to 2) and $10 per month you brush twice a day on 80% of days (up to 7 months). Paid next plan year as an employer-funded wellness deposit to your FSA/HSA, or added to your plan's rollover balance.\n\nNo smart brush? Your dentist can confirm good home care at a cleaning. That earns the full brushing portion ($70), so nobody needs a device to qualify.\n\nStreak\n25\nday streak · 33 good days in the last 35\n2+ good sessions\n1 session\nnone\nnot collected\nPlan costs with your credit\n\nExpected premiums and care after tax for this year and next year.\n\nAcme Dental Low\nExpected total\n$1,148.35\nBrushing credit\n−$95\nTotal after credit\n$1,053.35\nAcme Dental High\nExpected total\n$1,129.80\nBrushing credit\n−$95\nTotal after credit\n$1,034.80\n\nLowest expected cost\n\nWaive coverage and pay yourself\nExpected total\n$2,177.80\nBrushing credit\n−$95\nTotal after credit\n$2,082.80\nYour dentist's membership plan\nExpected total\n$2,168.74\nBrushing credit\n−$95\nTotal after credit\n$2,073.74\n\nThe credit is the same on every plan, so it lowers your cost without changing which plan is best for you.\n\nDiscuss treatment with your dentist\n\nYour brushing record supports a conversation with your dentist. It does not predict whether you need a filling or root canal.\n\nReview uncertain treatment costs\nYour data, your call\nYou\nEvery session, your streak, your credits.\nYour dentist\nA 30-day summary on the visit handoff page, only if you turn it on below.\nNever sees: Individual sessions or times.\nYour insurer\nYour credit total (to pay it) and, if you allow, counts in groups of 20 or more.\nNever sees: Sessions, times or device IDs. Never used for pricing, underwriting or claim decisions.\nYour employer\nThe credit amount to deposit to your FSA/HSA.\nNever sees: Any brushing data.\nShare a 30-day summary with my dentist\nInclude me in your insurer's group counts (20+ people)\n\nCollecting since Jan 2, 2026 · 537 sessions stored.\n\nLeave and delete my data\nWhat your dentist sees\nShared on your visit handoff page\nWho benefits from this data\nYou · your dentist · your insurer",
+    "h1": [
+      {
+        "text": "SmileStreak",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": [
+      {
+        "tag": "text",
+        "right": 772.3536376953125
+      }
+    ]
+  },
+  {
+    "route": "/plan",
+    "width": 768,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 3327,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nPlan rules\nThe rules every estimate uses, read from your plan's own documents.\nYour plan this year\nAcme Dental Low\nAcme Dental High\nYour plan's rules\n\nAcme Dental Low\n\nPreventive: plan pays\nIn-network 100%\nOut-of-network 100%\nBasic: plan pays\nIn-network 80%\nOut-of-network 80%\nMajor: plan pays\nIn-network 50%\nOut-of-network 50%\nOrthodontics: plan pays\nIn-network 0%\nOut-of-network 0%\n\nOrthodontic lifetime maximum: $0. Confirm age eligibility and any installment rules in your plan document.\n\nAnnual max $1,500; deductible $50 on basic and major care. Plan Maximums, §4\nPremium $24 a month, pre-tax.\nOut of network: 80th percentile of usual and customary fees. Out-of-Network Benefits, §3\nMax Rollover: plan payments of $750 or less in a year add $375 (+$125 if all in network) to next year's max, deposited on day 65, up to $1,500. Max Rollover, §5\nBack-tooth tooth-colored fillings are paid at the silver-filling rate. Limitations, §8.3\nDeductible paid in October to December also counts toward next year. Schedule of Benefits, §1.4\nExams: 2 per calendar year\nCleanings: 2 per calendar year\nBitewing X-rays: 1 per calendar year\nFull-mouth or panoramic X-rays: 1 per 60 months\nCrowns and bridges: 1 per tooth per 60 months\nBuildups and posts: 1 per tooth per 60 months\nScaling and root planing: 1 per quadrant per 24 months\nNight guards: 1 per 36 months\nLoad a plan document\n\nUpload your benefits summary, review the coverage and fill in anything missing before using it for an estimate.\n\nUpload benefits summary\nScan insurance card\nSample benefits summary (PDF)",
+    "h1": [
+      {
+        "text": "Plan rules",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/onboarding",
+    "width": 768,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 1121,
+    "text": "Sample account. Plans, providers and default prices are illustrative. Edits are saved on this device.\n\nGet started\nBring your dentist’s recommendations and any quoted fees.\nStart with one person’s care\n\nTing estimates treatment for one person at a time. Family deductibles and combined family care need confirmation with your insurer.\n\nYou can type a treatment plan, upload a document, or browse procedures including braces. No treatment is added automatically.\n\nAdd my treatment plan",
+    "h1": [
+      {
+        "text": "Get started",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/share/not-a-real-token",
+    "width": 768,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 844,
+    "text": "Shared plan unavailable\n\nThis link is invalid, expired or could not be loaded. Ask the person who shared it for a new link.\n\nTry againTing home",
+    "h1": [
+      {
+        "text": "Shared plan unavailable",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/try",
+    "width": 768,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 941,
+    "text": "Try Ting on your phone\n\nExplore sample treatment costs and change dates to compare estimates.\n\nhttp://127.0.0.1:5173/?persona=dale&demo=1\n\nThis opens the sample account with illustrative fees.\n\nOpen the sample app",
+    "h1": [
+      {
+        "text": "Try Ting on your phone",
+        "size": "64px",
+        "line": "76px"
+      }
+    ],
+    "small": [],
+    "overflows": []
+  },
+  {
+    "route": "/auth/callback",
+    "width": 768,
+    "zoom": 2,
+    "errors": [],
+    "scrollWidth": 768,
+    "height": 844,
+    "text": "Sign-in was cancelled.\n\nBack to Ting",
+    "h1": [],
+    "small": [],
+    "overflows": []
+  }
+]

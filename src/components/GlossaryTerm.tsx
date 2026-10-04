@@ -1,25 +1,46 @@
-import { useId, useState, type ReactNode } from 'react';
-import glossary from '../fixtures/glossary.json';
-
+import { useId, useRef, useState, type ReactNode } from "react";
+import glossary from "../fixtures/glossary.json";
 type Key = keyof typeof glossary;
-
-export function GlossaryTerm({ term, children }: { term: Key; children?: ReactNode }) {
+export function GlossaryTerm({
+  term,
+  children,
+}: {
+  term: Key;
+  children?: ReactNode;
+}) {
   const [open, setOpen] = useState(false);
+  const [position, setPosition] = useState({ left: 16, top: 80, width: 240 });
+  const ref = useRef<HTMLButtonElement>(null);
   const id = useId();
   const entry = glossary[term];
+  const show = () => {
+    const box = ref.current?.getBoundingClientRect();
+    if (box) {
+      const width = Math.min(320, window.innerWidth - 32);
+      setPosition({
+        width,
+        left: Math.max(16, Math.min(window.innerWidth - width - 16, box.left)),
+        top: Math.min(window.innerHeight / 2, box.bottom + 8),
+      });
+    }
+    setOpen(true);
+  };
   return (
-    <span className="relative inline-block">
+    <span className="inline-block">
       <button
+        ref={ref}
         type="button"
-        className="cursor-help border-b border-dotted border-current leading-tight"
+        className="cursor-help border-b border-dotted border-current"
         aria-describedby={open ? id : undefined}
         aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        onFocus={() => setOpen(true)}
+        onClick={() => (open ? setOpen(false) : show())}
+        onFocus={(e) => {
+          if (e.currentTarget.matches(":focus-visible")) show();
+        }}
         onBlur={() => setOpen(false)}
-        onKeyDown={(e) => e.key === 'Escape' && setOpen(false)}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") setOpen(false);
+        }}
       >
         {children ?? entry.term}
       </button>
@@ -27,9 +48,10 @@ export function GlossaryTerm({ term, children }: { term: Key; children?: ReactNo
         <span
           id={id}
           role="tooltip"
-          className="absolute top-full left-1/2 z-40 mt-1.5 w-60 -translate-x-1/2 rounded-lg bg-ink px-3 py-2 text-left text-xs leading-snug font-normal text-white shadow-lg"
+          style={position}
+          className="fixed z-50 max-h-[45vh] overflow-auto border border-line bg-white px-4 py-3 text-left text-xs font-normal text-ink"
         >
-          <strong className="block font-semibold">{entry.term}</strong>
+          <strong className="mb-2 block">{entry.term}</strong>
           {entry.definition}
         </span>
       )}

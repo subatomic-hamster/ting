@@ -1,0 +1,42 @@
+{
+  "filteredSelection": "",
+  "hiddenFormAfterFilter": 0,
+  "added": {
+    "id": "catalog-D3330-1791100889504",
+    "cdt": "D3330",
+    "fee": 1500,
+    "feeSource": {
+      "kind": "quote",
+      "label": "Dentist quote entered by you"
+    },
+    "allowancePending": true,
+    "inNetwork": true
+  },
+  "ask": "Ask about your plan\nAsk\n\nYour Acme Dental Low deductible is $50 a year, for basic and major services.",
+  "enrollmentAction": {
+    "top": 1348.953125,
+    "text": " Add to calendar"
+  },
+  "enrollmentDash": true,
+  "planTables": 0,
+  "habitTables": 1,
+  "habitHeading": "Next year, with your credit\nPlan\tExpected cost next year\tSmileStreak credit\tNet\nAcme Dental Low\t$2,198.35\t−$95\t$2,103.35\nAcme Dental Highrecommended\t$2,179.80\t−$95\t$2,084.80\nWaive coverage and pay yourself\t$3,280\t−$95\t$3,185\nYour dentist's membership plan\t$3,041.50\t−$95\t$2,946.50\n\nThe credit is the same on every plan, so it lowers your cost without changing which plan is best for you.",
+  "date": {
+    "width": 288,
+    "font": "32px"
+  },
+  "textOverflow": {
+    "width": 320,
+    "scroll": 320
+  },
+  "mapTargets": [
+    {
+      "w": 30,
+      "h": 48
+    },
+    {
+      "w": 30,
+      "h": 48
+    }
+  ]
+}

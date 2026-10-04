@@ -1,15 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api, USE_MOCKS } from '../api';
-import { DemoDataPill } from '../components/DemoDataPill';
-import { PageHeader, Section } from '../components/Section';
-import { cdtLabel } from '../engine/cdt';
-import { formatDate, formatMoney } from '../lib/format';
-import { useAppStore } from '../store';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { api, USE_MOCKS } from "../api";
+import { DemoDataPill } from "../components/DemoDataPill";
+import { PageHeader, Section } from "../components/Section";
+import { cdtLabel } from "../engine/cdt";
+import { formatDate, formatMoney } from "../lib/format";
+import { useAppStore } from "../store";
 
 const CARC: Record<string, string> = {
-  '45': 'above the contracted fee',
-  '1': 'deductible',
-  '2': 'coinsurance',
+  "45": "above the contracted fee",
+  "1": "deductible",
+  "2": "coinsurance",
 };
 
 /**
@@ -20,18 +20,21 @@ export default function CarrierRecord() {
   const personaId = useAppStore((s) => s.personaId);
   const qc = useQueryClient();
   const rec = useQuery({
-    queryKey: ['carrier', personaId],
+    queryKey: ["carrier", personaId],
     queryFn: () => api.getCarrierRecord(),
     enabled: !USE_MOCKS,
     refetchInterval: 5000,
   });
   const visit = useMutation({
     mutationFn: () => api.fireMockClaim(useAppStore.getState().profile),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['carrier'] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["carrier"] }),
   });
   const change = useMutation({
-    mutationFn: () => api.changePlan(rec.data?.member?.planId === 'acme-high' ? 'acme-low' : 'acme-high'),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['carrier'] }),
+    mutationFn: () =>
+      api.changePlan(
+        rec.data?.member?.planId === "acme-high" ? "acme-low" : "acme-high",
+      ),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["carrier"] }),
   });
   const r = rec.data;
   const accum = r?.accumulators[r.accumulators.length - 1];
@@ -53,27 +56,48 @@ export default function CarrierRecord() {
           <Section
             title="Demo: things that happen outside Ting"
             id="demo"
-            actions={<span className="text-xs text-muted">Watch the dashboard update by itself</span>}
+            actions={
+              <span className="text-xs text-muted">
+                Watch the dashboard update by itself
+              </span>
+            }
           >
             <div className="flex flex-wrap gap-2">
-              <button type="button" className="btn-primary" disabled={visit.isPending} onClick={() => visit.mutate()}>
-                {visit.isPending ? 'Recording…' : 'A dentist visit happens'}
+              <button
+                type="button"
+                className="btn-primary"
+                disabled={visit.isPending}
+                onClick={() => visit.mutate()}
+              >
+                {visit.isPending ? "Recording…" : "A dentist visit happens"}
               </button>
-              <button type="button" className="btn-secondary" disabled={change.isPending} onClick={() => change.mutate()}>
-                {change.isPending ? 'Changing…' : `Employer changes plan to ${r.member.planId === 'acme-high' ? 'Low' : 'High'}`}
+              <button
+                type="button"
+                className="btn-secondary"
+                disabled={change.isPending}
+                onClick={() => change.mutate()}
+              >
+                {change.isPending
+                  ? "Changing…"
+                  : `Employer changes plan to ${r.member.planId === "acme-high" ? "Low" : "High"}`}
               </button>
             </div>
-            {visit.data === undefined && visit.isError && <p className="mt-2 text-xs text-warn">{visit.error.message}</p>}
+            {visit.data === undefined && visit.isError && (
+              <p className="mt-2 text-xs text-warn">{visit.error.message}</p>
+            )}
           </Section>
           <div className="grid gap-5 lg:grid-cols-2">
             <Section title="Enrollment (834)" id="enrollment">
               <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                 {[
-                  ['Member ID', r.member.memberId],
-                  ['Group', `${r.member.groupNumber} · ${r.member.employer}`],
-                  ['Plan', r.plan?.name ?? r.member.planId],
-                  ['Coverage', r.member.coverageTier],
-                  ['Effective', formatDate(r.member.effectiveDate, { year: true })],
+                  ["Member ID", r.member.memberId],
+                  ["Group", `${r.member.groupNumber} · ${r.member.employer}`],
+                  ["Plan", r.plan?.name ?? r.member.planId],
+                  ["Coverage", r.member.coverageTier],
+                  [
+                    "Effective",
+                    formatDate(r.member.effectiveDate, { year: true }),
+                  ],
                 ].map(([k, v]) => (
                   <div key={k} className="contents">
                     <dt className="text-muted">{k}</dt>
@@ -82,7 +106,10 @@ export default function CarrierRecord() {
                 ))}
               </dl>
             </Section>
-            <Section title={`Accumulators ${accum?.planYear ?? ''}`} id="accumulators">
+            <Section
+              title={`Accumulators ${accum?.planYear ?? ""}`}
+              id="accumulators"
+            >
               {accum && (
                 <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                   <dt className="text-muted">Annual max used</dt>
@@ -116,19 +143,33 @@ export default function CarrierRecord() {
                 <tbody className="divide-y divide-line">
                   {[...r.claims].reverse().flatMap((c) =>
                     c.lines.map((l) => (
-                      <tr key={`${c.claimId}-${l.lineNo}`} className={c.origin === 'visit' ? 'bg-amber-50' : ''}>
+                      <tr
+                        key={`${c.claimId}-${l.lineNo}`}
+                        className={c.origin === "visit" ? "bg-amber-50" : ""}
+                      >
                         <td className="py-1.5 font-mono text-xs">
                           {c.claimId}
-                          <span className="block text-[10px] text-muted">{c.status}</span>
+                          <span className="block text-xs text-muted">
+                            {c.status}
+                          </span>
                         </td>
                         <td>{formatDate(c.serviceDate)}</td>
                         <td>{cdtLabel(l.cdt, l.tooth)}</td>
                         <td className="text-right">{formatMoney(l.billed)}</td>
                         <td className="text-right">{formatMoney(l.allowed)}</td>
-                        <td className="text-right">{formatMoney(l.planPaid)}</td>
-                        <td className="text-right">{formatMoney(l.memberOwes)}</td>
+                        <td className="text-right">
+                          {formatMoney(l.planPaid)}
+                        </td>
+                        <td className="text-right">
+                          {formatMoney(l.memberOwes)}
+                        </td>
                         <td className="pl-4 text-xs text-muted">
-                          {l.adjustments.map((a) => `${a.group}-${a.carc} ${CARC[a.carc] ?? ''} ${formatMoney(a.amount)}`).join('; ')}
+                          {l.adjustments
+                            .map(
+                              (a) =>
+                                `${a.group}-${a.carc} ${CARC[a.carc] ?? ""} ${formatMoney(a.amount)}`,
+                            )
+                            .join("; ")}
                         </td>
                       </tr>
                     )),

@@ -4,44 +4,44 @@
 /** Calendar date, `YYYY-MM-DD`. */
 export type ISODate = string;
 
-export type ServiceClass = 'preventive' | 'basic' | 'major' | 'ortho';
+export type ServiceClass = "preventive" | "basic" | "major" | "ortho";
 
 /** CDT category; each plan maps every category to a service class (or excludes it). */
 export type CdtCategory =
-  | 'diagnostic'
-  | 'preventive'
-  | 'restorative'
-  | 'majorRestorative'
-  | 'endodontics'
-  | 'periodontics'
-  | 'prosthodontics'
-  | 'implants'
-  | 'oralSurgery'
-  | 'orthodontics'
-  | 'adjunctive';
+  | "diagnostic"
+  | "preventive"
+  | "restorative"
+  | "majorRestorative"
+  | "endodontics"
+  | "periodontics"
+  | "prosthodontics"
+  | "implants"
+  | "oralSurgery"
+  | "orthodontics"
+  | "adjunctive";
 
 /** Plan-document citation keys; every waterfall step and explanation cites one. */
 export type RuleKey =
-  | 'coinsurance'
-  | 'deductible'
-  | 'annualMax'
-  | 'waitingPeriods'
-  | 'frequencyLimits'
-  | 'alternateBenefit'
-  | 'maxRewards'
-  | 'preventiveMax'
-  | 'q4Carryover'
-  | 'outOfNetwork'
-  | 'serviceClasses'
-  | 'premium'
-  | 'workInProgress';
+  | "coinsurance"
+  | "deductible"
+  | "annualMax"
+  | "waitingPeriods"
+  | "frequencyLimits"
+  | "alternateBenefit"
+  | "maxRewards"
+  | "preventiveMax"
+  | "q4Carryover"
+  | "outOfNetwork"
+  | "serviceClasses"
+  | "premium"
+  | "workInProgress";
 
 export interface FrequencyLimit {
   id: string;
   label: string; // "Cleanings: 2 per calendar year"
   codes: string[];
   count: number;
-  period: { kind: 'calendarYear' } | { kind: 'months'; months: number };
+  period: { kind: "calendarYear" } | { kind: "months"; months: number };
   perTooth: boolean;
 }
 
@@ -54,25 +54,29 @@ export interface MaxRewards {
   depositDay: number; // day of the following plan year the rollover is deposited (Lincoln: 65)
 }
 
-export type OutOfNetworkBasis = { basis: 'ucr'; percentile: 50 | 70 | 80 | 90 | 95 } | { basis: 'mac' };
+export type OutOfNetworkBasis =
+  { basis: "ucr"; percentile: 50 | 70 | 80 | 90 | 95 } | { basis: "mac" };
 
 export interface PlanRules {
   id: string;
   name: string;
   /** insurance = a Lincoln plan; waive = self-pay; membership = a dentist's in-office plan. */
-  kind: 'insurance' | 'waive' | 'membership';
+  kind: "insurance" | "waive" | "membership";
   /** Approved rules version; every estimate names the version it used. */
   version: string;
   premiumMonthly: number;
   premiumPreTax: boolean;
-  coinsurance: { inNetwork: Record<ServiceClass, number>; outOfNetwork: Record<ServiceClass, number> };
+  coinsurance: {
+    inNetwork: Record<ServiceClass, number>;
+    outOfNetwork: Record<ServiceClass, number>;
+  };
   deductible: { amount: number; appliesTo: ServiceClass[] };
   annualMax: number;
   orthoLifetimeMax: number;
   /** Months from coverage start before each class is covered. Only new enrollees serve them. */
   waitingPeriodMonths: Record<ServiceClass, number>;
   frequencyLimits: FrequencyLimit[];
-  categoryClass: Record<CdtCategory, ServiceClass | 'excluded'>;
+  categoryClass: Record<CdtCategory, ServiceClass | "excluded">;
   /** Back-tooth composite fillings paid at the amalgam rate. */
   alternateBenefit: boolean;
   preventiveCountsTowardMax: boolean;
@@ -90,7 +94,7 @@ export interface ServiceRecord {
   tooth?: number;
   planPaid: number;
   inNetwork?: boolean;
-  source: 'claim' | 'user' | 'invoice';
+  source: "claim" | "user" | "invoice";
   claimId?: string;
   /** From the EOB: what the member owes for this line. */
   memberOwes?: number;
@@ -117,8 +121,17 @@ export interface PlannedProcedure {
   label?: string;
   /** Dentist's billed fee. */
   fee: number;
+  /** Provenance of the billed amount, independent of the insurer's allowance. */
+  feeSource?: FeeSource;
   /** Contracted fee (in network) or known allowance; looked up when absent. */
   allowedFee?: number;
+  allowedFeeSource?: FeeSource;
+  /** Confirmed downgraded benefit base, distinct from the dentist contract fee. */
+  alternateAllowedFee?: number;
+  /** A real quote has no confirmed allowance; never substitute a demo table value. */
+  allowancePending?: boolean;
+  /** Previous crown date unknown; do not infer replacement eligibility. */
+  historyPending?: boolean;
   inNetwork: boolean;
   /** Set by the dentist only. Nothing is ever scheduled after it. */
   deadline?: ISODate;
@@ -135,7 +148,10 @@ export interface PlannedProcedure {
   likelihood?: number;
 }
 
-export type FsaRule = { kind: 'carryover'; max: number } | { kind: 'grace'; until: string /* MM-DD */ } | { kind: 'none' };
+export type FsaRule =
+  | { kind: "carryover"; max: number }
+  | { kind: "grace"; until: string /* MM-DD */ }
+  | { kind: "none" };
 
 export interface Money {
   fsaOffered: boolean;
@@ -148,11 +164,28 @@ export interface Money {
   marginalTaxRate: number;
 }
 
+export interface FeeSource {
+  kind: "demo" | "quote" | "benchmark" | "contract";
+  /** Scope of a member-confirmed allowance; do not reuse for another plan or network. */
+  planId?: string;
+  planVersion?: string;
+  network?: "in" | "out";
+  label: string;
+  zip?: string;
+  retrievedAt?: ISODate;
+  url?: string;
+}
+
 export interface FeeEntry {
   /** A typical dentist's billed fee. */
   billed: number;
   /** In-network contracted fee estimate. */
-  inNetwork: number;
+  inNetwork?: number;
+  /** Observed charge percentile amounts, not percentages of one billed fee. */
+  ucr?: Partial<Record<50 | 70 | 80 | 90 | 95, number>>;
+  /** Plan-specific maximum allowable charge, when available. */
+  mac?: number;
+  source?: FeeSource;
 }
 export type FeeTable = Record<string, FeeEntry>;
 
@@ -172,15 +205,15 @@ export interface Placement {
 }
 
 export type WaterfallKey =
-  | 'fee'
-  | 'networkDiscount'
-  | 'membershipDiscount'
-  | 'coinsurance'
-  | 'alternateBenefit'
-  | 'deductible'
-  | 'maxCap'
-  | 'denied'
-  | 'youPay';
+  | "fee"
+  | "networkDiscount"
+  | "membershipDiscount"
+  | "coinsurance"
+  | "alternateBenefit"
+  | "deductible"
+  | "maxCap"
+  | "denied"
+  | "youPay";
 
 export interface WaterfallStep {
   key: WaterfallKey;
@@ -201,9 +234,13 @@ export interface AdjudicatedLine {
   label?: string;
   date: ISODate;
   year: number;
-  serviceClass: ServiceClass | 'excluded';
+  serviceClass: ServiceClass | "excluded";
   billed: number;
   allowed: number;
+  feeSource?: FeeSource;
+  allowanceSource?: FeeSource;
+  /** Missing allowance: full-fee budget until confirmed, not a coverage denial. */
+  pricingWarning?: string;
   /** Fee the plan's percentage is applied to (lower than allowed under the alternate benefit). */
   benefitBase: number;
   coinsuranceRate: number;
@@ -216,7 +253,10 @@ export interface AdjudicatedLine {
   /** Out of network: amount above the plan's allowance the dentist can bill. */
   balanceBill: number;
   maxRemainingBefore: number;
-  denied?: { reason: 'waitingPeriod' | 'frequency' | 'notCovered'; detail: string };
+  denied?: {
+    reason: "waitingPeriod" | "frequency" | "notCovered";
+    detail: string;
+  };
   rulesVersion: string;
   waterfall: WaterfallStep[];
 }
