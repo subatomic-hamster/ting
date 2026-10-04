@@ -8,3 +8,4 @@ dist
 .playwright-mcp
 e2e-report-local
 e2e-report
+test-results

@@ -1,11 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { resetDemo, failOnPageErrors } from "./helpers";
 
-test.beforeEach(async () => {
-  const response = await resetDemo("dale");
-  expect(response.ok).toBeTruthy();
-});
-
 test("release uses live API and member routes fit the viewport", async ({ page }) => {
   const errors = failOnPageErrors(page);
   await page.goto("/?demo=1");
@@ -22,6 +17,8 @@ test("release uses live API and member routes fit the viewport", async ({ page }
 });
 
 test("live claim arrives and is replayed after reload", async ({ page }) => {
+  const response = await resetDemo("dale");
+  expect(response.ok).toBeTruthy();
   await page.goto("/?demo=1");
   await expect(page.getByRole("heading", { name: "Your dental care", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Dentist visit" }).click();

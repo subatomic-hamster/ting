@@ -1,6 +1,6 @@
 # Ting mobile rebuild and pricing validation
 
-October 4, 2026. Implementation and local validation are complete. Release verification is recorded below when deployment completes.
+October 4, 2026. Implementation is committed and deployed. Local and live release verification are complete.
 
 ## Implemented scope
 
@@ -29,6 +29,18 @@ Final visual evidence: [Home, 390px](revamp-evidence/home-390.png), [Treatment, 
 
 The 101 county charges are FY2026–27 provider prices for a Winston-Salem clinic, not Greensboro market percentiles or plan-specific negotiated rates. The FAIR calculator returned an access limit; no numeric FAIR prices were captured. The hackathon library supplies education. Default worked-example amounts remain synthetic. Production pricing needs the organizer's usable licensed fee feed or actual dentist/insurer pretreatment estimates. Braces require a full-course quote; insurer installment, age and treatment-in-progress rules remain unmodeled and explicitly qualified in the UI. See the [developer pricing/procedure brief](pricing-procedure-handoff.md).
 
-Live AWS/carrier/authentication integration, real accounts, physical camera/microphone/Bluetooth/ESP32 behavior, actual email delivery and native calendar import were not exercised. Local file photo OCR and PDF extraction were exercised in both browser engines. Browser drafts persist by sample persona or signed-in member; live-mode drafts are scoped to the tab, not a promise of server synchronization. Previously created shares are copies rather than revocable live views.
+Real member sign-in sessions, physical camera/microphone/Bluetooth/ESP32 behavior and native calendar import were not exercised. Local file photo OCR and PDF extraction were exercised in both browser engines. Browser drafts persist by sample persona or signed-in member; live-mode drafts are scoped to the tab, not a promise of server synchronization. Previously created shares are copies rather than revocable live views.
+
+## Live release verification
+
+- Application commit: `4a6620e`, pushed to `origin/aws-backend`.
+- AWS CDK strict synthesis and change-set diff passed. No database, identity pool or other persistent resource replacement was proposed; updates publish application code and website assets.
+- Stack `Ting` deployed successfully in `us-west-2`, account `648616106975`. Website: https://d3tknbg8ry7x3q.cloudfront.net.
+- Live HTML serves the exact built asset `assets/index-DzEObpYI.js`; runtime configuration uses the live API.
+- `node infra/smoke.mjs`: **29/29 passed**. Checks include Bedrock intake/rules/explanation, Automated Reasoning, Textract upload/deduplication, Winnow triage, share snapshots, authorization guards, Cognito federation redirect, EventBridge/WebSocket claims and replay, reminder schedule/due/cancel, invoice reconciliation, forwarding quarantine/approval, carrier records, and demo email-agent/digest routes. Reminder delivery used the in-app channel; the result reported email `false`. These are demo integrations, not proof of real member email delivery or full authenticated user journeys.
+- `npx playwright test e2e/release.spec.ts --grep-invert 'live claim arrives' --retries=0`: **12 passed**.
+- `npx playwright test e2e/release.spec.ts --grep 'live claim arrives' --retries=0`: **2 passed**. Claim resets were isolated from the API smoke run to avoid competing mutations of the same sample account.
+- These **14 targeted live browser checks** cover Chromium and iPhone WebKit: member-route layout, full-course braces quotes and unknown allowances, published clinic source/price retention, tap date edits/reload, share round trips/invalid links, offline intake and server-snapshot restoration, and live claim replay. Chromium also verifies an offline page reload; Playwright WebKit's offline reload limitation remains.
+- The legacy `e2e/app.spec.ts` suite was not rerun; its old visual labels/selectors need migration. The complete updated local suite and the targeted live release suite are the verified browser scope.
 
 The main developer chat has not been identified in the pending user clarification, so no message was sent to an unrelated task. The implementation and developer brief are already available in this shared workspace.
