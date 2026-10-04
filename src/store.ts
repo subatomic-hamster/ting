@@ -48,6 +48,8 @@ export interface AppState {
   custom: Placement[];
   trace: TraceEvent[];
   liveClaimIds: string[];
+  /** Claim events received from the feed, replayed onto each server profile. */
+  liveClaims: unknown[];
   claimChecks: ClaimCheck[];
   lastChange: LastChange | null;
   /** Year-end reminders the member opted into (null: not opted in). */
@@ -70,6 +72,8 @@ export interface AppState {
   updateProcedure: (id: string, patch: Partial<PlannedProcedure>) => void;
   removeProcedure: (id: string) => void;
   applyClaim: (event: unknown) => void;
+  /** The server's live profile (carrier records + emailed documents) replaces the persona's; work added in this browser is kept. */
+  mergeServerProfile: (server: Profile) => void;
   addTrace: (e: TraceEvent) => void;
   setScheduledReminders: (scheduled: ScheduledReminder[] | null) => void;
   dismissReminder: (id: string) => void;
@@ -97,6 +101,7 @@ function personaState(id: PersonaId, asOf: string) {
     scheduleKind: 'cheapest' as ScheduleKind,
     custom: [],
     liveClaimIds: [],
+    liveClaims: [] as unknown[],
     claimChecks: [],
     lastChange: null,
     scheduledReminders: null,
@@ -265,6 +270,7 @@ export const useAppStore = create<AppState>()((set, get) => {
         set({
           profile: update.profile,
           liveClaimIds: [...s.liveClaimIds, event.claimId],
+          liveClaims: [...s.liveClaims, event],
           claimChecks: [...s.claimChecks, ...update.checks.map((c) => ({ ...c, claimId: event.claimId }))],
         });
         const off = update.checks.filter((c) => c.mismatch).length;
@@ -279,6 +285,27 @@ export const useAppStore = create<AppState>()((set, get) => {
     },
 
     addTrace: (e) => set((s) => ({ trace: [...s.trace, e].slice(-MAX_TRACE) })),
+
+    mergeServerProfile: (server) => {
+      const s = get();
+      const seeded = new Set(PERSONAS[s.personaId].profile(server.asOf).procedures.map((p) => p.id));
+      const serverIds = new Set(server.procedures.map((p) => p.id));
+      // Keep only what this browser added itself; the server owns the seeded work and anything learned by email.
+      const localOnly = s.profile.procedures.filter((p) => !seeded.has(p.id) && !serverIds.has(p.id) && !p.id.startsWith('email-'));
+      const before = s.profile.procedures.length;
+      // The server's profile comes without claims; the ones this browser already received are replayed onto it.
+      let profile: Profile = { ...server, asOf: s.profile.asOf, procedures: withNetwork([...server.procedures, ...localOnly], s.network, server.fees) };
+      for (const event of s.liveClaims) profile = applyClaimEvent(profile, claimEventSchema.parse(event)).profile;
+      set({
+        profile,
+        plans: s.plans.some((p) => p.id === server.currentPlan.id) ? s.plans : [...s.plans, server.currentPlan],
+      });
+      pushTrace({
+        tool: 'profile.sync',
+        summary: `Live profile: ${server.currentPlan.name}, ${server.procedures.length} planned (was ${before})`,
+        ms: 0,
+      });
+    },
 
     setScheduledReminders: (scheduled) => {
       set({ scheduledReminders: scheduled, dismissedReminders: [] });

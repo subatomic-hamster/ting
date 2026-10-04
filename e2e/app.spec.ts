@@ -25,17 +25,17 @@ test('moving the crown before Dec 31 re-prices the plan', async ({ page }) => {
   await expect(page.getByText(/moved to Dec \d+, \d{4}\. You pay \$[\d,.]+ in total \(\+\$[\d,.]+\)/).first()).toBeAttached();
 });
 
-test('a Lincoln claim arrives live, survives a reload, and an underpaid one drafts a message', async ({ page }) => {
+test('an insurer claim arrives live, survives a reload, and an underpaid one drafts a message', async ({ page }) => {
   await page.goto('/?demo=1');
-  await page.getByRole('button', { name: 'Fire mock claim' }).click();
+  await page.getByRole('button', { name: 'Dentist visit' }).click();
   await expect(page.getByText('New EOB')).toBeVisible();
   await expect(page.getByText(/Matches Ting's estimate/)).toBeVisible();
   await page.reload();
   await expect(page.getByText(/Matches Ting's estimate/)).toBeVisible(); // replayed from the server
   await page.getByRole('button', { name: 'Underpaid EOB' }).click();
   await expect(page.getByText(/EOB says you owe/)).toBeVisible();
-  await page.getByRole('button', { name: 'Draft a message to Lincoln' }).click();
-  await expect(page.getByText(/Hello Lincoln Member Services/)).toBeVisible();
+  await page.getByRole('button', { name: 'Draft a message to your insurer' }).click();
+  await expect(page.getByText(/Hello Member Services/)).toBeVisible();
 });
 
 test('typed intake in Spanish finds the crown on #19', async ({ page }) => {
@@ -55,11 +55,11 @@ test('treatment-plan photo is read by Textract into five items', async ({ page }
 
 test("a dentist's bill above the EOB is flagged", async ({ page }) => {
   await page.goto('/treatment?demo=1');
-  await page.getByRole('button', { name: 'Fire mock claim' }).click();
+  await page.getByRole('button', { name: 'Dentist visit' }).click();
   await page.waitForTimeout(3000);
   await page.getByLabel('Upload a photo of your treatment plan').setInputFiles('public/samples/invoice.png');
   const confirm = page.getByRole('button', { name: 'Yes, same visit' });
-  const flag = page.getByText(/Your bill asks for \$412, but Lincoln's EOB says you owe \$200/);
+  const flag = page.getByText(/Your bill asks for \$412, but your insurer's EOB says you owe \$200/);
   await expect(confirm.or(flag)).toBeVisible({ timeout: 30_000 });
   if (await confirm.isVisible()) await confirm.click();
   await expect(flag).toBeVisible();
@@ -143,7 +143,7 @@ test('employer admin sees server aggregates; a member is refused', async ({ page
   await expect(page.getByText(/2 groups hidden/)).toBeVisible();
 });
 
-test('Lincoln analyst approves submitted plan rules', async ({ page }) => {
+test('plan analyst approves submitted plan rules', async ({ page }) => {
   const plans = await (await api('/plans')).json();
   await api('/rules/submit', { method: 'POST', body: JSON.stringify({ rules: plans[0], evidence: {}, source: 'e2e' }) });
   await signInAs(page, 'lincoln_analyst');
@@ -179,3 +179,28 @@ test("a 'maybe' from the dentist's wording starts the likelihood slider", async 
   await expect(page.getByLabel('Likelihood percent')).not.toHaveValue('50');
 });
 
+test("a dentist's urgent email is read, planned, and the member is alerted", async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.goto('/email?demo=1');
+  await page.getByRole('button', { name: 'Dentist: urgent x-ray result' }).click();
+  await page.getByRole('button', { name: 'Send to Ting' }).click();
+  const doc = page.locator('#received li').first();
+  await expect(doc.getByText(/Marked urgent/)).toBeVisible({ timeout: 60_000 });
+  await expect(doc.getByText(/Root canal.*#14/).first()).toBeVisible();
+  await expect(doc.getByText(/Scheduled: .*Root canal/)).toBeVisible();
+  await expect(page.locator('#outbox').getByText('urgent', { exact: true }).first()).toBeVisible({ timeout: 20_000 });
+  await page.goto('/treatment');
+  await expect(page.getByText(/Root canal \(molar\) on #14/).first()).toBeVisible();
+});
+
+test('a visit in the insurer record reaches the dashboard by itself', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.goto('/record?demo=1');
+  await expect(page.getByText('Enrollment (834)')).toBeVisible();
+  const before = await page.locator('#claims tbody tr').count();
+  await page.getByRole('button', { name: 'A dentist visit happens' }).click();
+  await expect.poll(() => page.locator('#claims tbody tr').count(), { timeout: 20_000 }).toBeGreaterThan(before);
+  await expect(page.locator('#claims').getByText(/CO-45/).first()).toBeVisible();
+  await page.goto('/');
+  await expect(page.getByText('New EOB')).toBeVisible({ timeout: 30_000 });
+});

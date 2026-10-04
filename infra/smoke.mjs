@@ -328,6 +328,50 @@ await check('Winnow uses 4, 5, 8: second reader, bill lines, question router', a
   return `${c.secondReader.filter((x) => x.review).length}/${c.secondReader.length} rules flagged; missed-appointment fee found; router ok (${med.source})`;
 });
 
+await check('email agent: a forwarded EOB is read, recorded and answered', async () => {
+  await call('/demo/reset', {});
+  await call('/demo/email', {
+    subject: 'Fwd: Lincoln EOB',
+    text: 'Lincoln Financial Group — Explanation of Benefits.\nClaim number: C-SMOKE-1. Date of service: 10/01/2026. Provider: College Hill Dental.\nD1110 Prophylaxis adult — Billed $125.00 Allowed $90.00 Plan paid $90.00 You owe $0.00',
+  });
+  for (let i = 0; i < 25; i++) {
+    const { docs } = await call('/corpus');
+    const outbox = await call('/outbox');
+    const reply = outbox.find((m) => m.kind === 'reply');
+    if (docs.length && reply) {
+      assert(docs[0].record.docType === 'eob', docs[0].record.docType);
+      assert(/C-SMOKE-1/.test(docs[0].recorded.join(' ')), JSON.stringify(docs[0].recorded));
+      return `${docs[0].record.docType}, ${docs[0].recorded[0]}; replied "${reply.subject}"`;
+    }
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+  throw new Error('no reply within 75 s');
+});
+
+await check('email webhook rejects an unsigned post', async () => {
+  const res = await fetch(`${API}/email/inbound`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{"event_type":"message.received"}' });
+  assert(res.status === 401 || res.status === 503, `unsigned → ${res.status}`);
+  return `${res.status}`;
+});
+
+await check('carrier: a visit lands in the record and accumulators', async () => {
+  const before = await call('/carrier/record');
+  const v = await call('/carrier/visits', {});
+  const after = await call('/carrier/record');
+  const used = (r) => r.accumulators.at(-1).annualMaxUsed;
+  assert(after.claims.length === before.claims.length + 1, `${before.claims.length} → ${after.claims.length} claims`);
+  assert(Math.abs(used(after) - used(before) - v.totals.planPaid) < 0.01, `max used ${used(before)} → ${used(after)}, plan paid ${v.totals.planPaid}`);
+  return `${v.claimId} ${v.provider}: plan paid $${v.totals.planPaid}`;
+});
+
+await check('monthly overview sends', async () => {
+  const r = await call('/demo/monthly/send', {});
+  assert(r.sent, JSON.stringify(r));
+  const m = (await call('/outbox')).find((x) => x.kind === 'monthly');
+  assert(m && /Your dental benefits in/.test(m.subject), 'no monthly email in outbox');
+  return m.subject;
+});
+
 await check('rejects a malformed claim', async () => {
   try {
     await call('/mock/claims', { type: 'claim.adjudicated', member: 'x' });

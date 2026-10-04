@@ -6,8 +6,7 @@ import { classifyDocument } from '../intake/classify';
 import { notify } from '../lib/notify';
 import { pdfText } from '../services/pdf';
 import { apiContext } from './context';
-import type { ReadDocument, ShareSnapshot, TingApi } from './index';
-import { mockClaimEvent } from './mockClaim';
+import type { Contact, ReadDocument, ReceivedDoc, ShareSnapshot, TingApi } from './index';
 
 const runtime = typeof window === 'undefined' ? undefined : window.TING_CONFIG;
 const API_URL = (runtime?.apiUrl ?? import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
@@ -84,6 +83,10 @@ export const httpApi: TingApi = {
           if (frame.type === 'claim.adjudicated') onEvent(frame);
           // Digests and reminders arrive content-free; a system notification only says there's an update.
           else if (frame.type === 'digest' || frame.type === 'reminder.due') notify('You have a dental benefits update', 'Open Ting to see it.', String(frame.type));
+          // The agent read an email, the carrier changed the plan, or something urgent arrived: the app refreshes.
+          if (frame.type === 'corpus.updated' || frame.type === 'profile.updated' || frame.type === 'urgent' || frame.type === 'claim.adjudicated')
+            window.dispatchEvent(new CustomEvent('ting:signal', { detail: frame }));
+          if (frame.type === 'urgent') notify('Important dental benefits update', 'Open Ting to see it.', 'urgent');
         } catch {
           /* ignore malformed frames */
         }
@@ -101,13 +104,25 @@ export const httpApi: TingApi = {
     };
   },
 
-  fireMockClaim: async (profile, opts) => {
-    await http('/mock/claims', post(mockClaimEvent(profile, PERSONAS[apiContext.personaId].memberId, opts?.underpay)));
+  // A dentist visit: Lincoln's claims system records and adjudicates it; its change stream delivers the claim to Ting.
+  fireMockClaim: async (_profile, opts) => {
+    await http('/carrier/visits', post({ underpay: opts?.underpay ?? 0 }));
   },
   submitRules: (rules, evidence, source) => http('/rules/submit', post({ rules, evidence, source })),
   pendingRules: () => http('/rules/pending'),
   approveSubmittedRules: (id) => http('/rules/approve', post({ id })),
   ask: (question, facts) => http('/ask', post({ question, facts })),
+  getProfile: () => http('/profile?claims=0'),
+  getContact: () => http('/contact'),
+  setContact: async (contact) => (await http<{ contact: Contact }>('/contact', post(contact))).contact,
+  getOutbox: () => http('/outbox'),
+  getReceived: async () => (await http<{ docs: ReceivedDoc[] }>('/corpus')).docs,
+  emailAgent: (mail) => http('/demo/email', post(mail)),
+  sendMonthlyNow: () => http('/demo/monthly/send', post({})),
+  getCarrierRecord: () => http('/carrier/record'),
+  changePlan: async (planId) => {
+    await http('/carrier/plan-change', post({ planId }));
+  },
   getInbox: () => http('/inbox'),
   simulateForward: (mail) => http('/mock/inbound-email', post(mail)),
   approveSender: (address, heldId) => http('/inbox/senders', post({ address, heldId })),

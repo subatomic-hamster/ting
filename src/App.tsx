@@ -4,6 +4,8 @@ import AuthCallback from './auth/AuthCallback';
 import Admin from './pages/Admin';
 import Analyst from './pages/Analyst';
 import Calibration from './pages/Calibration';
+import EmailPage from './pages/Email';
+import CarrierRecord from './pages/CarrierRecord';
 import Dashboard from './pages/Dashboard';
 import Dentists from './pages/Dentists';
 import Enroll from './pages/Enroll';
@@ -35,6 +37,8 @@ export default function App() {
         <Route path="admin" element={<Admin />} />
         <Route path="analyst" element={<Analyst />} />
         <Route path="calibration" element={<Calibration />} />
+        <Route path="email" element={<EmailPage />} />
+        <Route path="record" element={<CarrierRecord />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

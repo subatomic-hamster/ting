@@ -9,7 +9,6 @@ import { FsaCountdown } from '../components/FsaCountdown';
 import { LeftOnTableBanner } from '../components/LeftOnTableBanner';
 import { MaxGauge } from '../components/MaxGauge';
 import { SamplePlanNote } from '../components/SamplePlanNote';
-import { NotificationSettings } from '../components/NotificationSettings';
 import { RemindersCard } from '../components/RemindersCard';
 import { PageHeader, Section } from '../components/Section';
 import { Timeline } from '../components/Timeline';
@@ -84,7 +83,20 @@ export default function Dashboard() {
       </Section>
 
       <RemindersCard />
-      <NotificationSettings />
+      <Section
+        title="Email"
+        id="email"
+        actions={
+          <Link to="/email" className="btn-ghost">
+            Open
+          </Link>
+        }
+      >
+        <p className="text-sm text-muted">
+          Ting emails you a monthly overview on the 1st and anything urgent right away. Forward it EOBs, bills and notes from your dentist; it reads them,
+          updates your plan and replies.
+        </p>
+      </Section>
 
       <Section title="Activity" id="activity" actions={<DemoDataPill label="Demo claims feed" />}>
         <ActivityFeed />

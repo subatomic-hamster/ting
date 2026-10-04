@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { api, onApiTrace } from '../api';
+import { api, onApiTrace, USE_MOCKS } from '../api';
 import { useAppStore } from '../store';
 
 /**
@@ -20,6 +20,32 @@ export function useBootstrap() {
   const session = useQuery({ queryKey: ['session', personaId], queryFn: () => api.getSession() });
   const plans = useQuery({ queryKey: ['plans', personaId], queryFn: () => api.getPlans() });
   const ledger = useQuery({ queryKey: ['ledger', personaId], queryFn: () => api.getLedger() });
+  // Live: the member's profile as the server builds it from the insurer's records and the email agent's corpus.
+  const merge = useAppStore((s) => s.mergeServerProfile);
+  const live = useQuery({ queryKey: ['profile', personaId], queryFn: () => api.getProfile(), enabled: !USE_MOCKS });
+  useEffect(() => {
+    if (live.data) merge(live.data);
+  }, [live.data, merge]);
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (USE_MOCKS) return undefined;
+    // The agent read an email, the carrier changed something, or a claim landed: refetch what the server knows.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const onSignal = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        void queryClient.invalidateQueries({ queryKey: ['profile'] });
+        void queryClient.invalidateQueries({ queryKey: ['received'] });
+        void queryClient.invalidateQueries({ queryKey: ['outbox'] });
+        void queryClient.invalidateQueries({ queryKey: ['carrier'] });
+      }, 600);
+    };
+    window.addEventListener('ting:signal', onSignal);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('ting:signal', onSignal);
+    };
+  }, [queryClient]);
 
   useEffect(() => {
     if (plans.data) setPlans(plans.data);

@@ -5,7 +5,10 @@ import { CorsHttpMethod, HttpApi, WebSocketApi, WebSocketStage } from 'aws-cdk-l
 import { HttpLambdaIntegration, WebSocketLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import { S3BucketOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
-import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType, BillingMode, StreamViewType, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { DynamoEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
+import { StartingPosition } from 'aws-cdk-lib/aws-lambda';
+import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { EventBus, Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import { Queue } from 'aws-cdk-lib/aws-sqs';
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
@@ -81,6 +84,19 @@ export class TingStack extends Stack {
     });
 
     const bus = new EventBus(this, 'Claims', { eventBusName: 'ting-claims' });
+
+    // Lincoln's system of record (enrollment, plans, accumulators, claims, providers) as its own table. Its change
+    // stream is how a visit adjudicated at the carrier reaches Ting with no one in the loop.
+    const carrier = new Table(this, 'Carrier', {
+      partitionKey: { name: 'pk', type: AttributeType.STRING },
+      sortKey: { name: 'sk', type: AttributeType.STRING },
+      billingMode: BillingMode.PAY_PER_REQUEST,
+      stream: StreamViewType.NEW_AND_OLD_IMAGES,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+
+    // AgentMail key, inbox and webhook secret: filled by the team (scripts/agentmail-setup.mjs), never in code.
+    const agentMailSecret = new Secret(this, 'AgentMail', { description: 'AgentMail API key, inbox and webhook secret for Ting' });
 
     // Winnow requests for a worker on a machine AWS can't reach (the team's 24 GB Mac): it long-polls this queue
     // and writes answers to the table. Short retention: a request nobody answers in time is useless.
@@ -318,6 +334,57 @@ export class TingStack extends Stack {
     // Anthropic models on Bedrock check the caller's Marketplace subscription on each call.
     apiFn.addToRolePolicy(new PolicyStatement({ actions: ['aws-marketplace:ViewSubscriptions', 'aws-marketplace:Subscribe'], resources: ['*'] }));
 
+    // --- Email agent, carrier sync, monthly overview ---------------------------------------------------------------
+    const emailEnv = {
+      TABLE_NAME: table.tableName,
+      CARRIER_TABLE: carrier.tableName,
+      AGENTMAIL_SECRET_ARN: agentMailSecret.secretArn,
+      WS_ENDPOINT: wsStage.callbackUrl,
+      WEB_ORIGIN: webOrigin,
+      EVENT_BUS: bus.eventBusName,
+      DOCS_BUCKET: docs.bucketName,
+      MODEL_FAST,
+      MODEL_SMART,
+      ...winnowEnv,
+      WINNOW_TEMPERATURE: winnowTemperature,
+      NODE_OPTIONS: '--enable-source-maps',
+    };
+    const bedrockInvoke = new PolicyStatement({
+      actions: ['bedrock:InvokeModel', 'aws-marketplace:ViewSubscriptions', 'aws-marketplace:Subscribe'],
+      resources: [
+        `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/${MODEL_FAST}`,
+        `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/${MODEL_SMART}`,
+        'arn:aws:bedrock:*::foundation-model/anthropic.*',
+        '*',
+      ],
+    });
+    const emailAgentFn = fn('EmailAgentFn', 'emailAgent.ts', { memorySize: 1024, timeout: Duration.seconds(120), environment: emailEnv });
+    const carrierSyncFn = fn('CarrierSyncFn', 'carrierSync.ts', { timeout: Duration.seconds(60), environment: emailEnv });
+    const monthlyFn = fn('MonthlyFn', 'monthly.ts', { timeout: Duration.minutes(5), environment: emailEnv });
+    for (const f of [emailAgentFn, carrierSyncFn, monthlyFn]) {
+      table.grantReadWriteData(f);
+      carrier.grantReadData(f);
+      agentMailSecret.grantRead(f);
+      wsApi.grantManageConnections(f);
+      bus.grantPutEventsTo(f);
+      winnowQueue.grantSendMessages(f);
+      f.addToRolePolicy(bedrockInvoke);
+    }
+    docs.grantReadWrite(emailAgentFn);
+    emailAgentFn.addToRolePolicy(new PolicyStatement({ actions: ['textract:DetectDocumentText'], resources: ['*'] }));
+    carrierSyncFn.addEventSource(new DynamoEventSource(carrier, { startingPosition: StartingPosition.LATEST, batchSize: 10, retryAttempts: 2 }));
+    // The API takes webhooks and demo emails and hands them to the agent.
+    carrier.grantReadWriteData(apiFn);
+    agentMailSecret.grantRead(apiFn);
+    emailAgentFn.grantInvoke(apiFn);
+    apiFn.addEnvironment('CARRIER_TABLE', carrier.tableName);
+    apiFn.addEnvironment('AGENTMAIL_SECRET_ARN', agentMailSecret.secretArn);
+    apiFn.addEnvironment('EMAIL_AGENT_FN', emailAgentFn.functionName);
+    new Rule(this, 'MonthlyOverview', {
+      schedule: Schedule.cron({ minute: '0', hour: '13', day: '1' }), // 9am Eastern on the 1st
+      targets: [new LambdaFunction(monthlyFn)],
+    });
+
     // --- Document ingestion: one Express workflow for every document (read → screen → record) ----------------
     const ingestFn = fn('IngestFn', 'ingest.ts', {
       memorySize: 1024,
@@ -417,6 +484,8 @@ export class TingStack extends Stack {
     new CfnOutput(this, 'AcmePoolId', { value: acme.userPoolId });
     new CfnOutput(this, 'WinnowQueueUrl', { value: winnowQueue.queueUrl });
     new CfnOutput(this, 'TableName', { value: table.tableName });
+    new CfnOutput(this, 'CarrierTable', { value: carrier.tableName });
+    new CfnOutput(this, 'AgentMailSecretArn', { value: agentMailSecret.secretArn });
     new CfnOutput(this, 'MembersPoolId', { value: members.userPoolId });
     new CfnOutput(this, 'SignInDomain', { value: membersDomain.baseUrl() });
     new CfnOutput(this, 'WebClientId', { value: webClient.userPoolClientId });

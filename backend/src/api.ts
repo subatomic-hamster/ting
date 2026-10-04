@@ -35,6 +35,16 @@ import { db, deleteClaims, getShare, putShare } from './lib/db';
 import admin from '../../src/fixtures/admin.json';
 import { rowsToText } from './lib/layout';
 import { checkLine } from './lib/reasoning';
+import { InvokeCommand, LambdaClient } from '@aws-sdk/client-lambda';
+import { carrierRecord, changePlan, recordVisit, resetMember } from './lib/carrier';
+import { PROVIDERS } from './lib/carrierModel';
+import { approveDentistSender, clearCorpus, docsFor, getContact, memberByEmail, plannedFor, setContact } from './lib/corpus';
+import { agentAddress, agentMail, outboxFor, sendEmail, verifySvix } from './lib/email';
+import { welcomeEmail } from './lib/emailTemplates';
+import { sendMonthly, sendUrgent } from './lib/notify';
+import { memberProfile } from './lib/profile';
+import { evaluateSchedule, topoOrder } from '../../src/engine/schedule';
+import type { InboundEmail as AgentEmail } from './emailAgent';
 import { addSender, heldFor, holdMail, sendersFor, takeHeld } from './lib/inbox';
 import { decideInbound, forwardingAddress, type InboundEmail } from '../../src/engine/inbox';
 import { digestFor, getPrefs, prefsSchema, putPrefs, sendDigest } from './lib/digest';
@@ -48,6 +58,18 @@ const BUS = process.env.EVENT_BUS ?? '';
 const WEB_ORIGIN = process.env.WEB_ORIGIN ?? '';
 const INGEST_ARN = process.env.INGEST_ARN ?? '';
 const sfnClient = new SFNClient({});
+const lambda = new LambdaClient({});
+const EMAIL_AGENT_FN = process.env.EMAIL_AGENT_FN ?? '';
+
+/** The email agent runs asynchronously: the webhook (and the demo composer) return at once. */
+const runAgent = (mail: AgentEmail) =>
+  lambda.send(
+    new InvokeCommand({
+      FunctionName: EMAIL_AGENT_FN,
+      InvocationType: 'Event',
+      Payload: Buffer.from(JSON.stringify(mail)),
+    }),
+  );
 const TABLE = process.env.TABLE_NAME ?? '';
 
 // Winnow: its server, the queue to the Mac worker, or the labelled simulation (see ai/winnowDecide.ts).
@@ -181,13 +203,13 @@ const routes: Record<string, Route> = {
     return json(200, { id, status: 'pending' });
   },
   'GET /rules/pending': async (e) => {
-    if (callers.get(e)?.group !== 'lincoln_analyst') throw new HttpError(403, 'Lincoln plan analysts only');
+    if (callers.get(e)?.group !== 'lincoln_analyst') throw new HttpError(403, 'Plan analysts only');
     const res = await db.send(new QueryCommand({ TableName: TABLE, KeyConditionExpression: 'pk = :p', ExpressionAttributeValues: { ':p': 'RULES#PENDING' } }));
     return json(200, (res.Items ?? []).map((i) => ({ id: i.sk, rules: i.rules, evidence: i.evidence, source: i.source, submittedAt: i.submittedAt })));
   },
   'POST /rules/approve': async (e) => {
     const caller = callers.get(e);
-    if (caller?.group !== 'lincoln_analyst') throw new HttpError(403, 'Lincoln plan analysts only');
+    if (caller?.group !== 'lincoln_analyst') throw new HttpError(403, 'Plan analysts only');
     const id = str(bodyOf(e).id, 'id', 20);
     const res = await db.send(new DeleteCommand({ TableName: TABLE, Key: { pk: 'RULES#PENDING', sk: id }, ReturnValues: 'ALL_OLD' }));
     if (!res.Attributes) throw new HttpError(404, 'No such submission');
@@ -251,7 +273,8 @@ const routes: Record<string, Route> = {
     try {
       const { answers, source } = await decide(
         { invoice: { provider: invoice.provider, serviceDate: invoice.serviceDate, amountDue: invoice.amountDue, codes: invoice.codes } },
-        { match: { type: 'choice', instructions: 'Which EOB is for the same dental visit as this invoice?', criteria } },
+        { match: { type: 'choice', instructions:
+            'Which EOB is for the same dental visit as this invoice? Offices and insurers can record dates of service a day or two apart, so dates within 3 days can be the same visit; matching procedure codes matter most.', criteria } },
       );
       const dist = answers.match;
       if (!dist) throw new Error('no distribution');
@@ -492,8 +515,191 @@ const routes: Record<string, Route> = {
   },
 
   'POST /demo/reset': async (e) => {
-    const removed = await deleteClaims(PERSONAS[context(e).personaId].memberId);
-    return json(200, { removed });
+    const { personaId, asOf } = context(e);
+    const member = PERSONAS[personaId].memberId;
+    const removed = await deleteClaims(member);
+    const visits = await resetMember(personaId, asOf).catch(() => 0);
+    const docs = await clearCorpus(member).catch(() => 0);
+    return json(200, { removed, visits, docs });
+  },
+
+  // --- Email -------------------------------------------------------------------------------------------------------
+  // AgentMail webhook: verify the Svix signature, hand the message to the agent, answer at once.
+  'POST /email/inbound': async (e) => {
+    const cfg = await agentMail();
+    const raw = e.body ? (e.isBase64Encoded ? Buffer.from(e.body, 'base64').toString('utf8') : e.body) : '';
+    const headers = Object.fromEntries(Object.entries(e.headers ?? {}).map(([k, v]) => [k.toLowerCase(), v]));
+    if (!cfg?.webhookSecret || !verifySvix(cfg.webhookSecret, headers, raw)) throw new HttpError(401, 'Bad signature');
+    const evt = JSON.parse(raw) as {
+      event_type?: string;
+      message?: Record<string, unknown>;
+    };
+    if (evt.event_type !== 'message.received' || !evt.message) return json(200, { ignored: evt.event_type });
+    const m = evt.message;
+    if (
+      cfg.address &&
+      String(m.from ?? '')
+        .toLowerCase()
+        .includes(cfg.address.toLowerCase())
+    )
+      return json(200, { ignored: 'own message' });
+    await runAgent({
+      messageId: String(m.message_id),
+      from: String(m.from ?? ''),
+      subject: String(m.subject ?? ''),
+      // Forwarded mail keeps its content in the full body; extraction can drop it.
+      text: String(m.text ?? m.extracted_text ?? ''),
+      attachments: (Array.isArray(m.attachments) ? m.attachments : []).map((a: Record<string, unknown>) => ({
+        attachmentId: String(a.attachment_id),
+        filename: a.filename ? String(a.filename) : undefined,
+        contentType: a.content_type ? String(a.content_type) : undefined,
+      })),
+      source: 'agentmail',
+    });
+    return json(200, { accepted: true });
+  },
+
+  // Demo composer: the same agent, for an email typed in the app (from the member, or from their dentist).
+  'POST /demo/email': async (e) => {
+    const body = bodyOf(e);
+    const { personaId } = context(e);
+    const member = PERSONAS[personaId].memberId;
+    const fromDentist = body.fromDentist === true;
+    let from = fromDentist ? 'frontdesk@greensborofamilydental.example' : ((await getContact(member))?.email ?? `${personaId}@demo.ting.test`);
+    if (fromDentist) await approveDentistSender(member, personaId, from);
+    else if (!(await memberByEmail(from))) {
+      await setContact(member, personaId, {
+        email: from,
+        monthly: true,
+        urgent: true,
+        detail: 'detailed',
+      });
+      from = (await getContact(member))?.email ?? from;
+    }
+    await runAgent({
+      from,
+      subject: str(body.subject, 'subject', 300),
+      text: str(body.text, 'text', 30_000),
+      attachments:
+        typeof body.attachmentText === 'string' && body.attachmentText
+          ? [
+              {
+                filename: 'attachment.txt',
+                text: body.attachmentText.slice(0, 30_000),
+              },
+            ]
+          : [],
+      source: 'demo',
+    });
+    return json(202, { accepted: true, from });
+  },
+
+  'GET /contact': async (e) => {
+    const member = PERSONAS[context(e).personaId].memberId;
+    return json(200, {
+      contact: (await getContact(member)) ?? null,
+      agent: await agentAddress(),
+      live: !!(await agentMail())?.inboxId,
+    });
+  },
+  'POST /contact': async (e) => {
+    const body = bodyOf(e);
+    const { personaId } = context(e);
+    const member = PERSONAS[personaId].memberId;
+    const email = str(body.email, 'email', 200).trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new HttpError(400, 'Enter a valid email address');
+    const prev = await getContact(member);
+    const contact = await setContact(member, personaId, {
+      email,
+      monthly: body.monthly !== false,
+      urgent: body.urgent !== false,
+      detail: body.detail === 'private' ? 'private' : 'detailed',
+    });
+    if (prev?.email !== contact.email) {
+      const r = welcomeEmail(PERSONAS[personaId].name, await agentAddress());
+      await sendEmail({
+        member,
+        kind: 'welcome',
+        to: contact.email,
+        subject: r.subject,
+        text: r.text,
+        html: r.html,
+      });
+    }
+    return json(200, { contact });
+  },
+  'GET /outbox': async (e) => json(200, await outboxFor(PERSONAS[context(e).personaId].memberId)),
+  'GET /corpus': async (e) => {
+    const member = PERSONAS[context(e).personaId].memberId;
+    const [docs, planned] = await Promise.all([docsFor(member), plannedFor(member)]);
+    return json(200, {
+      docs: docs.map(({ pk: _pk, sk: _sk, ...d }) => d),
+      planned,
+    });
+  },
+  /** The member's live profile: carrier records + Ting's corpus + claims since, as the engine's Profile. */
+  'GET /profile': async (e) => {
+    const { personaId, asOf } = context(e);
+    return json(200, await memberProfile(personaId, asOf, e.queryStringParameters?.claims !== '0'));
+  },
+  'POST /demo/monthly/send': async (e) => {
+    const { personaId, asOf } = context(e);
+    const r = await sendMonthly(PERSONAS[personaId].memberId, personaId, asOf);
+    return json(200, {
+      sent: r.sent,
+      delivered: 'delivered' in r ? r.delivered : undefined,
+      reason: 'reason' in r ? r.reason : undefined,
+    });
+  },
+
+  // --- Carrier (Lincoln's system of record) --------------------------------------------------------------------------
+  'GET /carrier/record': async (e) => {
+    const member = PERSONAS[context(e).personaId].memberId;
+    const rec = await carrierRecord(member);
+    return json(200, { ...rec, providers: PROVIDERS });
+  },
+  // Demo: a dentist visit happens. Lincoln's claims system records and adjudicates it; the stream does the rest.
+  'POST /carrier/visits': async (e) => {
+    const body = bodyOf(e);
+    const { personaId, asOf } = context(e);
+    const persona = PERSONAS[personaId];
+    const profile = await memberProfile(personaId, asOf);
+    const next = topoOrder(profile.procedures).find((p) => (p.likelihood ?? 1) >= 1);
+    if (!next) throw new HttpError(409, 'No planned procedure left to do');
+    const [line] = evaluateSchedule({ ...profile, procedures: [next] }, [{ id: next.id, date: asOf }]).lines;
+    const underpay = typeof body.underpay === 'number' ? Math.min(body.underpay, line.planPaid) : 0;
+    const visit = await recordVisit({
+      memberId: persona.memberId,
+      dentistId: persona.currentDentistId,
+      serviceDate: asOf,
+      inNetwork: next.inNetwork,
+      rulesVersion: line.rulesVersion,
+      lines: [
+        {
+          cdt: line.cdt,
+          tooth: line.tooth,
+          billed: line.billed,
+          allowed: line.allowed,
+          planPaid: line.planPaid - underpay,
+          deductibleApplied: line.deductibleApplied,
+        },
+      ],
+    });
+    return json(202, { ...visit, procedure: next.id });
+  },
+  // Demo: the employer moves the member to another plan mid-year (an urgent email follows).
+  'POST /carrier/plan-change': async (e) => {
+    const { personaId } = context(e);
+    const rec = await carrierRecord(PERSONAS[personaId].memberId);
+    const planId = str(bodyOf(e).planId, 'planId', 40);
+    if (!['acme-low', 'acme-high'].includes(planId)) throw new HttpError(400, 'Unknown plan');
+    if (rec.member?.planId === planId) return json(200, { unchanged: true });
+    await changePlan(PERSONAS[personaId].memberId, planId);
+    return json(202, { planId });
+  },
+  'POST /demo/urgent': async (e) => {
+    const { personaId } = context(e);
+    return json(200, await sendUrgent(PERSONAS[personaId].memberId, personaId, str(bodyOf(e).what, 'what', 200), [], []));
   },
 };
 

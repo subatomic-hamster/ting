@@ -15,10 +15,12 @@ const NAV = [
   { to: '/enroll', label: 'Enroll' },
   { to: '/dentists', label: 'Dentists' },
   { to: '/plan', label: 'Plan rules' },
+  { to: '/email', label: 'Email' },
+  { to: '/record', label: 'Insurer record' },
   { to: '/habits', label: 'SmileStreak' },
   { to: '/onboarding', label: 'Get started' },
   { to: '/admin', label: 'Employer' },
-  { to: '/program', label: 'Lincoln view' },
+  { to: '/program', label: 'Insurer view' },
   { to: '/analyst', label: 'Rules review' },
 ];
 

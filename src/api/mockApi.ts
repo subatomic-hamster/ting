@@ -19,7 +19,7 @@ import { addDays, todayISO } from '../lib/dates';
 import { localOcr } from '../services/ocr';
 import { pdfText } from '../services/pdf';
 import { apiContext as mock } from './context';
-import type { NotificationPrefs, ScheduledReminder, ShareSnapshot, TingApi } from './index';
+import type { Contact, NotificationPrefs, ScheduledReminder, ShareSnapshot, TingApi } from './index';
 import { mockClaimEvent } from './mockClaim';
 
 const latency = () => new Promise<void>((r) => setTimeout(r, 300 + Math.random() * 500));
@@ -39,6 +39,7 @@ const ledgerListeners = new Set<(e: unknown) => void>();
 const shares = new Map<string, ShareSnapshot>();
 const pending: { id: string; rules: PlanRules; evidence: CompileResult['evidence']; source: string; submittedAt: string }[] = [];
 let prefs: NotificationPrefs = { cadence: 'monthly', detail: 'private' };
+let contact: Contact | null = null;
 const inbox: { senders: string[]; held: { id: string; from: string; subject: string; text: string; receivedAt: string }[] } = { senders: [], held: [] };
 
 /** Scheduled reminders, by member. In mock mode the app itself shows them when they come due. */
@@ -135,6 +136,33 @@ export const mockApi: TingApi = {
     if (intent === 'out_of_scope') return { intent, answer: 'Ting can answer questions about your dental plan, your costs and when to schedule work.' };
     return { intent, answerBy: 'engine' };
   },
+
+  async getProfile() {
+    return null; // the store already holds the persona's profile
+  },
+  async getContact() {
+    return { contact, agent: 'ting-dental@agentmail.to', live: false };
+  },
+  async setContact(next) {
+    contact = next;
+    return next;
+  },
+  async getOutbox() {
+    return [];
+  },
+  async getReceived() {
+    return [];
+  },
+  async emailAgent() {
+    throw new Error('The email agent needs the live backend');
+  },
+  async sendMonthlyNow() {
+    return { sent: false, reason: 'needs the live backend' };
+  },
+  async getCarrierRecord() {
+    return null;
+  },
+  async changePlan() {},
 
   async getInbox() {
     await latency();

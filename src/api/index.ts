@@ -89,6 +89,110 @@ export interface NotificationPrefs {
   detail: Detail;
 }
 
+export interface Contact {
+  email: string;
+  monthly: boolean;
+  urgent: boolean;
+  detail: 'detailed' | 'private';
+}
+
+export interface SentEmail {
+  at: string;
+  kind: 'reply' | 'monthly' | 'urgent' | 'welcome' | 'reminder';
+  to: string;
+  subject: string;
+  text: string;
+  html: string;
+  delivered: 'agentmail' | 'outbox';
+  error?: string;
+}
+
+/** A document Ting received by email, what it read from it and what it did. */
+export interface ReceivedDoc {
+  docId: string;
+  receivedAt: string;
+  from: string;
+  role?: 'member' | 'dentist';
+  subject: string;
+  quarantined?: boolean;
+  urgent?: boolean;
+  urgentP?: number;
+  urgentSource?: string;
+  record?: {
+    docType: string;
+    summary: string;
+    provider?: string;
+    serviceDate?: string;
+    claimNumber?: string;
+    procedures: {
+      label: string;
+      status: string;
+      urgency: string;
+      billed?: number;
+      planPaid?: number;
+      memberOwes?: number;
+      deadline?: string;
+    }[];
+    amounts: { label: string; amount: number }[];
+    followUps: string[];
+  };
+  recorded?: string[];
+  flags?: string[];
+  plan?: {
+    items: { label: string; date: string; memberOwes: number }[];
+    dentist?: { name: string; distanceMiles: number; isCurrent: boolean };
+  };
+}
+
+export interface CarrierRecord {
+  member?: Record<string, unknown> & {
+    memberId: string;
+    planId: string;
+    groupNumber: string;
+    employer: string;
+    coverageTier: string;
+    effectiveDate: string;
+  };
+  plan?: PlanRules;
+  accumulators: {
+    planYear: number;
+    deductibleMet: number;
+    annualMaxUsed: number;
+    orthoUsed: number;
+    rolloverBalance: number;
+  }[];
+  claims: {
+    claimId: string;
+    serviceDate: string;
+    status: string;
+    providerNpi: string;
+    inNetwork: boolean;
+    origin: string;
+    totals: {
+      billed: number;
+      allowed: number;
+      planPaid: number;
+      memberOwes: number;
+    };
+    lines: {
+      lineNo: number;
+      cdt: string;
+      tooth?: number;
+      billed: number;
+      allowed: number;
+      planPaid: number;
+      memberOwes: number;
+      adjustments: { group: string; carc: string; amount: number }[];
+    }[];
+  }[];
+  providers: {
+    npi: string;
+    name: string;
+    inNetwork: boolean;
+    dentistId: string;
+  }[];
+}
+
 export interface AdminInsights {
   employer: string;
   groups: { id: string; title: string; metric: string; detail: string; n: number }[];
@@ -140,6 +244,23 @@ export interface TingApi {
   approveSubmittedRules(id: string): Promise<{ rules: PlanRules; hash: string }>;
   /** Winnow use 8: routes a typed question; `facts` (engine numbers) is all a model may use for explanations. */
   ask(question: string, facts: string): Promise<AskResult>;
+  /** The member's live profile from the carrier's records and Ting's corpus (AWS); the persona's in mock mode. */
+  getProfile(): Promise<Profile | null>;
+  getContact(): Promise<{
+    contact: Contact | null;
+    agent: string;
+    live: boolean;
+  }>;
+  setContact(contact: Contact): Promise<Contact>;
+  getOutbox(): Promise<SentEmail[]>;
+  getReceived(): Promise<ReceivedDoc[]>;
+  /** Demo composer: an email to the agent, from the member or from their dentist. */
+  emailAgent(mail: { subject: string; text: string; fromDentist?: boolean }): Promise<{ accepted: boolean; from: string }>;
+  sendMonthlyNow(): Promise<{ sent: boolean; reason?: string }>;
+  /** Lincoln's system of record for this member. */
+  getCarrierRecord(): Promise<CarrierRecord | null>;
+  /** Demo: the employer moves the member to another plan mid-year. */
+  changePlan(planId: string): Promise<void>;
   /** F7: a factual message to Lincoln about an EOB that differs from the estimate. */
   draftAppeal(discrepancy: EobDiscrepancy, plan: Pick<PlanRules, 'name' | 'sections'>): Promise<{ text: string; source: 'model' | 'template' }>;
   /** A signed, expiring link for the dentist. The snapshot is what the link shows on any device. */

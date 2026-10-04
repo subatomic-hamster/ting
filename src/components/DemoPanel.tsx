@@ -92,14 +92,14 @@ export function DemoPanel() {
           disabled={fire.isPending}
           onClick={() => fire.mutate()}
         >
-          {fire.isPending ? 'Sending…' : fire.isError ? 'Nothing left to claim' : 'Fire mock claim'}
+          {fire.isPending ? 'Sending…' : fire.isError ? 'Nothing left to claim' : USE_MOCKS ? 'Fire mock claim' : 'Dentist visit'}
         </button>
         <button
           type="button"
           className="btn-secondary px-2 py-1.5 text-xs"
           disabled={underpaid.isPending}
           onClick={() => underpaid.mutate()}
-          title="Lincoln pays $90 less than Ting estimated, to show the EOB check"
+          title="The insurer pays $90 less than Ting estimated, to show the EOB check"
         >
           {underpaid.isPending ? 'Sending…' : 'Underpaid EOB'}
         </button>
