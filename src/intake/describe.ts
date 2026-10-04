@@ -178,34 +178,67 @@ function clauses(text: string): string[] {
   return out;
 }
 
+const COUNT_WORDS: Record<string, number> = { two: 2, both: 2, couple: 2, pair: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8 };
+const COUNT =
+  /\b(\d{1,2}|two|both|couple|pair|three|four|five|six|seven|eight)\s+(?:of\s+)?((?:[\w-]+\s+){0,2}?)(fillings|cavities|crowns|caps|wisdom\s+teeth|teeth|extractions|implants|root\s*canals|sealants)\b/i;
+
+/** "2 fillings", "three wisdom teeth", "a couple of cavities": how many of the same procedure (1 when not said). */
+export function countIn(clause: string): number {
+  const m = COUNT.exec(clause);
+  // "3 surface fillings" is a size, and "#2 crowns" / "tooth 3" name teeth, not a count.
+  if (!m || /surface|sided/i.test(m[2]) || /(#|\btooth\s*|\bteeth\s*|\bno\.?\s*)$/i.test(clause.slice(0, m.index))) return 1;
+  const n = Number(m[1]) || COUNT_WORDS[m[1].toLowerCase()];
+  return n >= 2 && n <= 8 ? n : 1;
+}
+
+/** n copies of one set of possible teeth, each led by a different tooth so "3 wisdom teeth" doesn't mean one tooth thrice. */
+const spread = (teeth: Teeth, n: number): Teeth[] => Array.from({ length: n }, (_, k) => [...teeth.slice(k % (teeth.length || 1)), ...teeth.slice(0, k % (teeth.length || 1))]);
+
 /** Plain English or a voice transcript to candidate codes and teeth, one item per procedure. */
 export function parseDescription(text: string, source: IntakeSource = 'text'): IntakeItem[] {
   const whole = toothGroups(text);
   // "root canal and a crown on #19": a clause without its own tooth inherits the one tooth named elsewhere.
   const inherited = whole.length === 1 ? whole[0] : [];
-  const items: IntakeItem[] = [];
+  // The same clause said twice ("filling; filling", as a translator may write "2 fillings") counts like a number.
+  const said = new Map<string, { clause: string; times: number }>();
   for (const clause of clauses(text)) {
+    const key = clause.toLowerCase().replace(/\s+/g, ' ');
+    const seen = said.get(key);
+    if (seen) seen.times++;
+    else said.set(key, { clause, times: 1 });
+  }
+  const items: IntakeItem[] = [];
+  for (const { clause, times } of said.values()) {
     const rule = RULES.find((r) => r.re.test(clause));
     if (!rule) continue;
     const own = toothGroups(clause);
-    const groups = own.length === 1 && !own[0].length ? [inherited] : own;
+    const named = own.length > 1 || own[0].some((t) => t.p === EXPLICIT_TOOTH_P);
+    let groups = own.length === 1 && !own[0].length ? [inherited] : own;
+    const count = named ? 1 : Math.max(countIn(clause), times);
+    if (count > 1) groups = spread(groups[0], count);
+    // Several of the same procedure from one phrase are one appointment: they share a visit, per kind of work.
+    const visits = new Map<number, string>();
     groups.forEach((teeth, g) => {
       const built = rule.build(clause, teeth);
-      for (const candidates of isMulti(built) ? built : [built]) {
+      (isMulti(built) ? built : [built]).forEach((candidates, c) => {
         const top = candidates[0].cdt;
-        if (g > 0 && !needsTooth(top)) continue;
+        if (g > 0 && !needsTooth(top)) return;
+        const id = itemId(source, text, items.length);
+        if (groups.length > 1 && !visits.has(c)) visits.set(c, id);
         items.push(
           makeItem({
-            id: itemId(source, text, items.length),
+            id,
             source,
             phrase: clause,
             candidates,
             teeth: needsTooth(top) ? teeth : [],
             replacement: CROWN_CODES.has(top) && REPLACING.test(clause) ? REPLACEMENT_P : undefined,
+            ...(groups.length > 1 && { visit: visits.get(c) }),
           }),
         );
-      }
+      });
     });
   }
-  return items;
+  // A visit of one (the extra copies weren't per-tooth work) is no visit at all.
+  return items.map((item) => (item.visit && items.filter((x) => x.visit === item.visit).length < 2 ? { ...item, visit: undefined } : item));
 }

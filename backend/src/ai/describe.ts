@@ -9,6 +9,7 @@ import type { Decide, WinnowQuestion } from './winnow';
 const SYSTEM = `You normalize a dental patient's description of planned dental work into short plain-English clauses.
 Rules:
 - One clause per procedure, joined with "; ".
+- When the patient gives a number of the same procedure, write ONE clause with the number ("2 fillings", "3 wisdom teeth removed", "two crowns on the lower back molars"). Never repeat a clause once per tooth.
 - Use only these procedure words: root canal, crown (porcelain / porcelain fused to metal / gold), core buildup, post, filling (tooth-colored or silver, N surfaces), deep cleaning, cleaning, checkup exam, emergency exam, new patient exam, bitewing x-rays, full-mouth x-rays, panoramic x-ray, extraction, surgical extraction, wisdom tooth removal, implant, implant crown, bridge, partial denture, full denture, night guard, sealant, fluoride.
 - Keep words that change the procedure, such as emergency, toothache, surgical, broken or impacted.
 - Keep tooth details exactly as stated: a tooth number as "#N"; otherwise only the words the patient used for upper/lower, left/right, molar/premolar/front/back.

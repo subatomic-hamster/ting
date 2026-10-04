@@ -191,6 +191,8 @@ export function validatePlacements(profile: Profile, placements: Placement[]): V
       const dep = profile.procedures.find((q) => q.id === d);
       if (dep && depDate && date < depDate) out.push({ id: p.id, message: `${name} must come after ${cdtLabel(dep.cdt, dep.tooth)}.` });
     }
+    const mate = p.visit ? profile.procedures.find((q) => q.id !== p.id && q.visit === p.visit && at.has(q.id) && at.get(q.id) !== date) : undefined;
+    if (mate) out.push({ id: p.id, message: `${name} is done in the same visit as ${cdtLabel(mate.cdt, mate.tooth)}.` });
   }
   return out;
 }
@@ -228,8 +230,11 @@ export function optimize(profile: Profile, opts: ScheduleOptions = {}): Optimize
     p.locked ? [y0] : planYears.map((py) => py.year).filter((y) => !p.deadline || firstDate(y) <= p.deadline),
   );
   const history = profile.ledger.history;
+  // One appointment: every procedure in a visit takes the year its first member takes.
+  const leader = procs.map((p, i) => (p.visit ? procs.findIndex((q) => q.visit === p.visit) : i));
+  const visits = [...new Set(procs.flatMap((p) => (p.visit ? [p.visit] : [])))].map((v) => procs.filter((p) => p.visit === v).map((p) => p.id));
 
-  const place = (years: number[], notBefore?: Map<string, ISODate>): Placement[] | null => {
+  const placeEach = (years: number[], notBefore?: Map<string, ISODate>): Placement[] | null => {
     const dates: ISODate[] = [];
     for (let i = 0; i < n; i++) {
       const p = procs[i];
@@ -254,6 +259,27 @@ export function optimize(profile: Profile, opts: ScheduleOptions = {}): Optimize
       dates.push(date);
     }
     return procs.map((p, i) => ({ id: p.id, date: dates[i] }));
+  };
+
+  // A visit happens on the latest date any of its procedures can have; dates only move later, so this settles.
+  const place = (years: number[], notBefore?: Map<string, ISODate>): Placement[] | null => {
+    const nb = new Map(notBefore);
+    for (let pass = 0; pass <= n; pass++) {
+      const placed = placeEach(years, nb);
+      if (!placed || !visits.length) return placed;
+      const at = new Map(placed.map((p) => [p.id, p.date]));
+      let moved = false;
+      for (const ids of visits) {
+        const last = ids.reduce((m, id) => ((at.get(id) ?? m) > m ? (at.get(id) ?? m) : m), '');
+        for (const id of ids)
+          if ((at.get(id) ?? last) < last) {
+            nb.set(id, last);
+            moved = true;
+          }
+      }
+      if (!moved) return placed;
+    }
+    return null;
   };
 
   // Rollover timing: MaxRewards money lands on day 65, so capped work in a later year may be worth moving there.
@@ -292,6 +318,13 @@ export function optimize(profile: Profile, opts: ScheduleOptions = {}): Optimize
       return;
     }
     const minYear = deps[i].reduce((m, d) => Math.max(m, years[d]), y0);
+    if (leader[i] < i) {
+      const y = years[leader[i]];
+      if (y < minYear || !choices[i].includes(y)) return;
+      years[i] = y;
+      search(i + 1);
+      return;
+    }
     for (const y of choices[i]) {
       if (y < minYear) continue;
       years[i] = y;

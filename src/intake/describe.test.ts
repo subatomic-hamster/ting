@@ -97,6 +97,45 @@ describe('parseDescription', () => {
     expect(parseDescription('hello there')).toEqual([]);
   });
 
+  describe('counts: several of the same procedure are one visit, not separate events', () => {
+    const visitOf = (text: string) => parseDescription(text).map((i) => i.visit);
+
+    it('"2 fillings" is two fillings in one visit', () => {
+      const items = parseDescription('I need 2 fillings');
+      expect(items.map((i) => i.candidates[0].cdt)).toEqual(['D2392', 'D2392']);
+      expect(new Set(items.map((i) => i.visit)).size).toBe(1);
+      expect(items[0].visit).toBeDefined();
+    });
+
+    it('"3 wisdom teeth removed" is three different teeth in one visit', () => {
+      const items = parseDescription('3 wisdom teeth removed');
+      expect(items).toHaveLength(3);
+      expect(new Set(items.map((i) => i.teeth[0].tooth)).size).toBe(3);
+      expect(new Set(items.map((i) => i.visit)).size).toBe(1);
+    });
+
+    it('number words, "a couple of", and named teeth in one phrase', () => {
+      expect(parseDescription('two crowns on my lower back molars').map((i) => i.teeth[0].tooth)).toEqual([19, 30]);
+      expect(parseDescription('a couple of cavities')).toHaveLength(2);
+      expect(new Set(visitOf('fillings on #3 and #14')).size).toBe(1);
+      expect(visitOf('fillings on #3 and #14')[0]).toBeDefined();
+    });
+
+    it('the same clause repeated (as a translator may write it) counts like a number', () => {
+      const items = parseDescription('wisdom tooth removal; wisdom tooth removal; wisdom tooth removal');
+      expect(items).toHaveLength(3);
+      expect(new Set(items.map((i) => i.visit)).size).toBe(1);
+    });
+
+    it('sizes, tooth numbers and different procedures are not counts', () => {
+      expect(top('a 3 surface filling')).toEqual(['D2393']);
+      expect(visitOf('crown on #2')).toEqual([undefined]);
+      expect(visitOf('root canal and a crown on #19')).toEqual([undefined, undefined]);
+      expect(visitOf('cleaning and x-rays')).toEqual([undefined, undefined]);
+      expect(visitOf('implant with a crown')).toEqual([undefined, undefined]);
+    });
+  });
+
   it('needing a tooth and having none gives zero confidence', () => {
     expect(parseDescription('a crown')[0].confidence).toBe(0);
   });

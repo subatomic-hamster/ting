@@ -11,6 +11,8 @@ export interface IntakeItem {
   candidates: { cdt: string; p: number }[];
   /** Sorted by p descending; empty when unknown or not needed. */
   teeth: { tooth: number; p: number }[];
+  /** Items from one phrase ("2 fillings", "fillings on #3 and #14") share a visit: one appointment, one date. */
+  visit?: string;
   /** Dentist's billed fee, when the source states one. */
   fee?: number;
   /** P(replaces an existing crown); set only when the user mentions it. */

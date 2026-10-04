@@ -26,7 +26,7 @@ export function toProcedures(items: IntakeItem[], profile: Profile): PlannedProc
     const table = profile.fees[cdt];
     const fee = item.fee ?? table?.billed;
     if (fee === undefined) return [];
-    return [{ id: item.id, cdt, tooth: item.teeth[0]?.tooth, fee, allowedFee: table?.inNetwork, inNetwork: true }];
+    return [{ id: item.id, cdt, tooth: item.teeth[0]?.tooth, fee, allowedFee: table?.inNetwork, inNetwork: true, ...(item.visit && { visit: item.visit }) }];
   });
   // Each step on a tooth depends on the latest earlier step on that tooth.
   return procs.map((p) => {
