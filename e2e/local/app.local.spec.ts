@@ -301,15 +301,16 @@ test("recommended calendar and handoff use the displayed enrollment dates after 
     page.getByRole("heading", { name: /Dale’s treatment plan/ }),
   ).toBeVisible();
 });
-test("cost explanations are shown in plain words and checked against the engine", async ({
+test("cost explanations are shown in plain words without verification badges", async ({
   page,
 }) => {
   await page.goto("/treatment");
   const cost = page.locator("#waterfall");
   await expect(cost.getByText("Estimated amount you pay")).toBeVisible();
   await expect(cost.getByText(/^The demo fee for/)).toBeVisible();
-  await expect(cost.getByText("Verified", { exact: true })).toBeVisible();
-  await expect(page.locator("main").getByText(/question type|Winnow/)).toHaveCount(0);
+  await expect(
+    page.locator("main").getByText(/Verified|Proved|question type|Winnow/),
+  ).toHaveCount(0);
 });
 test("insurance document upload retains coverage review and plan application", async ({
   page,

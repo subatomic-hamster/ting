@@ -6,7 +6,6 @@ import { explainQuery } from "../lib/explainQuery";
 import { formatMoney } from "../lib/format";
 import { isTotal, waterfallBars } from "../lib/geometry";
 import { GlossaryTerm } from "./GlossaryTerm";
-import { ProofBadge, VerifiedBadge, VerifiedMark, type Verification } from "./VerifiedBadge";
 
 const TERM: Partial<Record<WaterfallKey, "deductible" | "coinsurance" | "annual maximum">> = {
   deductible: "deductible",
@@ -31,14 +30,8 @@ export function Waterfall({
   const steps = line.waterfall.map((s) => {
     const polished = explained.data?.find((e) => e.key === s.key);
     const text = polished && verifyNumbers(polished.text, line).ok ? polished.text : template.find((e) => e.key === s.key)?.text;
-    const state: Verification = explained.isPending ? "pending" : text && verifyNumbers(text, line).ok ? "verified" : "unverified";
-    return { step: s, polished, text, state };
+    return { step: s, text };
   });
-  const overall: Verification = steps.some((s) => s.state === "unverified")
-    ? "unverified"
-    : steps.some((s) => s.state === "pending")
-      ? "pending"
-      : "verified";
 
   return (
     <figure aria-label={`Estimated cost for ${name}`}>
@@ -51,15 +44,12 @@ export function Waterfall({
         <p className="tabular mt-1 text-[32px] leading-[38px] font-medium">
           {formatMoney(line.memberOwes)}
         </p>
-        <p className="mt-2 text-xs text-muted" aria-live="polite">
-          <VerifiedBadge state={overall} />
-        </p>
       </div>
       <ol
         aria-label="Horizontal cost waterfall"
         className="divide-y divide-line text-base"
       >
-        {steps.map(({ step, polished, text, state }, i) => {
+        {steps.map(({ step, text }, i) => {
           const term = TERM[step.key];
           return (
             <li key={step.key} className="py-3">
@@ -89,10 +79,6 @@ export function Waterfall({
               <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
                 {!isTotal(step) && (
                   <span className="tabular">Running total {formatMoney(step.running)}</span>
-                )}
-                <VerifiedMark state={state} />
-                {polished?.reasoning && (
-                  <ProofBadge verdict={polished.reasoning.verdict} claim={polished.reasoning.claim} />
                 )}
                 {step.section && <span>Plan rule: {step.section}</span>}
               </div>
