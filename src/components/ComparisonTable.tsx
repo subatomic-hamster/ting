@@ -25,8 +25,8 @@ export function ComparisonTable() {
             key={o.plan.id}
             className={`rounded-xl border p-3 ${o === best ? "border-brand-500 bg-brand-50" : "border-line"}`}
           >
-            <div className="flex items-center justify-between gap-2">
-              <span className="font-semibold">
+            <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+              <span className="min-w-0 font-semibold">
                 {o.plan.name}
                 {current(o) && (
                   <span className="ml-1.5 text-xs font-normal text-muted">

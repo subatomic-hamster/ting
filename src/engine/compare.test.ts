@@ -10,15 +10,16 @@ describe('plan comparison (F4)', () => {
   it('recommends the lowest expected total and shows the bad year beside it', () => {
     const totals = c.options.map((o) => o.total);
     expect(c.best.total).toBe(Math.min(...totals));
-    expect(c.best.plan.id).toBe('acme-high');
+    // Low and High share 100/80/50 (as real Lincoln pairs do), so Dale's likely care doesn't justify High's premium.
+    expect(c.best.plan.id).toBe('acme-low');
     for (const o of c.options) expect(o.badYearTotal).toBeGreaterThanOrEqual(o.total);
   });
 
   it('total = care cost + premiums after the pre-tax saving', () => {
     const high = c.options.find((o) => o.plan.id === 'acme-high');
-    expect(high?.premiumsAnnual).toBe(576);
-    expect(high?.premiumCost).toBe(403.2); // 576 × (1 − 30%)
-    expect(high?.total).toBe(Math.round(((high?.careCost ?? 0) + 403.2) * 100) / 100);
+    expect(high?.premiumsAnnual).toBe(552);
+    expect(high?.premiumCost).toBe(386.4); // 552 × (1 − 30%)
+    expect(high?.total).toBe(Math.round(((high?.careCost ?? 0) + 386.4) * 100) / 100);
   });
 
   it('waiving pays the full fee: no network discount, no plan', () => {
@@ -67,7 +68,7 @@ describe('FSA amount', () => {
 describe('Enrollment Card', () => {
   const { card } = compare(DEMO_PROFILE, DEMO_PLAN_OPTIONS);
   it('sums up plan, FSA, dates and savings', () => {
-    expect(card.summary).toContain('choose Acme Dental High');
+    expect(card.summary).toContain('choose Acme Dental Low');
     expect(card.summary).toContain(`elect $${card.fsa.election.toLocaleString('en-US')} FSA`);
     expect(card.summary).toMatch(/before Dec 31 \(2026 FSA\)/);
     expect(card.summary).toMatch(/Jan 4 \(2027 FSA\)/);

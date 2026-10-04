@@ -1,5 +1,11 @@
 // Seeded demo data, labelled "demo data" on screen. Plan numbers follow the spec's worked example:
 // $1,500 max with $300 used, root canal + buildup + two crowns quoted in October.
+//
+// The plan designs mirror real Lincoln-insured employer plans (docs/dental-pricing-and-plan-designs.md):
+// Low ≈ Iredell County NC Low Plan 2023–24 ($1,500 max, $50 deductible, preventive/basic/major 100/80/50, the common
+// Lincoln split); High ≈ Iredell High / Prosper ISD High 2024–25 ($2,000 max, child braces, 90th-percentile U&C,
+// SmileRewards); Basic ≈ Life School of Dallas Low 2025 ($750 max, $100 deductible, 80/80/50, MAC). MaxRewards
+// rollover tables are Lincoln's published ones. Premiums are illustrative, within the observed employee-only range.
 import { DEMO_FEES } from '../engine/cdt';
 import type { CdtCategory, FrequencyLimit, PlanRules, Profile, ServiceClass } from '../engine/types';
 
@@ -73,7 +79,9 @@ export const ACME_LOW: PlanRules = {
   alternateBenefit: true,
   preventiveCountsTowardMax: true,
   q4DeductibleCarryover: true,
-  maxRewards: { threshold: 750, rolloverAmount: 375, inNetworkBonus: 125, accountLimit: 1500, depositDay: 65 },
+  // Lincoln's MaxRewards table for a $1,500 max: $800 claim threshold, $350 rollover ($500 if only in-network
+  // dentists were used), $1,250 account cap, deposited on day 65.
+  maxRewards: { threshold: 800, rolloverAmount: 350, inNetworkBonus: 150, accountLimit: 1250, depositDay: 65 },
   outOfNetwork: { basis: 'ucr', percentile: 80 },
   sections: SECTIONS,
 };
@@ -83,9 +91,10 @@ export const ACME_HIGH: PlanRules = {
   id: 'acme-high',
   name: 'Acme Dental High',
   version: 'PLAN-ACME-HIGH-v3',
-  premiumMonthly: 48,
+  premiumMonthly: 46,
+  // Real Lincoln Low/High pairs keep the same 100/80/50 split; High buys a bigger max, braces and better out-of-network pay.
   coinsurance: {
-    inNetwork: { preventive: 1, basic: 0.9, major: 0.6, ortho: 0.5 },
+    inNetwork: { preventive: 1, basic: 0.8, major: 0.5, ortho: 0.5 },
     outOfNetwork: { preventive: 1, basic: 0.8, major: 0.5, ortho: 0.5 },
   },
   annualMax: 2000,
@@ -93,8 +102,28 @@ export const ACME_HIGH: PlanRules = {
   categoryClass: { ...CLASSES, orthodontics: 'ortho' },
   alternateBenefit: false,
   preventiveCountsTowardMax: false,
-  maxRewards: { threshold: 1000, rolloverAmount: 500, inNetworkBonus: 150, accountLimit: 2000, depositDay: 65 },
+  // No published Lincoln table for a $2,000 max was found; this is the nearest one ($1,750 max).
+  maxRewards: { threshold: 800, rolloverAmount: 350, inNetworkBonus: 175, accountLimit: 1500, depositDay: 65 },
   outOfNetwork: { basis: 'ucr', percentile: 90 },
+};
+
+/** The cost-conscious tier some employers add below Low (Life School of Dallas Low 2025; Prosper ISD Standard 2024–25). */
+export const ACME_BASIC: PlanRules = {
+  ...ACME_LOW,
+  id: 'acme-basic',
+  name: 'Acme Dental Basic',
+  version: 'PLAN-ACME-BASIC-v1',
+  premiumMonthly: 16,
+  coinsurance: {
+    inNetwork: { preventive: 0.8, basic: 0.8, major: 0.5, ortho: 0 },
+    outOfNetwork: { preventive: 0.8, basic: 0.8, major: 0.5, ortho: 0 },
+  },
+  deductible: { amount: 100, appliesTo: ['basic', 'major'] },
+  annualMax: 750,
+  q4DeductibleCarryover: false,
+  maxRewards: undefined,
+  // Maximum allowable charge: out of network, the plan pays from the in-network fee schedule.
+  outOfNetwork: { basis: 'mac' },
 };
 
 function selfPay(id: string, name: string, kind: 'waive' | 'membership', annualFee = 0, discount = 0): PlanRules {
@@ -116,7 +145,7 @@ function selfPay(id: string, name: string, kind: 'waive' | 'membership', annualF
 export const WAIVE: PlanRules = selfPay('waive', 'Waive coverage and pay yourself', 'waive');
 export const MEMBERSHIP: PlanRules = selfPay('membership', "Your dentist's membership plan", 'membership', 399, 0.2);
 
-export const DEMO_PLAN_OPTIONS: PlanRules[] = [ACME_LOW, ACME_HIGH, WAIVE, MEMBERSHIP];
+export const DEMO_PLAN_OPTIONS: PlanRules[] = [ACME_BASIC, ACME_LOW, ACME_HIGH, WAIVE, MEMBERSHIP];
 
 export const DEMO_PROFILE: Profile = {
   asOf: '2026-10-05',

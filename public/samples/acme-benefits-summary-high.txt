@@ -3,7 +3,7 @@ Acme Corp · Group 00412345 · Plan year: calendar year (January 1 – December 
 For eligible employees and enrolled dependents. This summary describes your dental benefits.
 
 Enrollment Summary
-Your monthly premium: $48.00, deducted pre-tax from your paycheck.
+Your monthly premium: $46.00, deducted pre-tax from your paycheck.
 Network: Acme Dental PPO. You may also see dentists outside the network (see §3).
 
 Schedule of Benefits, §1  Annual Deductible
@@ -16,8 +16,8 @@ Q4 carryover: any deductible met in October, November or December also counts to
 Schedule of Benefits, §2  Coinsurance (what the plan pays after the deductible)
 Service class             In-network      Out-of-network
 Preventive & Diagnostic   100%            100%
-Basic                     90%             80%
-Major                     60%             50%
+Basic                     80%             80%
+Major                     50%             50%
 Orthodontia               50%             50%
 
 Out-of-Network Benefits, §3  Dentists Outside the Network
@@ -32,9 +32,9 @@ Plan Maximums, §4.2  Preventive Care
 Preventive care does not count toward the annual maximum (SmileRewards).
 
 Max Rollover, §5  Rollover for Low-Use Years
-If your plan-paid claims for a calendar year total $1,000 or less, $500 rolls over to next year's maximum.
-If every claim that year was in network, an extra $150 is added to the rollover.
-Your Max Rollover rollover account can hold up to $2,000.
+If your plan-paid claims for a calendar year total $800 or less, $350 rolls over to next year's maximum.
+If every claim that year was in network, an extra $175 is added to the rollover.
+Your Max Rollover rollover account can hold up to $1,500.
 Rollover amounts are deposited on day 65 of the following plan year.
 
 --- Page 2 ---
