@@ -1,8 +1,10 @@
 // Intake: the model only translates the member's words into phrases the tested parser knows.
 // Codes, teeth and probabilities still come from parseDescription.
-import { parseDescription } from '../../../src/intake/describe';
+import { CDT } from '../../../src/engine/cdt';
+import { makeItem, parseDescription } from '../../../src/intake/describe';
 import type { IntakeItem, IntakeSource } from '../../../src/intake/types';
 import { isRec, type CallModel } from './model';
+import type { Decide, WinnowQuestion } from './winnow';
 
 const SYSTEM = `You normalize a dental patient's description of planned dental work into short plain-English clauses.
 Rules:
@@ -38,4 +40,44 @@ export async function describeWithModel(text: string, call: CallModel, source: I
   const viaModel = parseDescription(rewritten, source);
   const score = (items: IntakeItem[]) => items.reduce((s, i) => s + i.confidence, 0);
   return viaModel.length > direct.length || (viaModel.length === direct.length && score(viaModel) > score(direct)) ? viaModel : direct;
+}
+
+// --- Winnow use 1: probabilities for the fields the intake questions price ---------------------------------------
+
+const CROWNS = new Set(['D2740', 'D2750', 'D2790']);
+
+export function blend(prior: IntakeItem['candidates'], winnow: Record<string, number>): IntakeItem['candidates'] {
+  const raw = prior.map((c) => ({ cdt: c.cdt, p: Math.sqrt(Math.max(c.p, 1e-6) * Math.max(winnow[c.cdt] ?? 0, 1e-6)) }));
+  const total = raw.reduce((s, c) => s + c.p, 0);
+  return raw.map((c) => ({ cdt: c.cdt, p: Math.round((c.p / total) * 1e4) / 1e4 }));
+}
+
+/**
+ * One Winnow request for every uncertain field: which code (when there's more than one candidate) and whether a
+ * crown replaces an old one. The engine then prices each answer and asks only when guessing would cost money.
+ */
+export async function withWinnow(text: string, items: IntakeItem[], decide: Decide): Promise<IntakeItem[]> {
+  const questions: Record<string, WinnowQuestion> = {};
+  items.forEach((item, i) => {
+    if (item.candidates.length > 1)
+      questions[`code_${i}`] = {
+        type: 'choice',
+        instructions: `Which procedure does "${item.phrase}" describe?`,
+        criteria: Object.fromEntries(item.candidates.map((c) => [c.cdt, CDT[c.cdt] ? `${CDT[c.cdt].short} (${CDT[c.cdt].description})` : c.cdt])),
+      };
+    if (CROWNS.has(item.candidates[0]?.cdt ?? '') && item.replacement !== undefined)
+      questions[`replacement_${i}`] = { type: 'noul', instructions: 'Does this crown replace an existing crown on the same tooth?' };
+  });
+  if (!Object.keys(questions).length) return items;
+  const { answers, source } = await decide({ description: text.slice(0, 2000) }, questions);
+  return items.map((item, i) => {
+    const code = answers[`code_${i}`];
+    const repl = answers[`replacement_${i}`];
+    if (!code && !repl) return item;
+    // The parser's dental priors and Winnow's reading of these exact words, combined (geometric mean): Winnow can
+    // overturn a prior with clear evidence, but a literal reading alone doesn't erase what's usual in dentistry.
+    const candidates = code ? blend(item.candidates, code) : item.candidates;
+    const { confidence: _c, ...base } = item;
+    return { ...makeItem({ ...base, candidates, replacement: repl ? repl.yes : item.replacement }), decidedBy: source };
+  });
 }

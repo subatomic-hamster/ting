@@ -38,24 +38,47 @@ export function normalize(raw: unknown, q: WinnowQuestion): Record<string, numbe
 export const top = (dist: Record<string, number>): [string, number] =>
   Object.entries(dist).reduce<[string, number]>((best, [a, p]) => (p > best[1] ? [a, p] : best), ['', -1]);
 
-/** Live Winnow server (winnow-inference). The response field names follow docs/API.md; adjust here if they differ. */
-export function liveWinnow(url: string, temperature = 1): Decide {
+/**
+ * One answer from the live server (docs/API.md): noul → {"noul": p_true}; choice → a probability map by key;
+ * score → a probability map by zero-based index. Returned in Ting's shape: answer label → probability.
+ */
+export function fromWinnow(r: unknown, q: WinnowQuestion): Record<string, number> | null {
+  if (!isRec(r)) return null;
+  if (q.type === 'noul') {
+    const p = Number(r.noul ?? r.p_true ?? r.probability);
+    return Number.isFinite(p) ? { yes: p, no: Math.round((1 - p) * 1e4) / 1e4 } : null;
+  }
+  const map = [r.probabilities, r.distribution, r.probs, r.p].find(isRec);
+  if (!map) return null;
+  if (q.type === 'score') return normalize(Object.fromEntries(q.scale.map((label, i) => [label, map[String(i)] ?? map[label] ?? 0])), q);
+  return normalize(map, q);
+}
+
+/** Live Winnow server (winnow-inference) on its API key. */
+export function liveWinnow(url: string, apiKey = '', temperature = 1): Decide {
   return async (state, questions) => {
+    // The server's choice criteria are key → description; score criteria are the ordered labels.
+    const wire = Object.fromEntries(
+      Object.entries(questions).map(([name, q]) => [
+        name,
+        q.type === 'noul' ? q : q.type === 'choice' ? { ...q } : { type: 'score', instructions: q.instructions, criteria: q.scale },
+      ]),
+    );
     const res = await fetch(`${url.replace(/\/$/, '')}/v1/systemone`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'Winnow-12B', state, questions, winnow: { temperature } }),
-      signal: AbortSignal.timeout(8000),
+      headers: { 'Content-Type': 'application/json', ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}) },
+      body: JSON.stringify({ model: 'Winnow-12B', state, questions: wire, winnow: { temperature } }),
+      signal: AbortSignal.timeout(15_000),
     });
     if (!res.ok) throw new Error(`Winnow ${res.status}`);
     const body: unknown = await res.json();
-    const results = isRec(body) ? (body.answers ?? body.results ?? body) : {};
+    const results = isRec(body) && isRec(body.answers) ? body.answers : {};
     const answers: WinnowAnswers = {};
     for (const [name, q] of Object.entries(questions)) {
-      const r = isRec(results) ? results[name] : undefined;
-      const dist = normalize(isRec(r) ? (r.probabilities ?? r.probs ?? r.distribution ?? r) : undefined, q);
+      const dist = fromWinnow(results[name], q);
       if (dist) answers[name] = dist;
     }
+    if (!Object.keys(answers).length) throw new Error('Winnow returned no usable answers');
     return { answers, source: 'winnow' };
   };
 }

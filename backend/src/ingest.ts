@@ -2,14 +2,13 @@
 import { HeadObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { DetectDocumentTextCommand, TextractClient } from '@aws-sdk/client-textract';
 import { classifyDocument } from '../../src/intake/classify';
-import { liveWinnow, simulatedWinnow, triageDocument, type Decide } from './ai/winnow';
-import { callBedrock } from './lib/bedrock';
+import { triageDocument } from './ai/winnow';
+import { makeDecide } from './ai/winnowDecide';
 import { rowsToText } from './lib/layout';
 
 const s3 = new S3Client({});
 const textract = new TextractClient({});
-const WINNOW_URL = process.env.WINNOW_URL ?? '';
-const decide: Decide = WINNOW_URL ? liveWinnow(WINNOW_URL) : simulatedWinnow(callBedrock);
+const { decide } = makeDecide();
 
 interface ReadInput {
   step: 'read';

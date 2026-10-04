@@ -7,6 +7,7 @@ import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import { S3BucketOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { EventBus, Rule, Schedule } from 'aws-cdk-lib/aws-events';
+import { Queue } from 'aws-cdk-lib/aws-sqs';
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Architecture, Runtime } from 'aws-cdk-lib/aws-lambda';
@@ -35,6 +36,10 @@ const ROOT = path.join(__dirname, '..', '..');
 /** Automated Reasoning guardrail from scripts/ar-policy.mjs, when it has been built. */
 const arFile = path.join(__dirname, '..', 'ar.json');
 const ar: { guardrailId: string; guardrailVersion: string } | undefined = fs.existsSync(arFile) ? JSON.parse(fs.readFileSync(arFile, 'utf8')) : undefined;
+
+/** Temperature fitted by infra/calibrate.mjs on the labelled dental set. */
+const calFile = path.join(__dirname, '..', '..', 'public', 'calibration.json');
+const winnowTemperature = fs.existsSync(calFile) ? String(JSON.parse(fs.readFileSync(calFile, 'utf8')).temperature ?? 1) : '1';
 
 /** Bedrock inference profiles. The event's private Marketplace allows Haiku 4.5 and Sonnet 5 (not Sonnet 5.5). */
 const MODEL_FAST = 'us.anthropic.claude-haiku-4-5-20251001-v1:0';
@@ -76,6 +81,16 @@ export class TingStack extends Stack {
     });
 
     const bus = new EventBus(this, 'Claims', { eventBusName: 'ting-claims' });
+
+    // Winnow requests for a worker on a machine AWS can't reach (the team's 24 GB Mac): it long-polls this queue
+    // and writes answers to the table. Short retention: a request nobody answers in time is useless.
+    const winnowQueue = new Queue(this, 'WinnowRequests', { retentionPeriod: Duration.minutes(5), visibilityTimeout: Duration.seconds(30) });
+    // Direct server instead (a GPU host AWS can reach): `cdk deploy -c winnowUrl=https://… -c winnowKey=…`.
+    const winnowEnv = {
+      WINNOW_URL: this.node.tryGetContext('winnowUrl') ?? '',
+      WINNOW_API_KEY: this.node.tryGetContext('winnowKey') ?? '',
+      WINNOW_QUEUE_URL: winnowQueue.queueUrl,
+    };
 
     const fn = (name: string, entry: string, extra: Partial<NodejsFunctionProps> = {}) =>
       new NodejsFunction(this, name, {
@@ -226,7 +241,8 @@ export class TingStack extends Stack {
         WS_ENDPOINT: wsStage.callbackUrl,
         REMINDER_EMAIL: reminderEmail,
         // Set with `cdk deploy -c winnowUrl=http://<gpu-host>:8080` once the Winnow server runs; empty = simulated.
-        WINNOW_URL: this.node.tryGetContext('winnowUrl') ?? '',
+        ...winnowEnv,
+        WINNOW_TEMPERATURE: winnowTemperature,
         AR_GUARDRAIL_ID: ar?.guardrailId ?? '',
         AR_GUARDRAIL_VERSION: ar?.guardrailVersion ?? '',
         AR_RULES_PREFIX: 'PLAN-ACME-LOW',
@@ -240,6 +256,7 @@ export class TingStack extends Stack {
     table.grantReadWriteData(apiFn);
     docs.grantReadWrite(apiFn); // presigned PUTs are signed as this role; Textract reads with its credentials
     bus.grantPutEventsTo(apiFn);
+    winnowQueue.grantSendMessages(apiFn);
     wsApi.grantManageConnections(apiFn); // the demo reminder run pushes to sockets
 
     // Year-end reminders: a daily rule (EventBridge Scheduler isn't available in event accounts) sends the due ones.
@@ -292,9 +309,17 @@ export class TingStack extends Stack {
     const ingestFn = fn('IngestFn', 'ingest.ts', {
       memorySize: 1024,
       timeout: Duration.seconds(25),
-      environment: { TABLE_NAME: table.tableName, MODEL_FAST, WINNOW_URL: this.node.tryGetContext('winnowUrl') ?? '', NODE_OPTIONS: '--enable-source-maps' },
+      environment: {
+        TABLE_NAME: table.tableName,
+        MODEL_FAST,
+        ...winnowEnv,
+        WINNOW_TEMPERATURE: winnowTemperature,
+        NODE_OPTIONS: '--enable-source-maps',
+      },
     });
     docs.grantRead(ingestFn);
+    table.grantReadData(ingestFn); // the Winnow worker's heartbeat and answers
+    winnowQueue.grantSendMessages(ingestFn);
     ingestFn.addToRolePolicy(new PolicyStatement({ actions: ['textract:DetectDocumentText'], resources: ['*'] }));
     ingestFn.addToRolePolicy(
       new PolicyStatement({
@@ -377,6 +402,8 @@ export class TingStack extends Stack {
     new CfnOutput(this, 'WsUrl', { value: wsStage.url });
     new CfnOutput(this, 'DocsBucket', { value: docs.bucketName });
     new CfnOutput(this, 'AcmePoolId', { value: acme.userPoolId });
+    new CfnOutput(this, 'WinnowQueueUrl', { value: winnowQueue.queueUrl });
+    new CfnOutput(this, 'TableName', { value: table.tableName });
     new CfnOutput(this, 'MembersPoolId', { value: members.userPoolId });
     new CfnOutput(this, 'SignInDomain', { value: membersDomain.baseUrl() });
     new CfnOutput(this, 'WebClientId', { value: webClient.userPoolClientId });

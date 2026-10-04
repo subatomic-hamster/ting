@@ -5,7 +5,7 @@ import { explainLine } from '../../../src/engine/explain';
 import { evaluateSchedule } from '../../../src/engine/schedule';
 import { parseDescription } from '../../../src/intake/describe';
 import { compileWithModel, verifiedAnswers } from './compile';
-import { describeWithModel } from './describe';
+import { blend, describeWithModel } from './describe';
 import { explainWithModel } from './explain';
 import type { CallModel } from './model';
 
@@ -94,4 +94,18 @@ describe('explainWithModel', () => {
     const out = await explainWithModel(line, fake({ sentences }));
     expect(out[0].source).toBe('template');
   });
+});
+
+describe('blend (parser prior × Winnow reading)', () => {
+  const prior = [
+    { cdt: 'D7240', p: 0.7 },
+    { cdt: 'D7210', p: 0.2 },
+    { cdt: 'D7140', p: 0.05 },
+  ];
+  it('keeps a strong dental prior against a mild literal reading', () => expect(blend(prior, { D7240: 0.2, D7210: 0.2, D7140: 0.6 })[0].cdt).toBe('D7240'));
+  it('lets clear evidence overturn the prior', () => {
+    const out = blend(prior, { D7240: 0.001, D7210: 0.001, D7140: 0.998 });
+    expect(out.reduce((a, b) => (b.p > a.p ? b : a)).cdt).toBe('D7140');
+  });
+  it('sums to 1', () => expect(blend(prior, { D7240: 0.5, D7210: 0.3, D7140: 0.2 }).reduce((s, c) => s + c.p, 0)).toBeCloseTo(1, 3));
 });

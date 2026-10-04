@@ -17,6 +17,8 @@ export interface IntakeItem {
   replacement?: number;
   /** Top code p × top tooth p (1 when the code needs no tooth; 0 when it needs one and none is known). */
   confidence: number;
+  /** Who set the probabilities: the built-in heuristics (default), Winnow, or Winnow's labelled simulation. */
+  decidedBy?: 'winnow' | 'simulated';
 }
 
 export interface IntakeQuestion {

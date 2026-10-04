@@ -23,6 +23,8 @@ node smoke.mjs       # prod smoke test (23 checks): every route, Bedrock, Textra
 node eval.mjs        # intake accuracy on evals/intake.json against the live API → docs/accuracy.md
 node scripts/ar-policy.mjs   # one-time: build the Automated Reasoning policy + guardrail → infra/ar.json (committed)
 node scripts/seed-acme.mjs   # demo Acme SSO users; passwords only in infra/acme-users.local.json (gitignored, never commit)
+bash scripts/winnow-local.sh # live Winnow-12B on this Mac (M5, 24 GB) serving prod via SQS; Ctrl+C → backend falls back to simulation
+node calibrate.mjs           # Winnow on evals/winnow.json (67 labelled examples) → public/calibration.json + docs/calibration.md
 ```
 
 Deploy-time context: `-c reminderEmail=you@example.com` (SES-verified address for reminder/digest email; omitted = in-app only), `-c winnowUrl=http://host:port` (live Winnow server; omitted = simulated).
@@ -57,9 +59,16 @@ Stack: React 18, Vite, Tailwind 4, Zustand, React Query and zod.
   - `POST /demo/reset` clears a member's claims.
 - **More backend features**, each with a pure engine rule plus a thin AWS adapter:
   - **Automated Reasoning** (`lib/reasoning.ts`): per estimate line, states the engine's premises and "The plan pays $X." against a policy built from the Acme Low benefits summary. A VALID verdict shows a "Proved" badge.
-  - **Winnow** (`ai/winnow.ts`): the spec's `/v1/systemone` typed questions. It's simulated by Claude Haiku until a GPU server is set with `winnowUrl`; results are labelled `simulated`. Uses so far:
-    - document triage, plus an injection check that quarantines text before Claude sees it;
-    - invoice-to-EOB matching.
+  - **Winnow** (`ai/winnow.ts`, chosen in `ai/winnowDecide.ts`): the spec's `/v1/systemone` typed questions.
+    - **Where it runs:** live on the team Mac. Winnow-inference lives in `~/Developer/winnow`, with its API key in `~/Developer/winnow/api-key`.
+    - **How prod reaches it:** the Lambdas put requests on the `WinnowRequests` SQS queue. `scripts/winnow-worker.mjs` long-polls the queue, asks the local server, and writes answers to DynamoDB (`WINNOW#<id>`). A heartbeat item (`WINNOW/HEARTBEAT`) tells the Lambdas whether the worker is up.
+    - **Why a queue:** the venue network blocks Cloudflare tunnels (port 7844), so the Mac connects out to AWS instead. Nothing on the Mac is exposed.
+    - **Fallback:** with no fresh heartbeat, or on any error, it uses the Claude simulation, labelled `simulated`. `-c winnowUrl/-c winnowKey` points at a directly reachable server instead.
+    - **Uses:**
+      - intake code and replacement probabilities, blended with the parser's prior (`blend`);
+      - document triage, plus an injection check that quarantines text before Claude sees it;
+      - invoice-to-EOB matching.
+    - **Calibration:** `/calibration`.
   - **Sign-in:** Cognito federated over OIDC to a mock "Acme Corp" pool.
     - `pretoken.ts` maps the employee to a member and group via `lib/identity.ts`.
     - The API verifies the ID token when one is sent; otherwise it serves the public demo persona.
@@ -68,6 +77,13 @@ Stack: React 18, Vite, Tailwind 4, Zustand, React Query and zod.
   - **Reminders and digests:** a daily EventBridge rule (`reminders.ts`) sends them. Email is content-free unless the member opts into detail.
   - **EOB appeal draft** (`engine/eobAppeal.ts`), **invoice reconciliation and the overbilling check** (`engine/reconcile.ts`), and the **forwarding inbox** (`engine/inbox.ts`, simulated SES inbound).
   - **Spanish explanations** (EN/ES switch) go through the same amount checks.
+  - **Maps:** Leaflet with OpenStreetMap tiles (`components/DentistMap.tsx`). Location Service is denied in event accounts.
+  - **Offline:** `public/sw.js` caches the app shell. `withOfflineFallback` in `api/index.ts` answers compute calls with the in-browser `mockApi` when the network is gone.
+  - **Plan rules review:**
+    - Members send compiled rules from /plan to `POST /rules/submit`.
+    - `lincoln_analyst` users approve them on `/analyst`, and the server hashes the version.
+    - Approved versions are added to `GET /plans`.
+  - **Step-up:** `POST /share` from a signed-in member needs `auth_time` within 10 minutes; the client re-signs in with `prompt=login`.
 - **Documents:** the browser uploads to S3 with a presigned URL, then Textract runs `DetectDocumentText`. `backend/src/lib/layout.ts` rebuilds table rows from line positions. Multi-page PDFs fall back to the PDF's text layer in the browser. When deployed, `/documents` runs the Express Step Functions workflow `Ingest` (read → screen → record), and a repeat upload (same S3 ETag) is flagged `duplicate`.
 - **`infra/lib/ting-stack.ts` is one CDK stack:**
   - DynamoDB single table (`pk`/`sk`/`ttl`).
@@ -113,11 +129,13 @@ Stack: React 18, Vite, Tailwind 4, Zustand, React Query and zod.
   - Other models: Mistral Large 3, Nova Lite, gpt-oss-120b.
   - Automated Reasoning and Guardrails.
   - Textract, Transcribe, Lambda (400 concurrent runs), API Gateway, EventBridge rules, Step Functions, DynamoDB, S3, Cognito, SES, CloudFormation, Route 53 and CloudFront.
+- **Winnow on the Mac:** start it with `bash infra/scripts/winnow-local.sh`. The worker uses the `ting-aws` event credentials, so when they expire, the heartbeat stops and prod quietly returns to the simulation.
 - **What's blocked:**
   - Claude Sonnet 5.5 and Opus 5.5 are denied by the event's private Marketplace. Sonnet 5.5 worked once and then started failing.
   - EventBridge Scheduler (`scheduler:*`) isn't in the event policy, so use EventBridge rules for notifications.
-  - Location Service (`geo-places`) is denied, so the F5 map needs another approach or AWS staff approval.
-  - The G/VT GPU quota is 0, so the Winnow g5.2xlarge can't launch until AWS staff raise it.
+  - Location Service (`geo-places`) is denied. The F5 map uses OpenStreetMap instead.
+  - Outbound port 7844 is blocked on the venue network, so Cloudflare tunnels don't work. That's why Winnow uses the SQS bridge.
+  - The G/VT GPU quota is 0. Not needed: Winnow runs on the team Mac.
   - SES is in the sandbox, so it can only send to verified addresses.
 - The old account (`907813425258`, profiles `ting`, `ting-mgmt` and `ting-proj`) is no longer used. Its `ting-autostop-sunday` schedule still exists there.
 - Winnow targets a **g5.2xlarge** (1× A10G 24 GB, 8 vCPU).

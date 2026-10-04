@@ -18,12 +18,14 @@ import { heuristicMatch, type ClaimRecord, type Invoice } from '../../src/engine
 import { classifyDocument } from '../../src/intake/classify';
 import { addDays, todayISO } from '../../src/lib/dates';
 import { compileWithModel } from './ai/compile';
-import { describeWithModel } from './ai/describe';
+import { describeWithModel, withWinnow } from './ai/describe';
 import { explainWithModel } from './ai/explain';
 import { polish } from './ai/polish';
 import { appealAmounts, appealDraft, type EobDiscrepancy } from '../../src/engine/eobAppeal';
 import { isRec } from './ai/model';
-import { liveWinnow, simulatedWinnow, triageDocument, type Decide, type Triage } from './ai/winnow';
+import { triageDocument, type Triage } from './ai/winnow';
+import { makeDecide } from './ai/winnowDecide';
+import { workerAlive } from './lib/winnowQueue';
 import { callBedrock } from './lib/bedrock';
 import { AuthError, callerOf, type Caller } from './lib/auth';
 import { db, deleteClaims, getShare, putShare } from './lib/db';
@@ -41,23 +43,12 @@ const events = new EventBridgeClient({});
 const BUCKET = process.env.DOCS_BUCKET ?? '';
 const BUS = process.env.EVENT_BUS ?? '';
 const WEB_ORIGIN = process.env.WEB_ORIGIN ?? '';
-const WINNOW_URL = process.env.WINNOW_URL ?? '';
 const INGEST_ARN = process.env.INGEST_ARN ?? '';
 const sfnClient = new SFNClient({});
 const TABLE = process.env.TABLE_NAME ?? '';
 
-// Winnow when its server is up; otherwise the labelled Claude simulation (the spec's fallback path).
-const simulated = simulatedWinnow(callBedrock);
-const decide: Decide = WINNOW_URL
-  ? async (state, questions) => {
-      try {
-        return await liveWinnow(WINNOW_URL)(state, questions);
-      } catch (err) {
-        console.warn('Winnow unavailable, using the simulation', err);
-        return simulated(state, questions);
-      }
-    }
-  : simulated;
+// Winnow: its server, the queue to the Mac worker, or the labelled simulation (see ai/winnowDecide.ts).
+const { decide, mode: winnowMode } = makeDecide();
 
 async function safeTriage(text: string): Promise<Triage | undefined> {
   if (!text.trim()) return undefined;
@@ -200,7 +191,17 @@ const routes: Record<string, Route> = {
     return json(200, PERSONAS[personaId].profile(asOf).ledger);
   },
 
-  'POST /intake/parse': async (e) => json(200, await describeWithModel(str(bodyOf(e).text, 'text', 2000), callBedrock)),
+  // Bedrock translates the words; Winnow (or its labelled simulation) sets the probabilities the questions price.
+  'POST /intake/parse': async (e) => {
+    const text = str(bodyOf(e).text, 'text', 2000);
+    const items = await describeWithModel(text, callBedrock);
+    try {
+      return json(200, await withWinnow(text, items, decide));
+    } catch (err) {
+      console.warn('intake: Winnow step failed, keeping the parser probabilities', err);
+      return json(200, items);
+    }
+  },
 
   'POST /documents/upload': async (e) => {
     const body = bodyOf(e);
@@ -307,7 +308,8 @@ const routes: Record<string, Route> = {
     return json(200, { ...(await compileWithModel(text, callBedrock)), triage });
   },
 
-  'GET /winnow/status': async () => json(200, { mode: WINNOW_URL ? 'live' : 'simulated', url: WINNOW_URL ? 'configured' : undefined }),
+  'GET /winnow/status': async () =>
+    json(200, { mode: winnowMode === 'queue' ? ((await workerAlive().catch(() => false)) ? 'live (Mac worker)' : 'simulated (worker offline)') : winnowMode }),
 
   'POST /explain': async (e) => {
     const body = bodyOf(e);

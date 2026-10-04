@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CallModel } from './model';
-import { normalize, simulatedWinnow, triageDocument, triageRule } from './winnow';
+import { fromWinnow, normalize, simulatedWinnow, triageDocument, triageRule } from './winnow';
 
 describe('normalize', () => {
   const choice = { type: 'choice' as const, instructions: 'x', criteria: { a: 'A', b: 'B' } };
@@ -25,4 +25,18 @@ describe('simulatedWinnow', () => {
     const t = await triageDocument('Annual maximum: $1,500', simulatedWinnow(call));
     expect(t).toMatchObject({ docType: 'plan_summary', docTypeP: 0.9, injectionP: 0, quarantined: false });
   });
+});
+
+describe('fromWinnow (live server response shapes)', () => {
+  it('reads noul as p(true)', () => expect(fromWinnow({ type: 'noul', noul: 0.8 }, { type: 'noul', instructions: 'x' })).toEqual({ yes: 0.8, no: 0.2 }));
+  it('reads a choice probability map', () =>
+    expect(fromWinnow({ type: 'choice', selected: 'a', probabilities: { a: 0.9, b: 0.1 } }, { type: 'choice', instructions: 'x', criteria: { a: 'A', b: 'B' } })).toEqual({
+      a: 0.9,
+      b: 0.1,
+    }));
+  it('maps score indices to labels', () =>
+    expect(fromWinnow({ type: 'score', probabilities: { '0': 0.2, '1': 0.8 } }, { type: 'score', instructions: 'x', scale: ['low', 'high'] })).toEqual({
+      low: 0.2,
+      high: 0.8,
+    }));
 });

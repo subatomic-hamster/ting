@@ -1,0 +1,85 @@
+{
+  "generatedAt": "2026-10-04T01:50:06.804Z",
+  "model": "Winnow-12B Q8 (local, Apple M5 24 GB, Metal)",
+  "examples": 67,
+  "byKind": {
+    "procedure": 45,
+    "document": 12,
+    "injection": 10
+  },
+  "seconds": 88.848,
+  "temperature": 1,
+  "errors": 1,
+  "raw": {
+    "accuracy": 0.9850746268656716,
+    "ece": 0.024353771918572818,
+    "bins": [
+      {
+        "range": "50-60%",
+        "n": 1,
+        "accuracy": 0,
+        "confidence": 0.32379619974434115
+      },
+      {
+        "range": "60-70%",
+        "n": 1,
+        "accuracy": 1,
+        "confidence": 0.6419365627184227
+      },
+      {
+        "range": "70-80%",
+        "n": 0,
+        "accuracy": null,
+        "confidence": null
+      },
+      {
+        "range": "80-90%",
+        "n": 2,
+        "accuracy": 1,
+        "confidence": 0.8548677305252452
+      },
+      {
+        "range": "90-100%",
+        "n": 63,
+        "accuracy": 1,
+        "confidence": 0.9895304993243024
+      }
+    ]
+  },
+  "calibrated": {
+    "accuracy": 0.9850746268656716,
+    "ece": 0.024353771918572818,
+    "bins": [
+      {
+        "range": "50-60%",
+        "n": 1,
+        "accuracy": 0,
+        "confidence": 0.32379619974434115
+      },
+      {
+        "range": "60-70%",
+        "n": 1,
+        "accuracy": 1,
+        "confidence": 0.6419365627184227
+      },
+      {
+        "range": "70-80%",
+        "n": 0,
+        "accuracy": null,
+        "confidence": null
+      },
+      {
+        "range": "80-90%",
+        "n": 2,
+        "accuracy": 1,
+        "confidence": 0.8548677305252452
+      },
+      {
+        "range": "90-100%",
+        "n": 63,
+        "accuracy": 1,
+        "confidence": 0.9895304993243024
+      }
+    ]
+  }
+}

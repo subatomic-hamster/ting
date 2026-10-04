@@ -85,7 +85,11 @@ The live site (`infra/outputs.json` → `WebUrl`) runs the same app against the 
 
 - **Bedrock** for intake translation (including Spanish), plan-compiler gap filling (verified quotes only), plain explanations (EN/ES), digests and EOB appeal drafts. Every amount is checked against the engine.
 - **Automated Reasoning:** a "Proved" badge when the engine's plan-pays amount is proved against rules built from the benefits summary.
-- **Winnow decision layer** (simulated until the GPU is approved): document triage, prompt-injection quarantine, and invoice-to-EOB matching.
+- **Winnow decision layer:**
+  - **Where it runs:** Winnow-12B on the team's 24 GB Mac (`infra/scripts/winnow-local.sh`), reached through an SQS queue, so no tunnel or open port is needed. When it's off, a labelled Claude simulation takes over.
+  - **What it decides:** intake probabilities, document triage, prompt-injection quarantine, and invoice-to-EOB matching.
+  - **Calibration:** `/calibration` (67 labelled examples, 99% top-answer accuracy).
+- **Maps:** OpenStreetMap. **Offline:** a service worker plus in-browser fallback. **Plan rules review:** `/analyst`. **Step-up sign-in** before sharing.
 - **Employer sign-in:** "Sign in with Acme" (Cognito, OIDC), a consent screen, delete-my-data, and server-enforced admin aggregates.
 - **Live claims feed** over WebSocket with replay, dentist share links backed by snapshots, year-end reminders and digests (content-free email by default).
 - **Documents:** the Step Functions ingestion workflow with duplicate detection. A dentist's bill is reconciled with Lincoln's EOB and flagged if it asks for more than the EOB says.
