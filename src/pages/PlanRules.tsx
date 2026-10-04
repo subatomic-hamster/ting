@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { api, type CompiledPlan } from '../api';
 import { applyAnswers, approveRules, finalizeRules, type Answer, type AnswerPath } from '../compiler/compile';
+import { PlanPicker } from '../components/PlanPicker';
 import { PageHeader, Section } from '../components/Section';
 import type { PlanRules as Rules, ServiceClass } from '../engine/types';
 import { parseInsuranceCard, plansForGroup } from '../intake/insuranceCard';
@@ -94,7 +95,11 @@ export default function PlanRules() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Plan rules" subtitle="The rules every estimate uses, read from your plan's own documents." />
+      <PageHeader title="Plan rules" subtitle="The rules every estimate uses, read from your plan's own documents.">
+        <label className="flex items-center gap-2 text-sm text-muted">
+          Your plan this year <PlanPicker />
+        </label>
+      </PageHeader>
 
       <RulesView rules={currentPlan} title="Your plan's rules" />
 
@@ -150,7 +155,7 @@ export default function PlanRules() {
               </div>
             ))}
             {final && !final.ok && final.errors.length > 0 && (
-              <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-cost">
+              <div className="rounded-xl border border-cost/30 bg-cost/10 p-3 text-sm text-cost">
                 {final.errors.map((e) => (
                   <p key={e}>{e}</p>
                 ))}
@@ -158,7 +163,7 @@ export default function PlanRules() {
             )}
             {result.secondReader && result.secondReader.length > 0 && (
               <div
-                className={`rounded-xl border p-3 text-sm ${result.secondReader.some((c) => c.review) ? 'border-amber-200 bg-amber-50' : 'border-emerald-200 bg-emerald-50'}`}
+                className={`rounded-xl border p-3 text-sm ${result.secondReader.some((c) => c.review) ? 'border-amber-200 bg-amber-50' : 'border-save/30 bg-save/10'}`}
               >
                 {result.secondReader.some((c) => c.review) ? (
                   <>
@@ -199,7 +204,7 @@ export default function PlanRules() {
               {final && !final.ok && <span className="text-xs text-muted">{final.missing.length} answer(s) still needed.</span>}
             </div>
             {approved && (
-              <div className="space-y-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm">
+              <div className="space-y-2 rounded-xl border border-save/30 bg-save/10 p-3 text-sm">
                 <p>
                   Approved as <strong>{approved.rules.version}</strong>. Fingerprint <code>{approved.hash.slice(0, 16)}…</code>
                 </p>

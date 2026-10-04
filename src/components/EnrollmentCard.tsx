@@ -71,7 +71,9 @@ export function EnrollmentCard({ variant = 'full' }: { variant?: 'compact' | 'fu
     <section className="rounded-2xl border border-brand-200 bg-gradient-to-br from-brand-50 to-white p-4 sm:p-5" aria-labelledby="enroll-card-title">
       <div className="eyebrow mb-1 text-brand-700">Your enrollment card</div>
       <h2 id="enroll-card-title" className="text-lg leading-snug font-semibold sm:text-xl">
-        {card.summary.replace(/^Your enrollment decisions: /, '')}
+        {fsa.election > 0
+          ? `Choose ${choice.plan.name} and put ${formatMoney(fsa.election)} in your ${fsa.year} FSA`
+          : `Choose ${choice.plan.name}`}
       </h2>
 
       <ul className="mt-3 divide-y divide-brand-100 rounded-xl border border-brand-100 bg-white">

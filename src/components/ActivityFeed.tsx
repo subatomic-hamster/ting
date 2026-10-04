@@ -6,7 +6,6 @@ import type { EobDiscrepancy } from '../engine/eobAppeal';
 import { yearOf } from '../lib/dates';
 import { formatDate, formatMoney } from '../lib/format';
 import { useAppStore } from '../store';
-import { DemoDataPill } from './DemoDataPill';
 
 /** F7: a factual message to Lincoln, drafted from the EOB and the engine's estimate. */
 function AppealDraft({ discrepancy }: { discrepancy: EobDiscrepancy }) {
@@ -54,11 +53,11 @@ export function ActivityFeed() {
         const isNew = isLive(e.claimId);
         const check = checks.find((c) => c.claimId === e.claimId);
         return (
-          <li key={e.key} className={`flex flex-wrap items-center gap-x-3 gap-y-1 py-2.5 ${isNew ? '-mx-2 rounded-lg bg-emerald-50 px-2' : ''}`}>
+          <li key={e.key} className={`flex flex-wrap items-center gap-x-3 gap-y-1 py-2.5 ${isNew ? '-mx-2 rounded-lg bg-save/10 px-2' : ''}`}>
             <span className="tabular w-14 shrink-0 text-xs text-muted">{formatDate(e.date)}</span>
             <span className="min-w-0 flex-1 text-sm">
               <span className="font-medium">{cdtLabel(e.cdt, e.tooth)}</span> <span className="font-mono text-xs text-muted">{e.cdt}</span>
-              {isNew && <span className="ml-2 rounded-full bg-emerald-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">New EOB</span>}
+              {isNew && <span className="ml-2 rounded-full bg-save px-1.5 py-0.5 text-[10px] font-semibold text-white">New EOB</span>}
               {check && (
                 <span className={`mt-0.5 block text-xs ${check.mismatch ? 'font-medium text-cost' : 'text-save'}`}>
                   {check.mismatch
@@ -76,7 +75,6 @@ export function ActivityFeed() {
               Plan paid <span className="font-medium text-ink">{formatMoney(e.planPaid)}</span>
               {e.inNetwork === false && ' · out of network'}
             </span>
-            <DemoDataPill />
           </li>
         );
       })}

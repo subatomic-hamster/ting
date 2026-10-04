@@ -1,44 +1,46 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { api, type ReadDocument } from '../api';
+
+type ForwardResult = Awaited<ReturnType<typeof api.simulateForward>>;
 import { useAppStore } from '../store';
 import { DemoDataPill } from './DemoDataPill';
 import { InvoiceCheck } from './InvoiceCheck';
 import { Section } from './Section';
-
-const DEMO_SENDER = 'billing@greensborofamilydental.example';
-const DEMO_BILL = `Greensboro Family Dental
-Statement / Invoice
-Patient: Dale        Date of service: 10/03/2026
-D3330   Root canal - molar   #19        $1,180.00
-Insurance adjustment                     -$768.00
-Amount due                                $412.00`;
 
 /** F2 channel 2: forward what Lincoln can't see. No inbox access, ever: the member chooses what to send. */
 export function ForwardingCard() {
   const personaId = useAppStore((s) => s.personaId);
   const qc = useQueryClient();
   const inbox = useQuery({ queryKey: ['inbox', personaId], queryFn: () => api.getInbox() });
-  const [doc, setDoc] = useState<ReadDocument>();
-  const [note, setNote] = useState('');
+  // The demo panel's "Dentist emails a bill" stands in for SES inbound and leaves its result here.
+  const forwarded = useQuery<ForwardResult | null>({ queryKey: ['forwarded', personaId], queryFn: () => null, enabled: false });
+  const [approval, setApproval] = useState<{ for: unknown; doc?: ReadDocument }>();
   const refresh = () => void qc.invalidateQueries({ queryKey: ['inbox', personaId] });
 
-  const forward = useMutation({
-    mutationFn: () => api.simulateForward({ from: DEMO_SENDER, subject: 'Your statement from Greensboro Family Dental', text: DEMO_BILL }),
-    onSuccess: (r) => {
-      setDoc(r.doc);
-      setNote(r.status === 'held' ? (r.reason ?? 'Held for your approval.') : r.status === 'rejected' ? `Rejected: ${r.reason}` : 'Received.');
-      refresh();
-    },
-  });
   const approve = useMutation({
     mutationFn: ({ from, id }: { from: string; id: string }) => api.approveSender(from, id),
     onSuccess: (r) => {
-      setDoc(r.doc);
-      setNote(r.doc ? 'Sender added. The email was read and then deleted; only what Ting found is kept.' : 'Sender added.');
+      setApproval({ for: forwarded.data, doc: r.doc });
       refresh();
     },
   });
+
+  const latest = forwarded.data;
+  // An approval belongs to the email it released; a newer email replaces it.
+  const approved = approval?.for === latest ? approval : undefined;
+  const doc = approved ? approved.doc : latest?.doc;
+  const note = approved
+    ? approved.doc
+      ? 'Sender added. The email was read and then deleted; only what Ting found is kept.'
+      : 'Sender added.'
+    : latest
+      ? latest.status === 'held'
+        ? (latest.reason ?? 'Held for your approval.')
+        : latest.status === 'rejected'
+          ? `Rejected: ${latest.reason}`
+          : 'Received.'
+      : '';
 
   return (
     <Section id="forwarding" title="Your forwarding address" actions={<DemoDataPill label="Simulated mail" />}>
@@ -66,9 +68,6 @@ export function ForwardingCard() {
         </div>
       ))}
 
-      <button type="button" className="btn-secondary mt-3 px-2.5 py-1.5 text-xs" onClick={() => forward.mutate()} disabled={forward.isPending}>
-        {forward.isPending ? 'Sending…' : 'Demo: the dentist emails a bill'}
-      </button>
       {note && <p className="mt-2 text-sm text-muted">{note}</p>}
       {doc?.kind === 'invoice' && doc.invoice && <InvoiceCheck invoice={doc.invoice} lineChecks={doc.lineChecks} />}
     </Section>

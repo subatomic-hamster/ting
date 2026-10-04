@@ -2,10 +2,10 @@ import type { CalendarDay } from '../../habits/analytics';
 import { formatDate } from '../../lib/format';
 
 function cellClass(d: CalendarDay) {
-  if (!d.collected) return 'bg-slate-50 border border-dashed border-line';
+  if (!d.collected) return 'bg-paper border border-dashed border-line';
   if (d.good) return 'bg-brand-500';
   if (d.sessions === 1) return 'bg-brand-200';
-  return 'bg-slate-200';
+  return 'bg-line';
 }
 
 export function StreakCalendar({ days, streak }: { days: CalendarDay[]; streak: number }) {
@@ -29,8 +29,8 @@ export function StreakCalendar({ days, streak }: { days: CalendarDay[]; streak: 
       <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted">
         <Key className="bg-brand-500" label="2+ good sessions" />
         <Key className="bg-brand-200" label="1 session" />
-        <Key className="bg-slate-200" label="none" />
-        <Key className="border border-dashed border-line bg-slate-50" label="not collected" />
+        <Key className="bg-line" label="none" />
+        <Key className="border border-dashed border-line bg-paper" label="not collected" />
       </div>
     </div>
   );

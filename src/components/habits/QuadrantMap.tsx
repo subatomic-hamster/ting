@@ -29,8 +29,8 @@ export function QuadrantMap({
   const color = (i: number) => {
     if (active === i + 1) return 'var(--color-brand-500)';
     if (weakest === i) return 'var(--color-warn)';
-    if (shares) return `color-mix(in srgb, var(--color-brand-500) ${Math.round(25 + (shares[i] ?? 0) * 220)}%, #e2e8f0)`;
-    return '#e2e8f0';
+    if (shares) return `color-mix(in srgb, var(--color-brand-500) ${Math.round(25 + (shares[i] ?? 0) * 220)}%, var(--color-line))`;
+    return 'var(--color-line)';
   };
   const label = shares
     ? `Brushing time by area: ${QUADRANTS.map((q, i) => `${q} ${Math.round((shares[i] ?? 0) * 100)}%`).join(', ')}`

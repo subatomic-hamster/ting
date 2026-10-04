@@ -96,11 +96,14 @@ The live site (`infra/outputs.json` → `WebUrl`) runs the same app against the 
 - **A simulated forwarding address**, with sender approval.
 - **Scorecard:** `docs/accuracy.md`.
 
+The main nav is the member's journey; employer and insurer screens (Employer insights, Insurer view, Insurer record, Rules review, Winnow calibration) are under **For employers & insurers**. Every demo-only control lives in the demo panel (`?demo=1` or Ctrl+Shift+D), grouped by page.
+
 Extra demo moments (demo panel):
-- **Underpaid EOB:** an EOB $90 below the estimate. Use **Draft a message to Lincoln** on it.
+- **Underpaid EOB:** an EOB $90 below the estimate. Use **Draft a message to your insurer** on it.
 - **Overbilling check:** after **Fire mock claim**, upload `public/samples/invoice.png` on /treatment.
-- **Forwarding:** on the dashboard, click **Demo: the dentist emails a bill**.
-- **Digest:** **Send a test digest now** on the dashboard.
+- **Forwarding:** on /email, click **Dentist emails a bill** in the panel's Email group, then **Add sender** on the page.
+- **Email agent:** on /email, pick a sample (e.g. **Dentist: urgent x-ray result**) in the panel's Email group and click **Send to Ting** (live API only).
+- **Digest:** **Send this month’s overview now** in the panel's Email group.
 
 ## Demo script
 
@@ -109,7 +112,7 @@ Extra demo moments (demo panel):
 3. In **When to do it**, compare Cheapest / Balanced / Fastest, then drag **Crown (porcelain) on #30** across the bold **Dec 31** line. The floating delta shows the recompute time in milliseconds. The root canal is locked (urgent). The keyboard works too: ← → moves a week, Shift + ← → moves a month.
 4. Flip the **In-network / Out** toggle in the top bar. Every number changes, including the balance bill.
 5. In the demo panel, click **Fire mock claim**. Lincoln's EOB for the root canal arrives; it's checked against Ting's estimate, and the max gauge, schedule and activity feed update live.
-6. On the **Dashboard**, under **Scheduled reminders**, click **Remind me**: Nov 1, Dec 1 and (with a grace-period FSA) 10 days before the FSA deadline, each with the engine's amounts. **Add to calendar** downloads them as .ics. Then click **Simulate Dec 1**: the Dec 1 reminder fires in the app (and as a browser notification if allowed), it shows as "Due now", and the "Left on the table" year-end banner appears.
+6. On **Home**, under **Reminders**, click **Remind me**: Nov 1, Dec 1 and (with a grace-period FSA) 10 days before the FSA deadline, each with the engine's amounts. **Add to calendar** downloads them as .ics. Then click **Simulate Dec 1**: the Dec 1 reminder fires in the app (and as a browser notification if allowed), it shows as "Due now", and the "Left on the table" year-end banner appears.
 7. Go to **/enroll** for the Enrollment Card: plan choice, FSA election, what to do before Dec 31 and what waits until January, and expected savings. Try **Add to calendar** (.ics) and **Share with my dentist** (opens the printable `/share/:token` page).
 
 8. Go to **/plan** and upload the **sample benefits summary (PDF)**. The compiler reads it into rules, asks the one thing the document doesn't say, and stamps the approved version.
@@ -150,7 +153,7 @@ Like a safe-driving app for teeth, but **rewards only**: sharing data can lower 
   - Reward credits are computed in `rewards.ts`; components only format them.
 
 **Demo:**
-1. Open `/habits` as Dale and click **Brush now**: you'll see the live quadrant map, then a verified session.
+1. Open `/habits` as Dale and click **Brush now** in the demo panel's SmileStreak group: you'll see the live quadrant map, then a verified session.
 2. Switch to **Jordan** to show the opt-in moment: their cleaning already counts.
 3. Switch to **Priya** and click **Use 27% instead** on her maybe root canal.
 4. Open `/share/dale.cheapest.x` for the dentist's view and `/program` for Lincoln's view.

@@ -15,7 +15,7 @@ export function DeductibleBar() {
           <span className="font-semibold text-ink">{formatMoney(met)}</span> of {formatMoney(total)} met
         </span>
       </div>
-      <div className="h-2.5 overflow-hidden rounded-full bg-slate-100" role="img" aria-label={`Deductible: ${formatMoney(met)} of ${formatMoney(total)} met`}>
+      <div className="h-2.5 overflow-hidden rounded-full bg-paper" role="img" aria-label={`Deductible: ${formatMoney(met)} of ${formatMoney(total)} met`}>
         <div className="h-full rounded-full bg-plan transition-[width] duration-500" style={{ width: `${percentOf(met, total)}%` }} />
       </div>
     </div>

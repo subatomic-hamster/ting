@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
 import { ActivityFeed } from '../components/ActivityFeed';
 import { AskTing } from '../components/AskTing';
-import { ForwardingCard } from '../components/ForwardingCard';
 import { DeductibleBar } from '../components/DeductibleBar';
 import { DemoDataPill } from '../components/DemoDataPill';
 import { EnrollmentCard } from '../components/EnrollmentCard';
 import { FsaCountdown } from '../components/FsaCountdown';
 import { LeftOnTableBanner } from '../components/LeftOnTableBanner';
 import { MaxGauge } from '../components/MaxGauge';
+import { PlanPicker } from '../components/PlanPicker';
 import { SamplePlanNote } from '../components/SamplePlanNote';
 import { RemindersCard } from '../components/RemindersCard';
 import { PageHeader, Section } from '../components/Section';
@@ -34,12 +34,17 @@ export default function Dashboard() {
         title={`Hi ${persona.name}`}
         subtitle={
           <>
-            {formatDate(profile.asOf, { year: true })} · {profile.currentPlan.name} · you'll pay{' '}
+            {formatDate(profile.asOf, { year: true })} · <PlanPicker className="mx-0.5 py-0.5" /> · you'll pay{' '}
             <strong className="tabular text-ink">{formatMoney(active.expectedOwes)}</strong> for planned work
           </>
         }
       >
-        <SamplePlanNote />
+        <div className="flex flex-col items-start gap-1 sm:items-end">
+          <SamplePlanNote />
+          <Link to="/onboarding" className="text-sm font-medium text-brand-700 hover:underline">
+            New here? Answer 3 quick questions
+          </Link>
+        </div>
       </PageHeader>
 
       {isEnrollmentWindow(profile.asOf) && <EnrollmentCard variant="compact" />}
@@ -57,6 +62,20 @@ export default function Dashboard() {
         </Section>
       </div>
 
+      <Section title="Ask about your plan" id="ask">
+        <AskTing />
+      </Section>
+
+      <Section title="Treatment timeline" id="timeline" actions={<Link to="/treatment" className="btn-ghost">Details</Link>}>
+        <Timeline compact />
+      </Section>
+
+      <RemindersCard />
+
+      <Section title="Activity" id="activity" actions={<DemoDataPill label="Demo claims feed" />}>
+        <ActivityFeed />
+      </Section>
+
       <Section
         title="SmileStreak"
         id="smilestreak"
@@ -73,35 +92,6 @@ export default function Dashboard() {
           </p>
         )}
       </Section>
-
-      <Section title="Ask about your plan" id="ask">
-        <AskTing />
-      </Section>
-
-      <Section title="Treatment timeline" id="timeline" actions={<Link to="/treatment" className="btn-ghost">Details</Link>}>
-        <Timeline compact />
-      </Section>
-
-      <RemindersCard />
-      <Section
-        title="Email"
-        id="email"
-        actions={
-          <Link to="/email" className="btn-ghost">
-            Open
-          </Link>
-        }
-      >
-        <p className="text-sm text-muted">
-          Ting emails you a monthly overview on the 1st and anything urgent right away. Forward it EOBs, bills and notes from your dentist; it reads them,
-          updates your plan and replies.
-        </p>
-      </Section>
-
-      <Section title="Activity" id="activity" actions={<DemoDataPill label="Demo claims feed" />}>
-        <ActivityFeed />
-      </Section>
-      <ForwardingCard />
     </div>
   );
 }

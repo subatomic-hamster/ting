@@ -61,7 +61,7 @@ export default function Analyst() {
         ))
       )}
       {approve.data && (
-        <p className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm">
+        <p className="rounded-xl border border-save/30 bg-save/10 p-3 text-sm">
           Approved as <strong>{approve.data.rules.version}</strong> (fingerprint <code>{approve.data.hash.slice(0, 16)}…</code>). It&rsquo;s now a plan option for
           members.
         </p>

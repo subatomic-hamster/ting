@@ -11,7 +11,7 @@ function describe(g: Gauge) {
 function Bar({ g, height = 'h-3' }: { g: Gauge; height?: string }) {
   const s = gaugeSegments(g);
   return (
-    <div className={`flex w-full overflow-hidden rounded-full bg-slate-100 ${height}`} role="img" aria-label={describe(g)}>
+    <div className={`flex w-full overflow-hidden rounded-full bg-paper ${height}`} role="img" aria-label={describe(g)}>
       <div className="bg-plan transition-[width] duration-500" style={{ width: `${s.usedPct}%` }} />
       <div
         className="bg-sched transition-[width] duration-500"
@@ -43,7 +43,7 @@ export function MaxGauge({ gauge }: { gauge: Gauge }) {
       <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-sm sm:grid-cols-4">
         <Legend color="bg-plan" label="Used" value={gauge.used} />
         <Legend color="bg-sched" label="Scheduled" value={gauge.scheduled} />
-        <Legend color="bg-slate-200" label="Remaining" value={gauge.remaining} />
+        <Legend color="bg-line" label="Remaining" value={gauge.remaining} />
         {gauge.rollover > 0 && <Legend color="bg-roll" label="Rollover" value={gauge.rollover} />}
       </dl>
     </div>

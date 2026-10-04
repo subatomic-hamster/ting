@@ -146,9 +146,9 @@ export function Timeline({ compact = false }: { compact?: boolean }) {
               ))}
             </div>
 
-            <div ref={trackRef} className="relative rounded-xl border border-line bg-slate-50/60" style={{ height: visits.length * LANE_PX + 28 }}>
+            <div ref={trackRef} className="relative rounded-xl border border-line bg-paper/60" style={{ height: visits.length * LANE_PX + 28 }}>
               {/* past */}
-              <div className="absolute inset-y-0 left-0 rounded-l-xl bg-slate-200/50" style={{ width: `${asOfPct}%` }} aria-hidden />
+              <div className="absolute inset-y-0 left-0 rounded-l-xl bg-line/50" style={{ width: `${asOfPct}%` }} aria-hidden />
               {/* month grid */}
               {months.map((m) => (
                 <div key={m} className="absolute inset-y-0 w-px bg-line/70" style={{ left: `${datePct(m, start, end)}%` }} aria-hidden />
@@ -244,15 +244,15 @@ function Chip({
         onKeyDown={onKeyDown}
         className={`flex h-[38px] touch-none items-center gap-2 rounded-xl border px-2.5 text-left text-xs whitespace-nowrap shadow-sm select-none ${
           locked
-            ? 'cursor-not-allowed border-slate-300 bg-slate-100 text-slate-700'
+            ? 'cursor-not-allowed border-line bg-paper text-ink'
             : `cursor-grab bg-white active:cursor-grabbing ${maybe ? 'border-dashed ' : ''}${isDragging ? 'border-brand-500 shadow-lg ring-2 ring-brand-200' : 'border-brand-200 hover:border-brand-500'}`
         }`}
       >
-        {locked && <LockIcon className="shrink-0 text-slate-500" />}
+        {locked && <LockIcon className="shrink-0 text-muted" />}
         <span className="flex flex-col leading-tight">
           <span className="font-semibold">
             {name}
-            {maybe && <span className="ml-1 font-normal text-violet-800">{formatPercent(procedure.likelihood ?? 1)}</span>}
+            {maybe && <span className="ml-1 font-normal text-brand-700">{formatPercent(procedure.likelihood ?? 1)}</span>}
           </span>
           <span className="tabular text-muted">
             {formatDate(previewDate ?? date, { year: true })} · {formatMoney(owes)}
@@ -289,7 +289,7 @@ function DeltaPill({ change }: { change: { id: number; delta: number; ms: number
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -6 }}
           className={`tabular rounded-full px-3 py-1 text-sm font-semibold shadow ${
-            change.delta > 0 ? 'bg-rose-50 text-cost ring-1 ring-rose-200' : 'bg-emerald-50 text-save ring-1 ring-emerald-200'
+            change.delta > 0 ? 'bg-cost/10 text-cost ring-1 ring-cost/30' : 'bg-save/10 text-save ring-1 ring-save/30'
           }`}
           aria-hidden
         >

@@ -1,9 +1,9 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import type { ReminderStatus } from '../engine/reminders';
 import { useReminderSchedule } from '../hooks/useReminderSchedule';
 import { formatDate } from '../lib/format';
 import { notificationPermission } from '../lib/notify';
-import { DemoDataPill } from './DemoDataPill';
 import { BellIcon, CalendarIcon } from './Icons';
 import { Section } from './Section';
 
@@ -23,9 +23,18 @@ export function RemindersCard() {
   };
 
   return (
-    <Section id="reminders" title="Scheduled reminders" actions={<DemoDataPill label="Demo: shown in the app" />}>
+    <Section
+      id="reminders"
+      title="Reminders"
+      actions={
+        <Link to="/email" className="btn-ghost">
+          Email settings
+        </Link>
+      }
+    >
       <p className="text-sm text-muted">
-        Your annual max and covered cleanings reset on Jan 1, and unspent FSA money is forfeited. Ting reminds you before that happens.
+        Your annual max and covered cleanings reset on Jan 1, and unspent FSA money is forfeited. Ting reminds you before that happens, and emails
+        you a monthly overview plus anything urgent.
       </p>
 
       {reminders.length === 0 ? (
@@ -73,7 +82,7 @@ export function RemindersCard() {
         )}
       </div>
       {toggle.isError && (
-        <p className="mt-2 text-xs text-red-700" role="alert">
+        <p className="mt-2 text-xs text-cost" role="alert">
           Couldn't update reminders. Try again.
         </p>
       )}
@@ -83,8 +92,7 @@ export function RemindersCard() {
             ? 'Due reminders appear here and as a browser notification.'
             : permission === 'denied'
               ? 'Due reminders appear here. Browser notifications are blocked in this browser.'
-              : 'Due reminders appear here in the app.'}{' '}
-          Email delivery comes with the AWS backend.
+              : 'Due reminders appear here in the app.'}
         </p>
       )}
     </Section>

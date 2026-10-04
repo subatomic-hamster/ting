@@ -81,7 +81,7 @@ export function ComparisonTable() {
       {insights.length > 0 && (
         <ul className="mt-3 space-y-1.5 text-sm">
           {insights.map((i) => (
-            <li key={i.text} className={`rounded-lg px-3 py-2 ${i.id === 'maybe' ? 'bg-violet-50 text-violet-900' : 'bg-slate-50'}`}>
+            <li key={i.text} className={`rounded-lg px-3 py-2 ${i.id === 'maybe' ? 'bg-brand-50 text-brand-900' : 'bg-paper'}`}>
               {i.text}
             </li>
           ))}
