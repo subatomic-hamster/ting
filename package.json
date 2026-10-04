@@ -10,7 +10,10 @@
     "e2e:local": "playwright test -c playwright.local.config.ts",
     "lint": "eslint .",
     "test": "vitest run",
-    "typecheck": "tsc -b"
+    "typecheck": "tsc -b",
+    "docker:prepare": "node scripts/prepare-container.mjs",
+    "docker:check": "node scripts/prepare-container.mjs --check",
+    "e2e:docker": "playwright test -c playwright.docker.config.ts"
   },
   "repository": {
     "type": "git",

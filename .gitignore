@@ -9,3 +9,4 @@ dist
 e2e-report-local
 e2e-report
 test-results
+docker/.site

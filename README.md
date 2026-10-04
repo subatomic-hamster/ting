@@ -18,6 +18,18 @@ npm run lint
 npm run build      # strict TypeScript check + production build into dist/
 ```
 
+### Docker / isolated grading sandbox
+
+Declare the root **`Dockerfile`** when submitting. It builds without network access or credentials, including PDF/image OCR assets and the real calculation engine in a clearly labelled offline demo.
+
+```bash
+docker build --network=none -t ting .
+docker run --rm -p 8088:8080 ting  # http://localhost:8088
+# Alternatively: docker compose up --build
+```
+
+See [Docker setup and validation](docker/README.md) for architecture support, snapshot refresh and the AWS-only features. See [rubric assessment](docs/grading-rubric-assessment.md) for the weighted score estimate and criterion-level evidence.
+
 ### Environment variables
 
 Copy `.env.example` to `.env.local`.
