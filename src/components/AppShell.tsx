@@ -1,25 +1,13 @@
 import { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { ConsentDialog } from "../auth/ConsentDialog";
-import { useAuth } from "../auth/auth";
-import { useAppStore } from "../store";
-import { USE_MOCKS } from "../api";
 import { useBootstrap } from "../hooks/useBootstrap";
 import { AuditDrawer } from "./AuditDrawer";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { DemoPanel } from "./DemoPanel";
-import { EstimateFooter } from "./EstimateFooter";
 import { ReminderToast } from "./ReminderToast";
 import { TopBar } from "./TopBar";
 export function AppShell() {
-  const authSub = useAuth((s) => s.claims?.sub);
-  const demoPrices = useAppStore((s) =>
-    s.profile.procedures.some(
-      (p) =>
-        p.feeSource?.kind === "demo" ||
-        (!p.feeSource && s.profile.fees[p.cdt]?.source?.kind === "demo"),
-    ),
-  );
   const [saveError, setSaveError] = useState(false);
   useEffect(() => {
     const show = () => setSaveError(true);
@@ -47,16 +35,6 @@ export function AppShell() {
         id="main"
         className="member-content page-inset mx-auto w-full max-w-6xl flex-1"
       >
-        {(USE_MOCKS || !authSub || demoPrices) && (
-          <p className="mb-6 border-l-2 border-brand-600 pl-3 text-xs text-muted">
-            {USE_MOCKS || !authSub
-              ? "Sample account. Plans, providers and default prices are illustrative."
-              : "Sample prices remain in this estimate. Replace them with your dentist’s quote and confirmed insurer allowance."}{" "}
-            {USE_MOCKS
-              ? "Edits are saved on this device."
-              : "Draft edits are saved in this browser tab."}
-          </p>
-        )}
         {saveError && (
           <p role="alert" className="mb-5 border-l-2 border-cost pl-3">
             Your browser could not save these edits. Keep this tab open and
@@ -90,7 +68,6 @@ export function AppShell() {
           )}
         </ErrorBoundary>
       </main>
-      <EstimateFooter />
       <AuditDrawer open={auditOpen} onClose={() => setAuditOpen(false)} />
       <ReminderToast />
       <DemoPanel />

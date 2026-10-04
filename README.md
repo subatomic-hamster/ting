@@ -6,7 +6,7 @@ Ting tells an employee what planned dental work will cost, step by step, and whe
 
 **The AI translates, tested code decides.** Every dollar on screen comes from the engine (`src/engine`); the UI formats it (`formatMoney()` in `src/lib/format.ts`) and at most shows the difference between two engine totals.
 
-> Educational estimate — not insurance or tax advice. The plans, fees, dentists and claims in this repo are sample or demo data.
+The plans, fees, dentists and claims in this repo are sample or demo data.
 
 ## Run it
 
@@ -20,7 +20,7 @@ npm run build      # strict TypeScript check + production build into dist/
 
 ### Docker / isolated grading sandbox
 
-Declare the root **`Dockerfile`** when submitting. It builds without network access or credentials, including PDF/image OCR assets and the real calculation engine in a clearly labelled offline demo.
+Declare the root **`Dockerfile`** when submitting. It builds without network access or credentials, including PDF/image OCR assets and the real calculation engine in an offline demo.
 
 ```bash
 docker build --network=none -t ting .
@@ -189,3 +189,5 @@ Like a safe-driving app for teeth, but **rewards only**: sharing data can lower 
 The Section 0 application requirements in `design.md` govern this rebuild. See [implementation and test report](docs/revamp-validation.md), [independent UX review](docs/mobile-revamp-review.md) and [pricing/procedure handoff](docs/pricing-procedure-handoff.md). Run `npm test`, `npm run lint`, `npm run build` and `npm run e2e:local`. The local end-to-end suite builds the production bundle in mock API mode; it does not certify live AWS, carrier contracts, physical microphones/cameras/brushes or native calendar import.
 
 See [plan rules and survey release](docs/plan-rules-release.md) for the latest overview, restored survey, moving preference and PDF-worker fix. Run the targeted live journeys with `npx playwright test e2e/plan-updates.spec.ts e2e/release.spec.ts`.
+
+See [AgentMail setup and verification](docs/agentmail-release.md) for the live inbox, secure credential configuration and isolated mail delivery test.

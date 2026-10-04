@@ -47,7 +47,10 @@ async function call<T>(cfg: AgentMailConfig, path: string, init: RequestInit = {
     },
     signal: AbortSignal.timeout(15_000),
   });
-  if (!res.ok) throw new Error(`AgentMail ${init.method ?? 'GET'} ${path} → ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  if (!res.ok) {
+    await res.body?.cancel();
+    throw new Error(`AgentMail ${init.method ?? 'GET'} failed (${res.status})`);
+  }
   return (await res.json()) as T;
 }
 
@@ -169,11 +172,12 @@ export function verifySvix(secret: string, headers: Record<string, string | unde
   const ts = headers['svix-timestamp'];
   const sigs = headers['svix-signature'];
   if (!id || !ts || !sigs || !secret) return false;
-  if (Math.abs(now / 1000 - Number(ts)) > 300) return false; // replay window
+  if (!/^\d+$/.test(ts) || !Number.isSafeInteger(Number(ts)) || Math.abs(now / 1000 - Number(ts)) > 300) return false; // replay window
   const key = Buffer.from(secret.replace(/^whsec_/, ''), 'base64');
   const expected = createHmac('sha256', key).update(`${id}.${ts}.${body}`).digest();
   return sigs.split(' ').some((s) => {
-    const [, sig] = s.split(',');
+    const [version, sig] = s.split(',');
+    if (version !== 'v1') return false;
     const got = Buffer.from(sig ?? '', 'base64');
     return got.length === expected.length && timingSafeEqual(got, expected);
   });

@@ -43,7 +43,7 @@ ${blocks
   )
   .join('\n')}
 <tr><td style="padding:16px 24px 22px"><a href="${esc(WEB)}" style="display:inline-block;background:#ad1f2d;color:#fff;text-decoration:none;padding:10px 16px;border-radius:9px;font-weight:600;font-size:14px">${esc(cta)}</a></td></tr>
-<tr><td style="padding:0 24px 20px;font-size:11px;color:#78716c">Educational estimate — not insurance or tax advice. Reply to this email or forward anything about your dental care to Ting.</td></tr>
+<tr><td style="padding:0 24px 20px;font-size:11px;color:#78716c">Reply to this email or forward anything about your dental care to Ting.</td></tr>
 </table></td></tr></table></body></html>`;
   const text = [
     intro,
@@ -51,7 +51,6 @@ ${blocks
     ...blocks.flatMap((b) => [...(b.heading ? [b.heading.toUpperCase()] : []), ...b.lines.map((l) => `- ${l}`), '']),
     `${cta}: ${WEB}`,
     '',
-    'Educational estimate — not insurance or tax advice.',
   ].join('\n');
   return { subject, text, html };
 }

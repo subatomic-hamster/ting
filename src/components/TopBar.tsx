@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import type { Session } from "../api";
 import { authConfig, signIn, signOut, useAuth } from "../auth/auth";
-import { ToothIcon } from "./Icons";
 const members = [
   ["/", "Home"],
   ["/treatment", "Treatment"],
@@ -61,9 +60,11 @@ export function TopBar({
           <NavLink
             to="/"
             aria-label="Ting home"
-            className="flex min-h-12 items-center gap-2 text-xl font-medium text-brand-600"
+            className="flex min-h-12 shrink-0 items-center text-brand-600"
           >
-            <ToothIcon /> Ting
+            <span className="font-serif text-[34px] leading-none tracking-[-0.055em]">
+              Ting<span className="text-[28px]">.</span>
+            </span>
           </NavLink>
           <span className="min-w-0 flex-1 truncate text-xs text-muted">
             {members.find(([p]) => p === pathname)?.[1] ?? "Ting"}

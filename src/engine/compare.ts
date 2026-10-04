@@ -187,7 +187,6 @@ export interface EnrollmentCard {
   baselineTotal: number;
   expectedSavings: number;
   summary: string;
-  disclaimer: string;
 }
 
 export interface Comparison {
@@ -200,7 +199,6 @@ export interface Comparison {
   card: EnrollmentCard;
 }
 
-export const DISCLAIMER = 'Educational estimate — not insurance or tax advice.';
 
 /** Prioritize documented out-of-network coverage, then cost. No future fees or network reach are invented. */
 export function portabilityOption(profile: Profile, options: OptionResult[]): Comparison['portability'] {
@@ -281,6 +279,5 @@ export function enrollmentCard(profile: Profile, choice: OptionResult): Enrollme
     baselineTotal,
     expectedSavings,
     summary: `Your enrollment decisions: ${parts.join(' · ')}`,
-    disclaimer: DISCLAIMER,
   };
 }

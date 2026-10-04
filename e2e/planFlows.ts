@@ -45,6 +45,10 @@ export function registerPlanFlows() {
         .getByRole("link", { name: "Ting home", exact: true })
         .evaluate((el) => getComputedStyle(el).color),
     ).toBe("rgb(173, 31, 45)");
+    const wordmark = page.getByRole("link", { name: "Ting home", exact: true });
+    await expect(wordmark).toHaveText("Ting.");
+    expect(await wordmark.locator("span").first().evaluate((el) => getComputedStyle(el).fontFamily)).toContain("Source Serif 4");
+    await expect(page.getByText(/Educational estimates|Sample account/i)).toHaveCount(0);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth - innerWidth,

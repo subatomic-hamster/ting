@@ -175,9 +175,6 @@ export function ConsentDialog() {
             Delete claims, reminders and consent
           </button>
         </div>
-        <p className="mt-3 text-xs text-muted">
-          Educational estimates, not insurance or tax advice.
-        </p>
       </div>
     </div>
   );

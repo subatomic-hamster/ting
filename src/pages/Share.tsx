@@ -3,7 +3,6 @@ import { useParams, Link } from "react-router-dom";
 import { api, USE_MOCKS } from "../api";
 import { HandoffSheet } from "../components/HandoffSheet";
 import { HomeCareSummary } from "../components/habits/HomeCareSummary";
-import { EstimateFooter } from "../components/EstimateFooter";
 import { formatDate } from "../lib/format";
 export default function Share() {
   const { token = "" } = useParams();
@@ -50,15 +49,9 @@ export default function Share() {
     );
   return (
     <main className="member-content page-inset mx-auto max-w-3xl">
-      {(USE_MOCKS ||
-        snap.schedule.lines.some(
-          (l) =>
-            l.feeSource?.kind === "demo" || l.allowanceSource?.kind === "demo",
-        )) && (
+      {USE_MOCKS && (
         <p className="mb-5 text-xs text-muted">
-          Contains sample estimates.{" "}
-          {USE_MOCKS &&
-            "In this mode, shared links open only in the browser where they were created."}
+          This link opens only in the browser where it was created.
         </p>
       )}
       <HandoffSheet
@@ -80,7 +73,6 @@ export default function Share() {
           />
         </section>
       )}
-      <EstimateFooter />
     </main>
   );
 }

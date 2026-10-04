@@ -66,13 +66,12 @@ describe('FSA amount', () => {
 
 describe('Enrollment Card', () => {
   const { card } = compare(DEMO_PROFILE, DEMO_PLAN_OPTIONS);
-  it('sums up plan, FSA, dates and savings with the disclaimer', () => {
+  it('sums up plan, FSA, dates and savings', () => {
     expect(card.summary).toContain('choose Acme Dental High');
     expect(card.summary).toContain(`elect $${card.fsa.election.toLocaleString('en-US')} FSA`);
     expect(card.summary).toMatch(/before Dec 31 \(2026 FSA\)/);
     expect(card.summary).toMatch(/Jan 4 \(2027 FSA\)/);
     expect(card.expectedSavings).toBeGreaterThan(0);
-    expect(card.disclaimer).toBe('Educational estimate — not insurance or tax advice.');
     expect(card.items.find((i) => i.id === 'cr19')?.prepDated).toBe(true);
   });
 });

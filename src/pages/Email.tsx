@@ -43,7 +43,7 @@ function EmailSettings() {
         it, updates your record, plans any work and replies.
         {info.data && !info.data.live && (
           <span className="block text-xs text-muted">
-            Demo: email isn&rsquo;t connected here, so messages show under
+            Email delivery isn&rsquo;t connected yet. Messages show under
             &ldquo;What Ting sent&rdquo;.
           </span>
         )}

@@ -19,7 +19,7 @@ export default function TryIt() {
       <div className="card w-full max-w-md text-center">
         <h1>Try Ting on your phone</h1>
         <p className="mt-1 text-sm text-muted">
-          Explore sample treatment costs and change dates to compare estimates.
+          Explore treatment costs and change dates to compare options.
         </p>
         <div
           className="mx-auto mt-4 w-64"
@@ -28,11 +28,8 @@ export default function TryIt() {
           dangerouslySetInnerHTML={{ __html: svg }}
         />
         <p className="mt-3 font-mono text-xs break-all text-muted">{url}</p>
-        <p className="mt-4 text-xs text-muted">
-          This opens the sample account with illustrative fees.
-        </p>
         <Link to="/?persona=dale&demo=1" className="btn-primary mt-5 w-full">
-          Open the sample app
+          Open Ting
         </Link>
       </div>
     </div>
