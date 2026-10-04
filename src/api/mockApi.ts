@@ -34,6 +34,8 @@ async function fileText(file: File): Promise<string> {
 // --- ledger events ------------------------------------------------------------
 
 const ledgerListeners = new Set<(e: unknown) => void>();
+/** Claims fired this session per persona, replayed to each new subscriber like the WebSocket's `replay`. */
+const firedClaims = new Map<string, unknown[]>();
 
 /** Shared snapshots, this browser only (the AWS backend keeps them in DynamoDB). */
 const shares = new Map<string, ShareSnapshot>();
@@ -89,12 +91,15 @@ export const mockApi: TingApi = {
 
   subscribeLedger(onEvent) {
     ledgerListeners.add(onEvent);
+    // A claim fired before the app subscribed (the starting ledger was still loading) still lands.
+    for (const event of firedClaims.get(mock.personaId) ?? []) onEvent(event);
     return () => ledgerListeners.delete(onEvent);
   },
 
   async fireMockClaim(profile, opts) {
     await latency();
     const event = mockClaimEvent(profile, PERSONAS[mock.personaId].memberId, opts?.underpay);
+    firedClaims.set(mock.personaId, [...(firedClaims.get(mock.personaId) ?? []), event]);
     ledgerListeners.forEach((l) => l(event));
   },
 
@@ -111,7 +116,9 @@ export const mockApi: TingApi = {
     return shares.get(token) ?? null;
   },
 
-  async resetDemo() {},
+  async resetDemo() {
+    firedClaims.delete(mock.personaId);
+  },
 
   async submitRules(rules, evidence, source) {
     await latency();

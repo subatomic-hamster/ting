@@ -7,6 +7,7 @@ const outputs = JSON.parse(readFileSync(new URL('./infra/outputs.json', import.m
 
 export default defineConfig({
   testDir: 'e2e',
+  testIgnore: 'local/**',
   timeout: 60_000,
   expect: { timeout: 15_000 },
   fullyParallel: false,
